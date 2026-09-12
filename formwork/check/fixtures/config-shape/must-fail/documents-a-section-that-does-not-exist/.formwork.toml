@@ -1,0 +1,5 @@
+[bindings]
+runtime = "claude-code"
+
+[strength]
+git_boundary = "block"

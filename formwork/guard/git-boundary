@@ -1,0 +1,508 @@
+#!/usr/bin/env python3
+"""The version-control boundary. The rule that refuses rather than advises.
+
+    git-boundary --format claude-code      < hook payload on stdin
+    git-boundary --command "git commit"    decide a single command directly
+
+Exit status:
+    0   allow. Reading version-control state is required, not forbidden
+    1   warn. The command runs; the human is told what happened
+    2   refuse, with the reason on stderr
+
+IT FAILS CLOSED. If the guard cannot decide — an unreadable payload, an
+unknown runtime, nothing on stdin — it refuses. A boundary that fails open is
+a boundary nobody notices is gone, and that is the worse of the two mistakes.
+A boundary that fails closed is noticed within one command.
+
+STRENGTH IS CONFIGURABLE, AND HAS TO BE
+---------------------------------------
+    .formwork.toml    [strength] git_boundary = "block" | "warn" | "off"
+    environment       FORMWORK_GIT_BOUNDARY=off   overrides it for one session
+
+block is the default, and the right setting for one person working alone. A
+team whose reviewer is in another timezone is stopped for twelve hours by a
+rule that costs a solo builder ten minutes.
+
+**What this does not do is stop the agent turning it off.** Nothing can. What
+protects you is that the change is visible: editing .formwork.toml shows up in
+`git status`, and the report is required to carry `git status`. The protection
+is a trace, not a lock, and calling it a lock would be a lie.
+
+Four runtimes refuse a tool call on exit code 2, so one program serves all of
+them. Only the payload shape differs, and --format says which.
+
+WHAT THIS CANNOT SEE
+--------------------
+Named, because an unqualified pass reads as total coverage and this is not.
+
+  * A command built at run time from variables, or decoded from a string.
+  * A script on disk that commits. This reads the command, not what it runs.
+  * An editor, an IDE button, or anything outside the agent's tool calls.
+  * A runtime with no pre-tool hook. There the rule is advice and says so.
+
+It catches the ordinary cases, which is what a boundary is for. It is not a
+sandbox and must not be described as one.
+
+Python 3, standard library only, no dependencies.
+"""
+import json
+import os
+import re
+import shlex
+import sys
+
+ALLOW, WARN, REFUSE = 0, 1, 2
+
+STRENGTHS = ("block", "warn", "off")
+
+# Subcommands that change history, the index, or a remote.
+WRITES = {
+    "commit", "push", "merge", "rebase", "revert", "cherry-pick", "am",
+    "reset", "add", "rm", "mv", "clean", "restore",
+    "update-ref", "update-index", "filter-branch",
+    "filter-repo", "replace", "gc", "prune",
+    "send-email", "request-pull", "subtree",
+}
+
+# Read-only. These must pass, or the report cannot be written.
+READS = {
+    "status", "diff", "log", "show", "ls-files", "ls-tree", "ls-remote",
+    "rev-parse", "rev-list", "cat-file", "blame", "describe", "shortlog",
+    "grep", "whatchanged", "reflog", "bisect", "annotate", "count-objects",
+    "check-ignore", "check-attr", "verify-commit", "merge-base", "diff-tree",
+    "diff-index", "name-rev", "for-each-ref", "var", "help", "version",
+}
+
+# Read when bare, write with certain flags.
+#
+# `stash`, `notes` and `cherry` sit here rather than in WRITES: an audit found
+# `git stash list`, `git notes list` and `git cherry -v` refused with the
+# message "git stash changes the repository", which is false. A guard that is
+# wrong about ordinary work is a guard somebody switches off.
+CONDITIONAL = {
+    "branch":   ("-d", "-D", "-m", "-M", "-c", "-C", "--delete", "--move",
+                 "--copy", "--set-upstream-to", "--edit-description"),
+    "tag":      ("-d", "-a", "-s", "-f", "--delete", "--annotate", "--sign",
+                 "--force"),
+    # `git config core.hooksPath /dev/null` switches off every hook in the
+    # repository, this kit's included, and needs none of the flags below.
+    # Anything past a bare `git config <key> <value>` is a write.
+    "config":   ("--add", "--unset", "--unset-all", "--replace-all",
+                 "--rename-section", "--remove-section", "--edit", "-e"),
+    "remote":   ("add", "remove", "rm", "set-url", "set-head", "rename",
+                 "prune", "set-branches"),
+    "worktree": ("add", "remove", "prune", "move", "lock", "unlock"),
+    "checkout": ("-b", "-B", "--orphan", "--"),
+    "switch":   ("-c", "-C", "--create", "--orphan"),
+    "submodule": ("add", "update", "deinit", "sync", "set-url", "foreach"),
+    "stash":    ("push", "pop", "apply", "drop", "clear", "save", "store",
+                 "create", "branch", "-u", "-p", "--include-untracked"),
+    "notes":    ("add", "append", "copy", "edit", "remove", "prune", "merge"),
+    "cherry":   (),
+    # `git apply --check` is explicitly a dry run; `git symbolic-ref --short
+    # HEAD` is the standard way to read the branch name. Both were refused.
+    "apply":    (),   # handled below: bare apply writes, --check does not
+    "symbolic-ref": ("-d", "--delete", "-m"),
+    "fetch":    ("--prune", "-p", "--force", "-f", "--tags", "--unshallow"),
+    "format-patch": ("-o", "--output-directory"),
+}
+
+# Global options these tools take before the subcommand, with a value.
+GH_FLAGS_WITH_VALUE = {"-R", "--repo", "--hostname", "-X", "--method",
+                       "-F", "-f", "--jq", "--template"}
+
+# Raising or merging a change request is the same boundary, different tool.
+FORGE = {
+    "gh": {"pr": ("create", "merge", "close", "ready", "edit", "comment",
+                  "review", "reopen"),
+           "release": ("create", "delete", "edit", "upload"),
+           "repo": ("create", "delete", "edit", "fork", "sync"),
+           "issue": ("create", "close", "edit", "comment", "reopen")},
+    "glab": {"mr": ("create", "merge", "close", "update"),
+             "release": ("create", "delete")},
+}
+
+# Wrappers that sit in front of the real command.
+PREFIXES = {"sudo", "env", "time", "nohup", "nice", "command", "exec",
+            "doas", "stdbuf", "timeout"}
+
+# Shell grouping and loop words. They are punctuation, not programs, and left
+# in place they became words[0] — so `for f in x; do git push; done` and
+# `(git push)` were both allowed.
+GROUPING = {"(", "{", "}", ")", "then", "else", "do", "done", "fi", "!",
+            "for", "while", "until", "if", "in", "case", "esac", "elif"}
+
+# Wrapper flags that consume the next token, so it is not the command either.
+WRAPPER_FLAGS_WITH_VALUE = {"-n", "-u", "-s", "-k", "-i", "-C", "-o", "-g"}
+
+# Shells and runners that take a command as an ARGUMENT. Whatever follows is
+# inspected in its own right; otherwise `bash -c "git commit"` walked through.
+INDIRECT = {"bash", "sh", "zsh", "ksh", "dash", "eval", "xargs", "watch"}
+
+# Grouping characters are punctuation, not part of the program name. Without
+# this, "(rm <guard>)" tokenised as "(rm" and matched nothing.
+GROUPING_EDGE = re.compile(r"(?<![\w-])([(){}])(?![\w-])|([(){}])")
+
+
+def ungroup(text):
+    return GROUPING_EDGE.sub(lambda m: " %s " % (m.group(1) or m.group(2)), text)
+
+
+SPLIT = re.compile(r"(?:&&|\|\||[;|&\n])")
+# Text being written is data, not instruction. A here-document body is the
+# contents of a file, and reading it as a command refused a legitimate write
+# while this kit's own tests were being written.
+HEREDOC = re.compile(r"<<-?\s*'?\"?([A-Za-z_][A-Za-z0-9_]*)'?\"?.*?^\1",
+                     re.S | re.M)
+ASSIGNMENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
+
+
+def strength(root=None):
+    """block, warn or off. Environment wins, then the file, then the default."""
+    env = os.environ.get("FORMWORK_GIT_BOUNDARY", "").strip().lower()
+    if env in STRENGTHS:
+        return env
+    root = root or os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
+    config = os.path.join(root, ".formwork.toml")
+    if os.path.exists(config):
+        try:
+            text = open(config, encoding="utf-8", errors="ignore").read()
+        except OSError:
+            return "block"
+        m = re.search(r'^\s*git_boundary\s*=\s*["\']([^"\']+)["\']', text, re.M)
+        if m and m.group(1).strip().lower() in STRENGTHS:
+            return m.group(1).strip().lower()
+    return "block"
+
+
+def tokens(segment):
+    """Rough split. Quotes are stripped; this reads intent, not syntax.
+
+    A leading backslash is removed: `\\git push` is the standard way to step
+    past a shell alias, and it ran straight through this guard.
+    """
+    out = []
+    for t in segment.split():
+        t = t.strip("'\"")
+        if t.startswith("\\") and len(t) > 1:
+            t = t[1:]
+        if t:
+            out.append(t)
+    return out
+
+
+def strip_prefixes(words):
+    """Drop leading wrappers to reach the real command.
+
+    Wrappers take options of their own — `nice -n 5`, `timeout 60`,
+    `env -u FOO`, `sudo -u me`. Stopping at the first token that is not a
+    known wrapper meant any of those shielded whatever came after it, and
+    `nice -n 5 git push` was allowed.
+    """
+    i = 0
+    while i < len(words):
+        w = words[i]
+        if w in GROUPING:
+            i += 1
+            continue
+        if ASSIGNMENT.match(w) or w in PREFIXES:
+            i += 1
+            # Skip the wrapper's own flags, and a value where one is taken.
+            while i < len(words) and words[i].startswith("-"):
+                takes_value = words[i] in WRAPPER_FLAGS_WITH_VALUE
+                i += 1
+                if takes_value and i < len(words):
+                    i += 1
+            # A bare number after a wrapper is its argument, not a command.
+            if i < len(words) and words[i].isdigit():
+                i += 1
+            continue
+        break
+    return words[i:]
+
+
+def git_subcommand(words):
+    """Skip git's own options to reach the subcommand. Handles -C and -c."""
+    i = 1
+    while i < len(words):
+        w = words[i]
+        if w in ("-C", "-c", "--git-dir", "--work-tree", "--namespace",
+                 "--exec-path"):
+            i += 2
+            continue
+        if w.startswith("--git-dir=") or w.startswith("--work-tree=") \
+                or w.startswith("--namespace=") or w.startswith("-c"):
+            i += 1
+            continue
+        if w.startswith("-"):
+            i += 1
+            continue
+        return w, words[i + 1:]
+    return None, []
+
+
+def verdict_for(segment):
+    """Return a reason to refuse, or None."""
+    words = strip_prefixes(tokens(segment))
+    if not words:
+        return None
+    program = os.path.basename(words[0])
+
+    if program == "git":
+        sub, rest = git_subcommand(words)
+        if sub is None:
+            return None
+        if sub in READS:
+            return None
+        if sub in WRITES:
+            return "git %s changes the repository" % sub
+        if sub in CONDITIONAL:
+            for flag in CONDITIONAL[sub]:
+                if flag in rest:
+                    return "git %s %s changes the repository" % (sub, flag)
+            # Some subcommands write with no flag at all, purely by having
+            # arguments. `git config a.b c` sets a value. `git checkout FILE`
+            # discards uncommitted work. Both were allowed.
+            plain = [r for r in rest if not r.startswith("-")]
+            # Bare `git stash` is `git stash push`. It moves your changes.
+            if sub == "stash" and not plain:
+                return "git stash with no subcommand stashes your changes"
+            # `git apply` writes unless it is one of the dry runs.
+            if sub == "apply" and not any(
+                    r.startswith(("--check", "--stat", "--summary",
+                                  "--numstat")) for r in rest):
+                return "git apply changes files in the working tree"
+            # --get and --list read, whatever scope they are given. Refusing
+            # `git config --global --get user.name` was a false positive, and
+            # the message said it changed the repository, which is untrue.
+            if sub == "config" and any(
+                    r.startswith(("--get", "--list", "-l")) for r in rest):
+                return None
+            if sub == "config" and len(plain) >= 2:
+                return ("git config with a value writes to the repository's "
+                        "configuration, and one such write can switch off "
+                        "every hook in it")
+            if sub == "checkout" and plain:
+                return ("git checkout with a path discards uncommitted work "
+                        "in it")
+            return None
+        # An unknown subcommand is not waved through. Say so rather than
+        # guessing, and let a human decide.
+        return "git %s is not on the read-only list" % sub
+
+    if program in FORGE:
+        # Skip the tool's own global options and their values. Reading
+        # words[1] and words[2] positionally meant `gh -R owner/repo pr
+        # create` was invisible.
+        rest = []
+        skip = False
+        for w in words[1:]:
+            if skip:
+                skip = False
+                continue
+            if w.startswith("-"):
+                skip = "=" not in w and w in GH_FLAGS_WITH_VALUE
+                continue
+            rest.append(w)
+        # `gh api -X POST ...` has no group/action pair to read at all.
+        if rest and rest[0] == "api" and re.search(
+                r"(?:-X|--method)\s+(POST|PUT|PATCH|DELETE)", segment, re.I):
+            return ("%s api with a writing method changes the repository"
+                    % program)
+        if len(rest) < 2:
+            return None
+        group, action = rest[0], rest[1]
+        if group in FORGE[program] and action in FORGE[program][group]:
+            return "%s %s %s changes a shared repository" % (program, group, action)
+        return None
+
+    return None
+
+
+# A heredoc body is data only when it is being written somewhere. Fed to a
+# shell or an interpreter it is code, and stripping it hid the command
+# completely. This was introduced by the fix for the opposite false positive,
+# which is a good reminder that a guard change needs its own test.
+SHELL_SINK = re.compile(
+    r"(?:^|[;&|]|\$\(|`)\s*(?:[A-Za-z_][A-Za-z0-9_]*=\S*\s+)*"
+    r"(?:sudo|env|nice|timeout|command|exec)?\s*"
+    r"(?:/\S*/)?(?:ba|z|k|da)?sh|python[0-9.]*|perl|ruby|node|eval\b")
+
+
+def strip_heredocs(command):
+    """Remove heredoc bodies, unless the receiving program can execute them."""
+    def keep_or_drop(m):
+        before = command[:m.start()]
+        line = before.rsplit("\n", 1)[-1]
+        if SHELL_SINK.search(line):
+            return m.group(0)        # it is code. Leave it to be inspected.
+        return "<<REDACTED"
+    return HEREDOC.sub(keep_or_drop, command)
+
+
+def decide(command):
+    """(refuse?, reason). Every segment of a compound command is examined.
+
+    A here-document body is removed first. It is content being written, not an
+    instruction. Writing a file whose text happens to contain "git commit" was
+    refused while this kit's own tests were being written, which is a false
+    positive rather than a boundary.
+
+    A command passed as an argument to a shell — `bash -c "git push"` — is
+    unwrapped and examined in its own right. An audit walked through this
+    guard with `bash -c`, `eval`, backticks and `$(...)`, so those are
+    unwrapped too.
+
+    **This is not containment and does not claim to be.** A determined agent
+    can encode a command in a form no regular expression will recognise. What
+    this stops is the ordinary path: the everyday `git commit` that should
+    have been a human's decision. See formwork/limits.md.
+    """
+    command = strip_heredocs(command)
+    for segment in split_all(command):
+        reason = verdict_for(segment)
+        if reason:
+            return True, reason
+    return False, None
+
+
+SUBSHELL = re.compile(r"\$\(([^()]*)\)|`([^`]*)`")
+
+
+def split_all(command, depth=0):
+    """Every command line in this string, including nested ones.
+
+    Command substitution runs what is inside it. `echo $(git push)` pushes.
+    Shell wrappers run their argument. Both were invisible to a guard that
+    only split on `;` and `&&`.
+    """
+    if depth > 4:
+        return
+    for m in SUBSHELL.finditer(command):
+        inner = m.group(1) or m.group(2) or ""
+        for seg in split_all(inner, depth + 1):
+            yield seg
+    stripped = ungroup(SUBSHELL.sub(" ", command))
+    for segment in SPLIT.split(stripped):
+        yield segment
+        # For a wrapper, the argument must keep its quoting: the command is
+        # one token, not the words it is made of.
+        try:
+            quoted = shlex.split(segment)
+        except ValueError:
+            quoted = tokens(segment)
+        words = strip_prefixes(quoted)
+        if words and os.path.basename(words[0]) in INDIRECT:
+            for w in words[1:]:
+                if w.startswith("-"):
+                    continue
+                for seg in split_all(w, depth + 1):
+                    yield seg
+                break
+
+
+FORMATS = {
+    # Where each runtime puts the shell command inside its hook payload.
+    "claude-code": ("tool_input", "command"),
+    "codex":       ("tool_input", "command"),
+    "cursor":      ("tool_input", "command"),
+    "gemini-cli":  ("tool_input", "command"),
+}
+
+
+def command_from_payload(payload, fmt):
+    """The shell command in this payload, or None when it cannot be read.
+
+    None means refuse. Three of the four runtimes have never been run, so the
+    exact payload shape is NOT ESTABLISHED for them. A guard that silently
+    allows whatever it failed to parse is worse than no guard, because it
+    reports success.
+    """
+    if not isinstance(payload, dict):
+        return None
+    outer, inner = FORMATS[fmt]
+    box = payload.get(outer)
+    if box is None:
+        box = payload              # runtimes that put the fields at the top
+    if not isinstance(box, dict):
+        return None
+    for key in (inner, "command", "cmd"):
+        v = box.get(key)
+        if isinstance(v, str):
+            return v
+        if v is not None:
+            return None            # present, and not a string. Do not guess.
+    return ""
+
+
+def main(argv):
+    fmt, command = None, None
+    i = 1
+    while i < len(argv):
+        if argv[i] == "--format" and i + 1 < len(argv):
+            fmt = argv[i + 1]; i += 2; continue
+        if argv[i] == "--command" and i + 1 < len(argv):
+            command = argv[i + 1]; i += 2; continue
+        i += 1
+
+    if command is None:
+        if fmt is None:
+            print("ERROR: give --command, or --format with a payload on stdin",
+                  file=sys.stderr)
+            return REFUSE
+        if fmt not in FORMATS:
+            print("ERROR: unknown runtime format: %s" % fmt, file=sys.stderr)
+            print("       The guard did not decide, so it refuses. Failing "
+                  "open would hide the fact that the boundary is gone.",
+                  file=sys.stderr)
+            return REFUSE
+        raw = sys.stdin.read()
+        if not raw.strip():
+            print("ERROR: no payload arrived on stdin.", file=sys.stderr)
+            print("       The guard did not decide, so it refuses. This "
+                  "usually means the hook is wired up wrongly.",
+                  file=sys.stderr)
+            return REFUSE
+        try:
+            payload = json.loads(raw)
+        except ValueError as e:
+            print("ERROR: payload is not readable: %s" % e, file=sys.stderr)
+            print("       Refusing rather than guessing.", file=sys.stderr)
+            return REFUSE
+        command = command_from_payload(payload, fmt)
+        if command is None:
+            print("ERROR: payload is not a shape this guard understands.",
+                  file=sys.stderr)
+            print("       Refusing rather than allowing something unread.",
+                  file=sys.stderr)
+            return REFUSE
+
+    if not command:
+        # A payload with no shell command in it. Reading a file, editing one,
+        # calling a tool that is not a shell. Nothing to inspect.
+        return ALLOW
+
+    refuse, reason = decide(command)
+    if not refuse:
+        return ALLOW
+
+    level = strength()
+    if level == "off":
+        return ALLOW
+    if level == "warn":
+        print("The version-control boundary would have refused this: %s."
+              % reason, file=sys.stderr)
+        print("It is set to warn, so the command ran.", file=sys.stderr)
+        return WARN
+
+    print("REFUSED by the version-control boundary: %s." % reason,
+          file=sys.stderr)
+    print("The human does all of it. Report what you would have run, and stop.",
+          file=sys.stderr)
+    print("To change this for one session: FORMWORK_GIT_BOUNDARY=warn, or off.",
+          file=sys.stderr)
+    return REFUSE
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

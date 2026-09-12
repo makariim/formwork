@@ -1,0 +1,349 @@
+#!/usr/bin/env python3
+"""Generate each runtime's role files from one source.
+
+    formwork/build                 write files for the runtime in .formwork.toml
+    formwork/build --all           write files for every runtime
+    formwork/build --runtime codex just that one
+    formwork/build --check         regenerate in memory and compare. Change nothing
+
+Exit status:
+    0   done, or --check found everything current
+    1   --check found a generated file that is stale or hand-edited
+    2   could not run
+
+WHY GENERATE AT ALL
+-------------------
+Four runtimes want role definitions in four shapes. Keeping four hand-written
+copies of twenty-seven roles is the duplication that drifts — one gets updated
+and the others quietly do not, and nothing announces it.
+
+One source, generated outward, with a check that regeneration produces
+identical bytes. A hand-edit to a generated file then fails the gate instead of
+surviving.
+
+WHAT EACH RUNTIME GETS, AND WHY CURSOR GETS NOTHING
+---------------------------------------------------
+    claude-code   .claude/agents/<name>.md      markdown, tools by name
+    gemini-cli    .gemini/agents/<name>.md      markdown, tools by name
+    codex         .codex/agents/<name>.toml     TOML, no tool list at all
+    cursor        nothing is written
+
+Cursor's own documentation names `.claude/agents/` as a location it reads. So
+the Claude Code output serves it directly, and generating a second identical
+tree would be duplication for its own sake.
+
+THE TOOL GRANT DOES NOT SURVIVE EVERY TRANSLATION
+-------------------------------------------------
+Claude Code and Gemini CLI take a named list and enforce it. Cursor has one
+boolean. Codex has a sandbox mode, which is not a tool list.
+
+This generator writes the grant where it can be expressed and **says in the
+generated file where it cannot**, rather than emitting something that looks
+like a restriction and is not. That was decided deliberately; the two rejected
+alternatives are recorded in docs/role-formats.md.
+
+Python 3, standard library only, no dependencies.
+"""
+import os
+import re
+import sys
+
+CLEAN, STALE, CANNOT_RUN = 0, 1, 2
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(HERE)
+ROLES = os.path.join(HERE, "roles")
+
+BANNER = ("GENERATED FROM %s — DO NOT EDIT.\n"
+          "Change the source and run formwork/build. A hand-edit here fails "
+          "the gate.")
+
+# The kit's five abstract grants, mapped to what each runtime actually calls
+# them. None means the name is not established, and the generator will not
+# invent one.
+TOOL_NAMES = {
+    "claude-code": {
+        "read":  ["Read", "Glob", "Grep"],
+        "write": ["Write", "Edit"],
+        "run":   ["Bash"],
+        "web":   ["WebFetch", "WebSearch"],
+        "spawn": ["Task"],
+    },
+    "gemini-cli": {
+        "read":  ["read_file", "grep_search"],
+        "run":   ["run_shell_command"],
+        # Established from the publisher's own example. The name of the
+        # file-writing tool is NOT among the documented examples, and guessing
+        # it would produce an allowlist that silently omits a tool the role
+        # needs. See docs/role-formats.md.
+        "write": None,
+        "web":   None,
+        "spawn": None,
+    },
+}
+
+# Runtimes that can hold a role to its grant at all.
+ENFORCES = {"claude-code", "gemini-cli"}
+
+TARGETS = {
+    "claude-code": (os.path.join(".claude", "agents"), ".md"),
+    "gemini-cli":  (os.path.join(".gemini", "agents"), ".md"),
+    "codex":       (os.path.join(".codex", "agents"), ".toml"),
+}
+ALL_RUNTIMES = tuple(sorted(TARGETS)) + ("cursor",)
+
+
+def read_roles():
+    out = []
+    for sub in ("method", "packs", "project"):
+        d = os.path.join(ROLES, sub)
+        if not os.path.isdir(d):
+            continue
+        for fn in sorted(os.listdir(d)):
+            if not fn.endswith(".md") or fn.upper().startswith(("TEMPLATE",
+                                                                "HOW-TO",
+                                                                "README")):
+                continue
+            out.append(os.path.join(d, fn))
+    return out
+
+
+def parse(path):
+    text = open(path, encoding="utf-8").read()
+    m = re.match(r"^---\n(.*?)\n---\n(.*)$", text, re.S)
+    if not m:
+        return None
+    meta = {}
+    for line in m.group(1).split("\n"):
+        if ":" in line:
+            k, v = line.split(":", 1)
+            meta[k.strip()] = v.strip()
+    body = m.group(2).lstrip("\n")
+    # Accept both `tools: ["read", "write"]` and `tools: [read, write]`.
+    # Reading only the quoted form meant an unquoted list parsed as NO grants,
+    # which emitted frontmatter with no tools key at all — and in Claude Code
+    # that grants every tool. The safest-looking role got the widest grant.
+    raw = meta.get("tools", "")
+    tools = re.findall(r'"([a-z]+)"', raw) or re.findall(r"\b([a-z]+)\b", raw)
+    owns = re.search(r"^\*\*Owns\.\*\*\s*(.+?)(?:\n\n|\Z)", body, re.S | re.M)
+    description = " ".join(owns.group(1).split()) if owns else meta.get("name", "")
+    if len(description) > 300:
+        description = description[:297].rsplit(" ", 1)[0] + "…"
+    return {"name": meta.get("name", ""), "pack": meta.get("pack", ""),
+            "owns": meta.get("owns", ""), "tools": tools,
+            "description": description, "body": body,
+            "source": os.path.relpath(path, ROOT)}
+
+
+def resolve_tools(runtime, grants):
+    """(names, unmapped). names is None when the list cannot be completed."""
+    table = TOOL_NAMES.get(runtime)
+    if table is None:
+        return None, list(grants)
+    names, unmapped = [], []
+    for g in grants:
+        got = table.get(g)
+        if got is None:
+            unmapped.append(g)
+        else:
+            names.extend(got)
+    if unmapped:
+        return None, unmapped
+    return names, []
+
+
+def render_markdown(role, runtime):
+    names, unmapped = resolve_tools(runtime, role["tools"])
+    if not role["tools"]:
+        # No grant could be read at all. Emitting frontmatter without a tools
+        # key means "every tool" on some runtimes, so say so instead.
+        unmapped = ["(the grant could not be read from the source)"]
+    lines = ["---", "name: %s" % role["name"],
+             "description: %s" % role["description"]]
+    if runtime == "gemini-cli":
+        lines.append("kind: local")
+    if names:
+        if runtime == "claude-code":
+            lines.append("tools: %s" % ", ".join(names))
+        else:
+            lines.append("tools:")
+            lines += ["  - %s" % n for n in names]
+    lines.append("---")
+    lines.append("")
+    for line in (BANNER % role["source"]).split("\n"):
+        lines.append("<!-- %s -->" % line)
+    lines.append("")
+    if unmapped:
+        lines.append("> **This role's tool grant is not expressed here.** It "
+                     "asks for %s, and %s does not have a documented name for "
+                     "%s. An incomplete allowlist would quietly remove a tool "
+                     "the role needs, so none is written. The grant is advice "
+                     "on this runtime."
+                     % (", ".join("`%s`" % t for t in role["tools"]),
+                        runtime, " and ".join("`%s`" % u for u in unmapped)))
+        lines.append("")
+    lines.append(role["body"].rstrip())
+    lines.append("")
+    return "\n".join(lines)
+
+
+def toml_escape(s):
+    return s.replace("\\", "\\\\").replace('"', '\\"')
+
+
+def render_toml(role):
+    banner = (BANNER % role["source"]).split("\n")
+    out = ["# %s" % b for b in banner]
+    out.append("")
+    out.append('name = "%s"' % toml_escape(role["name"]))
+    out.append('description = "%s"' % toml_escape(role["description"]))
+    out.append("")
+    out.append("# This runtime has a sandbox mode rather than a tool list, so")
+    out.append("# the grant %s is not expressed here. It is advice on Codex."
+               % ", ".join(role["tools"]))
+    out.append("")
+    out.append('developer_instructions = """')
+    out.append(role["body"].rstrip().replace('"""', '\\"\\"\\"'))
+    out.append('"""')
+    out.append("")
+    return "\n".join(out)
+
+
+def existing_targets():
+    """Runtimes whose generated tree is already present in this project.
+
+    A fork that uses one runtime should not be made to generate files for
+    three. But a tree that exists must stay current, or a stale agent
+    definition survives unnoticed — which is the whole reason this generator
+    exists.
+    """
+    out = []
+    for runtime, (folder, _ext) in sorted(TARGETS.items()):
+        if os.path.isdir(os.path.join(ROOT, folder)):
+            out.append(runtime)
+    return out
+
+
+def orphans(files, runtimes):
+    """Generated files with no source, in the trees we generate into.
+
+    An agent definition added by hand, or one left behind after its source was
+    deleted, used to pass unnoticed: --check only compared files the source
+    produces. A hand-written agent with every tool granted is exactly what
+    this kit exists to prevent.
+    """
+    expected = set(files)
+    found = []
+    for runtime in runtimes:
+        if runtime == "cursor":
+            continue
+        folder, ext = TARGETS[runtime]
+        d = os.path.join(ROOT, folder)
+        if not os.path.isdir(d):
+            continue
+        for fn in sorted(os.listdir(d)):
+            if not fn.endswith(ext):
+                continue
+            rel = os.path.join(folder, fn)
+            if rel not in expected:
+                found.append(rel)
+    return found
+
+
+def outputs(runtimes):
+    """{path: contents} for every runtime asked for."""
+    files = {}
+    roles = [parse(p) for p in read_roles()]
+    roles = [r for r in roles if r and r["name"]]
+    if not roles:
+        return None
+    for runtime in runtimes:
+        if runtime == "cursor":
+            continue                       # reads .claude/agents/ directly
+        folder, ext = TARGETS[runtime]
+        for role in roles:
+            rel = os.path.join(folder, role["name"] + ext)
+            if ext == ".toml":
+                files[rel] = render_toml(role)
+            else:
+                files[rel] = render_markdown(role, runtime)
+    return files
+
+
+def configured_runtime():
+    config = os.path.join(ROOT, ".formwork.toml")
+    if os.path.exists(config):
+        text = open(config, encoding="utf-8", errors="ignore").read()
+        m = re.search(r'^\s*runtime\s*=\s*["\']([^"\']+)["\']', text, re.M)
+        if m and m.group(1) in ALL_RUNTIMES:
+            return m.group(1)
+    return "claude-code"
+
+
+def main(argv):
+    check_only = "--check" in argv
+    if "--all" in argv:
+        runtimes = [r for r in ALL_RUNTIMES if r != "cursor"]
+    elif check_only and "--runtime" not in argv:
+        # Check the configured runtime, plus any tree already present. A fork
+        # using one runtime is not made to generate files for three, and a
+        # tree that does exist is still held to being current.
+        runtimes = sorted(set([configured_runtime()] + existing_targets())
+                          - {"cursor"})
+        if not runtimes:
+            runtimes = ["claude-code"]
+    elif "--runtime" in argv:
+        i = argv.index("--runtime")
+        if i + 1 >= len(argv) or argv[i + 1] not in ALL_RUNTIMES:
+            print("ERROR: --runtime needs one of: %s" % ", ".join(ALL_RUNTIMES),
+                  file=sys.stderr)
+            return CANNOT_RUN
+        runtimes = [argv[i + 1]]
+    else:
+        runtimes = [configured_runtime()]
+
+    if runtimes == ["cursor"]:
+        print("cursor reads .claude/agents/, so nothing is generated for it")
+        runtimes = ["claude-code"]
+
+    files = outputs(runtimes)
+    if files is None:
+        print("ERROR: no roles found under %s" % ROLES, file=sys.stderr)
+        return CANNOT_RUN
+
+    if check_only:
+        stale = ["%s — generated, but nothing in formwork/roles/ produces it"
+                 % o for o in orphans(files, runtimes)]
+        for rel, content in sorted(files.items()):
+            full = os.path.join(ROOT, rel)
+            if not os.path.exists(full):
+                stale.append("%s — missing" % rel)
+            elif open(full, encoding="utf-8").read() != content:
+                stale.append("%s — differs from what the source produces" % rel)
+        if stale:
+            print("%d generated file(s) are not current:" % len(stale))
+            for s in stale:
+                print("  %s" % s)
+            print("  Run formwork/build. If you edited one by hand, that edit "
+                  "is about to be lost — move it to the source first.")
+            return STALE
+        print("%d generated file(s), all current" % len(files))
+        return CLEAN
+
+    written = 0
+    for rel, content in sorted(files.items()):
+        full = os.path.join(ROOT, rel)
+        os.makedirs(os.path.dirname(full), exist_ok=True)
+        existing = None
+        if os.path.exists(full):
+            existing = open(full, encoding="utf-8").read()
+        if existing != content:
+            open(full, "w", encoding="utf-8").write(content)
+            written += 1
+    print("%d role file(s) considered, %d written, for: %s"
+          % (len(files), written, ", ".join(runtimes)))
+    return CLEAN
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

@@ -1,0 +1,556 @@
+#!/usr/bin/env python3
+"""The self-protection boundary. The kit refusing to be quietly disarmed.
+
+    protected-files --format claude-code     < hook payload on stdin
+    protected-files --command "sed -i ..."   decide a single shell command
+    protected-files --path formwork/check/run  decide a single file write
+
+Exit status, the same contract as every other guard:
+
+    0   allow
+    1   warn. The write happens; the human is told
+    2   refuse, with the reason on stderr
+
+WHY THIS EXISTS
+---------------
+Every rule in this kit is enforced by a program, and every one of those
+programs is an ordinary file. Turning the strongest rule off was four
+characters — `block` becomes `off` — and nothing anywhere noticed.
+
+So the things that do the enforcing are themselves protected: the guards, the
+gate, the checks, the wiring, and the word lists.
+
+THE LIMIT, STATED PLAINLY
+-------------------------
+**This is not a lock. Calling it one would be a lie.**
+
+Anything with shell access can do what a person can do. A determined agent can
+assemble a command this cannot read, or edit a file through an interpreter.
+
+What the three layers together buy is that **it cannot happen quietly**:
+
+  * this guard refuses the direct routes
+  * the integrity check notices anything that got through, including edits
+    made by a human in an editor
+  * both leave the change visible in the report
+
+Prevention is not available. Silence is what is being removed.
+
+Python 3, standard library only, no dependencies.
+"""
+import json
+import os
+import re
+import shlex
+import sys
+
+ALLOW, WARN, REFUSE = 0, 1, 2
+STRENGTHS = ("block", "warn", "off")
+
+# Everything that does the enforcing. A path prefix matches its whole subtree.
+PROTECTED = (
+    "formwork/guard/",
+    "formwork/check/run",
+    "formwork/check/checks/",
+    "formwork/check/fixtures/",
+    "formwork/adapters/",
+    ".formwork.toml",
+    ".claude/settings.json",
+    ".codex/hooks.json",
+    ".cursor/hooks.json",
+    ".gemini/settings.json",
+)
+
+# Where state actually lives, if it has been moved. Honoured by the checks and
+# the installer, and ignored here — so `rm $FORMWORK_STATE_DIR/fingerprints.txt`
+# was allowed for every user who relocated it.
+STATE_DIR = os.environ.get("FORMWORK_STATE_DIR", "")
+
+# The word lists live outside the repository, so they are named by home path.
+PROTECTED_HOME = (
+    ".formwork/denylist-anycase.txt",
+    ".formwork/denylist-exact.txt",
+    ".formwork/denylist-capitalised.txt",
+    ".formwork/allowlist.txt",
+    ".formwork/fingerprints.txt",
+    ".formwork/source-repos.txt",
+)
+
+# Programs that always write when pointed at a path.
+# Of the writers, the ones that take something away rather than add to it.
+# Only these make the directory HOLDING a protected file protected too.
+DESTROYERS = {"rm", "mv", "shred", "rmdir", "trash"}
+
+WRITERS = {
+    "tee", "cp", "mv", "rm", "rmdir", "install", "truncate", "dd", "ln",
+    "touch", "chown", "shred", "patch", "ed", "sponge",
+    "python", "python3", "perl", "ruby", "node",
+}
+
+# Programs that only write when told to. Refusing them unconditionally was a
+# false positive three times in one session, and a guard that is wrong about
+# ordinary work gets switched off by somebody busy.
+CONDITIONAL_WRITERS = {
+    # a stream editor prints to standard output unless asked to edit in place
+    "sed": ("-i", "--in-place"),   # the long form is the Linux spelling
+    "awk": ("-i", "-i.bak", "--in-place"),
+    "gawk": ("-i", "--in-place"),
+    # perl is deliberately NOT here: it is in WRITERS, and being in both
+    # meant this branch returned None before the inline-script rule ran.
+}
+
+
+def chmod_disarms(words):
+    """True when a chmod would remove permission rather than add it.
+
+    Adding the executable bit is how a new check gets finished; it cannot
+    disarm anything. Removing permissions is how a guard gets disabled without
+    editing a byte of it.
+    """
+    for w in words[1:]:
+        if w.startswith("-") and not w.startswith("--"):
+            if "x" in w or "r" in w or "w" in w:
+                return True          # -x, -rwx and friends
+        if w.startswith("+"):
+            continue                 # +x adds, and adding is safe
+        # Symbolic modes name a class first: a-x, u-x, go-rwx, a=r. An audit
+        # removed a check with `chmod a-x` and the gate reported green over
+        # the remaining eight, so any spelling that drops or omits execute
+        # counts as disarming.
+        m = re.fullmatch(r"[ugoa]*([-+=])([rwxXst]*)", w)
+        if m:
+            op, bits = m.group(1), m.group(2)
+            if op == "-" and ("x" in bits or "r" in bits or "w" in bits):
+                return True
+            if op == "=" and "x" not in bits:
+                return True
+        if re.fullmatch(r"[0-7]{3,4}", w):
+            owner = int(w[-3])
+            # The gate only runs checks that are executable, so a mode without
+            # the owner's execute bit disables one without editing a byte of
+            # it. 644 looked harmless and is exactly that.
+            if not owner & 1 or not owner & 4:
+                return True
+    return False
+
+# A heredoc body is data. git-boundary already strips these; this guard did
+# not, so a protected path mentioned inside one was never examined. Found by
+# accident, during the audit that produced this comment.
+HEREDOC = re.compile(r"<<-?\s*'?\"?([A-Za-z_][A-Za-z0-9_]*)'?\"?.*?^\1",
+                     re.S | re.M)
+
+# Programs that only read. A protected path in one of these is fine.
+READERS = {
+    "cat", "head", "tail", "less", "more", "grep", "egrep", "rg", "wc",
+    "diff", "ls", "file", "stat", "md5", "shasum", "sha256sum", "cmp",
+    "sort", "uniq", "cut", "find", "which", "realpath",
+}
+
+PREFIXES = {"sudo", "env", "time", "nohup", "nice", "command", "exec",
+            "doas", "stdbuf", "timeout"}
+
+WRAPPER_FLAGS_WITH_VALUE = {"-n", "-u", "-s", "-k", "-i", "-C", "-o", "-g"}
+
+# Given a protected file as their first argument, these run it. They do not
+# write to it.
+INTERPRETERS = {"python", "python3", "sh", "bash", "zsh", "node", "ruby",
+                "perl5", "uv"}
+
+# Pipes and backgrounding separate commands too. Leaving `|` out meant one
+# pipe character walked past this entire guard: `echo x | tee <protected>`.
+# Grouping characters are punctuation, not part of the program name. Without
+# this, "(rm <guard>)" tokenised as "(rm" and matched nothing.
+GROUPING_EDGE = re.compile(r"(?<![\w-])([(){}])(?![\w-])|([(){}])")
+
+
+def ungroup(text):
+    return GROUPING_EDGE.sub(lambda m: " %s " % (m.group(1) or m.group(2)), text)
+
+
+SPLIT = re.compile(r"(?:&&|\|\||[;&|\n])")
+ASSIGNMENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
+REDIRECT = re.compile(r"(\d?>>?|>\|)\s*([^\s;|&]+)")
+
+
+def is_protected(path, holder=False):
+    """Which protected thing this path is, or None.
+
+    A path that does not exist yet is not protected. Disarming means altering
+    or removing enforcement that is already there — creating a new guard or a
+    new check removes nothing, and the integrity check reports the addition, so
+    it is never silent.
+
+    This was relaxed after the guard refused the creation of the next guard.
+    Left strict, the protection would have had to be switched off during
+    exactly the work most likely to damage it.
+    """
+    if not path:
+        return None
+    p = path.strip().strip("'\"")
+
+    # A glob never exists on disk, so every path test below said "not
+    # protected" — and `rm formwork/guard/*` deleted every guard. Match the
+    # pattern against the protected list before asking the filesystem.
+    if any(ch in p for ch in "*?["):
+        stem = re.split(r"[*?\[]", p, maxsplit=1)[0].lstrip("./")
+        if stem:
+            for prefix in PROTECTED + PROTECTED_HOME:
+                tail = prefix.rstrip("/")
+                # Either the glob expands into a protected thing, or it names
+                # part of one. `formwork/guard/git-bound*` is the second.
+                if tail.startswith(stem) or stem.rstrip("/").startswith(tail):
+                    return prefix
+        return None
+
+    if not os.path.exists(os.path.abspath(os.path.expanduser(p))):
+        return None
+    home = os.path.expanduser("~")
+    absolute = os.path.abspath(os.path.expanduser(p))
+
+    # Matched by suffix rather than against this user's home. The word lists
+    # are protected wherever they live, including in somebody else's home on a
+    # shared machine, and including when reached by a relative path.
+    if STATE_DIR:
+        state = os.path.abspath(os.path.expanduser(STATE_DIR))
+        for h in PROTECTED_HOME:
+            leaf = os.path.basename(h)
+            if absolute == os.path.join(state, leaf) or \
+                    absolute.startswith(state + os.sep) and \
+                    os.path.basename(absolute) == leaf:
+                return h
+    for h in PROTECTED_HOME:
+        if absolute.endswith(os.sep + h.replace("/", os.sep)) or p.endswith(h):
+            return h
+        if absolute == os.path.join(home, h):
+            return h
+    # Compare on the tail, so both a relative and an absolute path match.
+    norm = absolute.replace("\\", "/")
+    for prefix in PROTECTED:
+        if norm.endswith("/" + prefix.rstrip("/")) or ("/" + prefix) in norm + "/":
+            return prefix
+        # Boundary-aware: a file whose name merely starts with a protected
+        # path is a different file.
+        if p == prefix or p.rstrip("/") == prefix.rstrip("/") \
+                or p.startswith(prefix.rstrip("/") + "/"):
+            return prefix
+
+    # A directory that CONTAINS protected things is protected too — but only
+    # against being destroyed or moved. Copying FROM it, or listing it, is
+    # ordinary work, and refusing `cp -R . /tmp/copy` was a false positive
+    # this guard produced within a minute of the rule being added.
+    if holder and os.path.isdir(absolute):
+        for prefix in PROTECTED:
+            candidate = os.path.join(absolute, *prefix.rstrip("/").split("/"))
+            if os.path.exists(candidate):
+                return "the directory holding %s" % prefix
+        for prefix in PROTECTED:
+            tail = prefix.rstrip("/").split("/")
+            for i in range(1, len(tail)):
+                if norm.endswith("/" + "/".join(tail[:i])):
+                    return "the directory holding %s" % prefix
+    return None
+
+
+def tokens(segment):
+    return [t for t in segment.split() if t]
+
+
+def strip_prefixes(words):
+    """Drop leading wrappers and shell grouping to reach the real command.
+
+    `nice -n 5 rm <guard>` was allowed, because this stopped at `-n`.
+    git-boundary was hardened against that and this file was not — the tests
+    only covered the other one, which is how the fix landed in one place.
+    """
+    i = 0
+    while i < len(words):
+        w = words[i]
+        if w in GROUPING:
+            i += 1
+            continue
+        if ASSIGNMENT.match(w) or w in PREFIXES:
+            i += 1
+            while i < len(words) and words[i].startswith("-"):
+                takes_value = words[i] in WRAPPER_FLAGS_WITH_VALUE
+                i += 1
+                if takes_value and i < len(words):
+                    i += 1
+            if i < len(words) and words[i].isdigit():
+                i += 1
+            continue
+        break
+    return words[i:]
+
+
+def verdict_for(segment):
+    """A reason to refuse this segment, or None."""
+    # A redirect into a protected path is a write whatever the program is.
+    for _, target in REDIRECT.findall(segment):
+        hit = is_protected(target)
+        if hit:
+            return "writing to %s" % hit
+
+    words = strip_prefixes(tokens(segment))
+    if not words:
+        return None
+    program = os.path.basename(words[0].strip("'\""))
+
+    # Running a protected program is exactly what it is for — with one
+    # exception. The integrity check can rewrite the record it checks
+    # against, which disarms it, so that one is a decision for the human.
+    if is_protected(words[0]):
+        if os.path.basename(words[0].rstrip("/")) == "kit-integrity" and \
+                "--record" in words[1:]:
+            return ("re-recording the integrity fingerprints. That tells the "
+                    "kit every current file is the intended one, so it is a "
+                    "decision, not a step. The installer takes the FIRST "
+                    "record; every later one is yours to run by hand")
+        return None
+
+    # An interpreter given a protected file as its argument is running it, not
+    # writing to it. `python3 formwork/check/run` was refused as a write.
+    if program in INTERPRETERS:
+        for w in words[1:]:
+            if w.startswith("-"):
+                continue
+            if is_protected(w):
+                return None
+            break
+    if program in READERS:
+        return None
+
+    if program == "chmod":
+        if not chmod_disarms(words):
+            return None
+        for w in words[1:]:
+            hit = is_protected(w)
+            if hit:
+                return "chmod would take permissions away from %s" % hit
+        return None
+
+    if program in CONDITIONAL_WRITERS:
+        in_place = any(w == f or w.startswith(f)
+                       for w in words[1:]
+                       for f in CONDITIONAL_WRITERS[program])
+        if not in_place:
+            return None          # reading, not writing
+        for w in words[1:]:
+            hit = is_protected(w)
+            if hit:
+                return "%s in place would change %s" % (program, hit)
+        return None
+
+    if program in WRITERS:
+        # Only these remove or relocate what is already there.
+        destroys = program in DESTROYERS
+        operands = [w for w in words[1:] if not w.startswith("-")]
+        # An interpreter handed a protected FILE is running it. The inline
+        # case is caught below, where it belongs. Without this,
+        # `python3 -m pytest <a guard test>` was refused as a write.
+        if program in INTERPRETERS and not any(
+                w in ("-c", "-e", "--command", "--eval") for w in words[1:]):
+            operands = []
+        # For a copy, only the destination is written. Refusing
+        # `cp <a guard> /tmp/backup` refused taking a backup before editing,
+        # which is the thing this guard most wants somebody to do.
+        if program == "cp" and len(operands) >= 2:
+            operands = operands[-1:]
+        for w in operands:
+            hit = is_protected(w, holder=destroys)
+            if hit:
+                return "%s would change %s" % (program, hit)
+        # An interpreter given a script INLINE can write anything, so a
+        # protected path inside one is refused. Running a FILE is not that:
+        # `python3 -m pytest <a test file>` was refused, which meant the
+        # guards could not be tested.
+        inline = any(w in ("-c", "-e", "--command", "--eval") for w in words[1:])
+        if inline and program in ("python", "python3", "perl", "ruby", "node"):
+            for prefix in PROTECTED + PROTECTED_HOME:
+                if prefix.rstrip("/") in segment:
+                    return "%s mentions %s in an inline script" % (
+                        program, prefix.rstrip("/"))
+    return None
+
+
+# A heredoc body is data only when it is being written somewhere. Fed to a
+# shell or an interpreter it is code, and stripping it hid the command
+# completely. This was introduced by the fix for the opposite false positive,
+# which is a good reminder that a guard change needs its own test.
+SHELL_SINK = re.compile(
+    r"(?:^|[;&|]|\$\(|`)\s*(?:[A-Za-z_][A-Za-z0-9_]*=\S*\s+)*"
+    r"(?:sudo|env|nice|timeout|command|exec)?\s*"
+    r"(?:/\S*/)?(?:ba|z|k|da)?sh|python[0-9.]*|perl|ruby|node|eval\b")
+
+
+def strip_heredocs(command):
+    """Remove heredoc bodies, unless the receiving program can execute them."""
+    def keep_or_drop(m):
+        before = command[:m.start()]
+        line = before.rsplit("\n", 1)[-1]
+        if SHELL_SINK.search(line):
+            return m.group(0)        # it is code. Leave it to be inspected.
+        return "<<REDACTED"
+    return HEREDOC.sub(keep_or_drop, command)
+
+
+SUBSHELL = re.compile(r"\$\(([^()]*)\)|`([^`]*)`")
+
+# Shells and runners that take a command as an ARGUMENT, and shell grouping
+# words that are not programs at all. git-boundary learned both; this file did
+# not, so `bash -c 'rm <guard>'` and `for f in x; do rm <guard>; done` walked
+# straight through.
+INDIRECT = {"bash", "sh", "zsh", "ksh", "dash", "eval", "xargs", "watch"}
+GROUPING = {"(", "{", "}", ")", "then", "else", "do", "done", "fi", "!",
+            "&&", "||", ";"}
+
+
+def split_all(command, depth=0):
+    """Every command line in this string, including nested ones."""
+    if depth > 4:
+        return
+    for m in SUBSHELL.finditer(command):
+        for seg in split_all(m.group(1) or m.group(2) or "", depth + 1):
+            yield seg
+    stripped = ungroup(SUBSHELL.sub(" ", command))
+    for segment in SPLIT.split(stripped):
+        yield segment
+        try:
+            quoted = shlex.split(segment)
+        except ValueError:
+            quoted = tokens(segment)
+        words = strip_prefixes(quoted)
+        if words and os.path.basename(words[0]) in INDIRECT:
+            for w in words[1:]:
+                if w.startswith("-"):
+                    continue
+                for seg in split_all(w, depth + 1):
+                    yield seg
+                break
+
+
+def decide(command):
+    # The body of a heredoc is text being written, not commands being run.
+    # It is stripped so its contents are never read as a command line.
+    command = strip_heredocs(command)
+    for segment in split_all(command):
+        reason = verdict_for(segment)
+        if reason:
+            return True, reason
+    return False, None
+
+
+def strength():
+    env = os.environ.get("FORMWORK_PROTECT_FILES", "").strip().lower()
+    if env in STRENGTHS:
+        return env
+    root = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
+    config = os.path.join(root, ".formwork.toml")
+    if os.path.exists(config):
+        try:
+            text = open(config, encoding="utf-8", errors="ignore").read()
+        except OSError:
+            return "block"
+        m = re.search(r'^\s*protect_files\s*=\s*["\']([^"\']+)["\']', text, re.M)
+        if m and m.group(1).strip().lower() in STRENGTHS:
+            return m.group(1).strip().lower()
+    return "block"
+
+
+FORMATS = ("claude-code", "codex", "cursor", "gemini-cli")
+
+
+def from_payload(payload):
+    """(command, file_path), or None when the payload is not a shape we know.
+
+    None means refuse. A guard that cannot read its input has not established
+    that the call is safe, and reporting success would be a lie about work it
+    did not do.
+    """
+    if not isinstance(payload, dict):
+        return None
+    box = payload.get("tool_input")
+    if box is None:
+        box = payload          # runtimes that put the fields at the top level
+    if not isinstance(box, dict):
+        return None
+    path = box.get("file_path") or box.get("path") or box.get("notebook_path")
+    command = box.get("command") or box.get("cmd") or ""
+    if not isinstance(command, str):
+        command = ""
+    if not isinstance(path, str):
+        path = ""
+    return command, path
+
+
+def main(argv):
+    fmt = command = path = None
+    i = 1
+    while i < len(argv):
+        if argv[i] == "--format" and i + 1 < len(argv):
+            fmt = argv[i + 1]; i += 2; continue
+        if argv[i] == "--command" and i + 1 < len(argv):
+            command = argv[i + 1]; i += 2; continue
+        if argv[i] == "--path" and i + 1 < len(argv):
+            path = argv[i + 1]; i += 2; continue
+        i += 1
+
+    if command is None and path is None:
+        if fmt is None:
+            print("ERROR: give --command, --path, or --format with a payload",
+                  file=sys.stderr)
+            return REFUSE
+        if fmt not in FORMATS:
+            print("ERROR: unknown runtime format: %s" % fmt, file=sys.stderr)
+            print("       Refusing rather than guessing.", file=sys.stderr)
+            return REFUSE
+        raw = sys.stdin.read()
+        if not raw.strip():
+            print("ERROR: no payload arrived on stdin.", file=sys.stderr)
+            print("       Refusing. This usually means the hook is wired up "
+                  "wrongly.", file=sys.stderr)
+            return REFUSE
+        try:
+            payload = json.loads(raw)
+        except ValueError as e:
+            print("ERROR: payload is not readable: %s" % e, file=sys.stderr)
+            return REFUSE
+        got = from_payload(payload)
+        if got is None:
+            print("ERROR: payload is not a shape this guard understands.",
+                  file=sys.stderr)
+            print("       Refusing rather than allowing something unread.",
+                  file=sys.stderr)
+            return REFUSE
+        command, path = got
+
+    reason = None
+    if path:
+        hit = is_protected(path)
+        if hit:
+            reason = "editing %s" % hit
+    if reason is None and command:
+        refuse, why = decide(command)
+        reason = why if refuse else None
+
+    if reason is None:
+        return ALLOW
+
+    level = strength()
+    if level == "off":
+        return ALLOW
+    if level == "warn":
+        print("Self-protection would have refused this: %s." % reason,
+              file=sys.stderr)
+        print("It is set to warn, so the change went ahead.", file=sys.stderr)
+        return WARN
+
+    print("REFUSED by self-protection: %s." % reason, file=sys.stderr)
+    print("These files are what enforce every other rule. Changing one is a "
+          "decision, so the human makes it.", file=sys.stderr)
+    print("To change this for one session: FORMWORK_PROTECT_FILES=warn, or off.",
+          file=sys.stderr)
+    return REFUSE
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

@@ -1,0 +1,258 @@
+#!/usr/bin/env python3
+"""The gate, wired to the end of a turn. The rule that actually blocks.
+
+    quality-gate --format claude-code    < hook payload on stdin
+    quality-gate --run                   run the aggregate and report it.
+                                         No budget, no counter, no state
+
+Exit status:
+    0   allowed to finish — green, or the budget is spent and you were told
+    2   refused. The aggregate is red and the turn cannot conclude
+
+WHAT THIS DOES
+--------------
+When the agent tries to finish a turn, this runs the aggregate — by name, the
+whole thing, never a hand-picked subset — and refuses to let the turn end while
+it is red.
+
+Naming the aggregate rather than listing its parts means a check added later is
+covered without anybody remembering to update this file.
+
+THE BUDGET, AND WHY IT IS NOT A DETAIL
+--------------------------------------
+It refuses a bounded number of times per session, then stands aside and tells
+the human.
+
+Both extremes fail, and one of them fails silently:
+
+  * **Refuse once.** A guard that gives up after a single refusal was defeated
+    under test: an agent broke a check, met one refusal, then altered working
+    code until the broken check agreed with it, and declared itself finished.
+    Nobody had run the aggregate a second time. The safeguard produced a
+    successful-looking result the first time it met a real agent.
+  * **Refuse for ever.** The work strands, and the human finds out by noticing
+    that nothing is happening.
+
+Bounded refusal with escalation is the only version that survives contact.
+
+WHAT A GREEN RESULT HERE DOES NOT MEAN
+--------------------------------------
+Named, because an unqualified pass reads as total coverage.
+
+  * Work done in another checkout this session is not seen.
+  * Changes made outside the agent's tool calls are not seen.
+  * Anything needing real hardware, a live model, or real money is not run by
+    the aggregate, so it is not run here either.
+
+Python 3, standard library only, no dependencies.
+"""
+import json
+import os
+import re
+import subprocess
+import sys
+
+ALLOW, REFUSE = 0, 2
+STRENGTHS = ("block", "warn", "off")
+
+DEFAULT_BUDGET = 3
+
+
+def _timeout():
+    """A malformed timeout must not crash the hook that blocks the turn."""
+    raw = os.environ.get("FORMWORK_GATE_TIMEOUT", "300")
+    try:
+        v = int(raw)
+    except (TypeError, ValueError):
+        return 300
+    return v if v > 0 else 300
+
+
+GATE_TIMEOUT = _timeout()
+STATE = os.environ.get("FORMWORK_STATE_DIR", os.path.expanduser("~/.formwork"))
+FORMATS = ("claude-code", "codex", "cursor", "gemini-cli")
+
+
+def project_root():
+    env = os.environ.get("CLAUDE_PROJECT_DIR")
+    if env and os.path.isdir(env):
+        return env
+    here = os.path.dirname(os.path.abspath(__file__))
+    return os.path.dirname(os.path.dirname(here))
+
+
+def setting(root, key, allowed, default):
+    config = os.path.join(root, ".formwork.toml")
+    if not os.path.exists(config):
+        return default
+    try:
+        text = open(config, encoding="utf-8", errors="ignore").read()
+    except OSError:
+        return default
+    m = re.search(r'^\s*%s\s*=\s*["\']?([A-Za-z0-9_]+)["\']?' % key, text, re.M)
+    if not m:
+        return default
+    v = m.group(1).strip().lower()
+    return v if (allowed is None or v in allowed) else default
+
+
+def budget(root):
+    env = os.environ.get("FORMWORK_GATE_BUDGET")
+    if env and env.isdigit():
+        return int(env)
+    v = setting(root, "gate_budget", None, str(DEFAULT_BUDGET))
+    return int(v) if str(v).isdigit() else DEFAULT_BUDGET
+
+
+def counter_path(session):
+    """Where this session's refusal count lives.
+
+    A payload without a session identifier used to get no counter at all,
+    which meant the escalation never happened and the gate refused for ever —
+    the exact failure this file's own docstring says it avoids. Three of the
+    four runtimes have never been run, so a missing identifier is likely
+    rather than exotic. Fall back to the project, which bounds the refusals
+    even when it cannot tell two sessions apart.
+    """
+    if not session:
+        session = "no-session-id-%s" % re.sub(
+            r"[^A-Za-z0-9_.-]", "_", os.path.basename(project_root()))
+    safe = re.sub(r"[^A-Za-z0-9_.-]", "_", session)
+    return os.path.join(STATE, "sessions", "%s.refusals" % safe)
+
+
+def refusals_so_far(path):
+    if not path:
+        return 0
+    try:
+        return int(open(path).read().strip())
+    except (OSError, ValueError):
+        return 0
+
+
+def record(path, n):
+    if not path:
+        return
+    try:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        open(path, "w").write(str(n))
+    except OSError:
+        pass
+
+
+def nothing_changed(root):
+    """True when version control reports a clean tree. Cheap, and read-only."""
+    try:
+        p = subprocess.run(["git", "-C", root, "status", "--porcelain"],
+                           capture_output=True, text=True, timeout=20)
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return p.returncode == 0 and not p.stdout.strip()
+
+
+def run_aggregate(root):
+    """(exit_code, output). exit_code is None when it could not run at all."""
+    gate = os.path.join(root, "formwork", "check", "run")
+    if not os.path.isfile(gate):
+        return None, "there is no aggregate at %s" % gate
+    try:
+        p = subprocess.run([gate], capture_output=True, text=True,
+                           cwd=root, timeout=GATE_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        return None, ("the aggregate took longer than %ds and was stopped"
+                      % GATE_TIMEOUT)
+    except OSError as e:
+        return None, "the aggregate could not be started: %s" % e
+    return p.returncode, (p.stdout + p.stderr).strip()
+
+
+def main(argv):
+    root = project_root()
+    direct = "--run" in argv
+    fmt = None
+    for i, a in enumerate(argv):
+        if a == "--format" and i + 1 < len(argv):
+            fmt = argv[i + 1]
+
+    session = ""
+    if not direct:
+        if fmt is None:
+            print("ERROR: give --run, or --format with a payload on stdin",
+                  file=sys.stderr)
+            return REFUSE
+        if fmt not in FORMATS:
+            print("ERROR: unknown runtime format: %s" % fmt, file=sys.stderr)
+            print("       Refusing rather than guessing.", file=sys.stderr)
+            return REFUSE
+        raw = sys.stdin.read()
+        if raw.strip():
+            try:
+                session = (json.loads(raw) or {}).get("session_id", "") or ""
+            except ValueError:
+                session = ""
+
+    level = os.environ.get("FORMWORK_GATE", "").strip().lower()
+    if level not in STRENGTHS:
+        level = setting(root, "aggregate_gate", STRENGTHS, "block")
+    if level == "off":
+        return ALLOW
+
+    if not direct and nothing_changed(root):
+        return ALLOW
+
+    code, out = run_aggregate(root)
+
+    if code is None:
+        if level == "warn":
+            # Saying REFUSED and then allowing it made the message and the
+            # exit code disagree.
+            print("WARNING: %s. A gate that did not run is not a green gate, "
+                  "and this gate is set to warn, so the turn finished anyway."
+                  % out, file=sys.stderr)
+            return ALLOW
+        print("REFUSED: %s." % out, file=sys.stderr)
+        print("A gate that did not run is not a green gate.", file=sys.stderr)
+        return REFUSE
+
+    if code == 0:
+        return ALLOW
+
+    if direct:
+        # --run is for a person or a script asking "is it green?". Reporting
+        # ALLOW on a red aggregate because a counter somewhere had reached
+        # three would be a false answer to a direct question — and the counter
+        # never reset, so it stayed false for ever.
+        print(out, file=sys.stderr)
+        return REFUSE
+
+    if level == "warn":
+        print("The aggregate is red. This gate is set to warn, so the turn "
+              "finished anyway.", file=sys.stderr)
+        print(out, file=sys.stderr)
+        return ALLOW
+
+    path = counter_path(session)
+    used = refusals_so_far(path)
+    allowance = budget(root)
+
+    if used >= allowance:
+        print("THE AGGREGATE IS STILL RED, and this gate has already refused "
+              "%d times in this session." % used, file=sys.stderr)
+        print("It is standing aside so the work is not stranded. NOTHING BELOW "
+              "HAS BEEN FIXED.", file=sys.stderr)
+        print(out, file=sys.stderr)
+        return ALLOW
+
+    record(path, used + 1)
+    print("REFUSED: the aggregate is red, so this turn cannot conclude.",
+          file=sys.stderr)
+    print(out, file=sys.stderr)
+    print("", file=sys.stderr)
+    print("Refusal %d of %d this session. Fix the cause. Do not change the "
+          "check that just failed you." % (used + 1, allowance),
+          file=sys.stderr)
+    return REFUSE
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

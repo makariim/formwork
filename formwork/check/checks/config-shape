@@ -1,0 +1,123 @@
+#!/usr/bin/env python3
+"""Check: the configuration file is the shape the documents describe.
+
+    config-shape <directory>
+
+CATCHES  Documentation drifting from the file it documents. Three documents
+         once described this configuration three different ways, and following
+         one of them would have moved a key where the guard could not find it.
+         Everything read correctly and the tool quietly stopped working.
+
+Two things are checked:
+
+  1. the layers are separate — [bindings] and [strength] exist, and [rules]
+     does not, because rules are not switched off in configuration
+  2. every section the kit's own instructions show in an example is a section
+     the real file actually has
+
+Only the kit's instructions are held to this — FORMWORK.md and everything
+under formwork/. A design document is allowed to describe something not built
+yet; an instruction telling somebody to write a section that nothing reads is
+a different thing, and that is what this catches.
+
+Exit status:
+    0   the file matches what is documented, or there is no file to check
+    1   they disagree, and the disagreement is named
+    2   the check could not run
+"""
+import os
+import re
+import sys
+
+CONFIG = ".formwork.toml"
+REQUIRED = ("bindings", "strength")
+FORBIDDEN = ("rules",)
+SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv"}
+SECTION = re.compile(r"^\s*\[([a-z_]+)\]", re.M)
+# Paths the runner has told this check to stay out of. The kit's own fixtures
+# are wrong on purpose.
+EXCLUDED = [os.path.abspath(p) for p in
+            os.environ.get("FORMWORK_EXCLUDE", "").split(os.pathsep) if p]
+
+
+def excluded(path):
+    a = os.path.abspath(path)
+    return any(a == e or a.startswith(e + os.sep) for e in EXCLUDED)
+# A toml block in a document that is clearly about this configuration.
+TOML_BLOCK = re.compile(r"```toml\n(.*?)```", re.S)
+
+
+def sections(text):
+    return set(SECTION.findall(text))
+
+
+def main(argv):
+    if len(argv) < 2:
+        print("usage: config-shape <directory>", file=sys.stderr)
+        return 2
+    root = argv[1]
+    if not os.path.isdir(root):
+        print("ERROR: not a directory: %s" % root, file=sys.stderr)
+        return 2
+
+    path = os.path.join(root, CONFIG)
+    if not os.path.exists(path):
+        print("no %s, nothing claimed" % CONFIG)
+        return 0
+    try:
+        real = open(path, encoding="utf-8", errors="strict").read()
+    except (UnicodeDecodeError, OSError) as e:
+        print("ERROR: cannot read %s: %s" % (CONFIG, e), file=sys.stderr)
+        return 2
+
+    have = sections(real)
+    problems = []
+    for s in REQUIRED:
+        if s not in have:
+            problems.append("%s has no [%s] section" % (CONFIG, s))
+    for s in FORBIDDEN:
+        if s in have:
+            problems.append("%s has a [%s] section. Rules are not switched off "
+                            "in configuration" % (CONFIG, s))
+
+    # Only the kit's own instructions. Planning documents may describe intent.
+    instruction_roots = [os.path.join(root, "formwork")]
+    front = os.path.join(root, "FORMWORK.md")
+    targets = [front] if os.path.exists(front) else []
+    for base in instruction_roots:
+        for dp, dn, fns in os.walk(base):
+            dn[:] = [d for d in dn if d not in SKIP_DIRS]
+            if excluded(dp):
+                dn[:] = []
+                continue
+            targets += [os.path.join(dp, f) for f in fns if f.endswith(".md")]
+
+    for full in targets:
+        if True:
+            try:
+                text = open(full, encoding="utf-8", errors="ignore").read()
+            except OSError:
+                continue
+            for block in TOML_BLOCK.findall(text):
+                shown = sections(block)
+                if not shown & set(REQUIRED) and not shown & {"roles"}:
+                    continue          # some other toml, not this file
+                for s in sorted(shown - have):
+                    problems.append("%s shows a [%s] section that %s does not "
+                                    "have" % (os.path.relpath(full, root), s,
+                                              CONFIG))
+
+    if problems:
+        print("%d disagreement(s) between the configuration and the documents"
+              % len(problems))
+        for p in sorted(set(problems)):
+            print("  %s" % p)
+        return 1
+
+    print("%s has %s, and every documented example matches it"
+          % (CONFIG, ", ".join("[%s]" % s for s in REQUIRED)))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

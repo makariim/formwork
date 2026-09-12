@@ -1,0 +1,16 @@
+# Formwork configuration. Three layers, kept apart on purpose.
+
+[bindings]
+# One person's setup. Change freely.
+runtime = "claude-code"
+
+[strength]
+# How hard each enforced rule bites: block | warn | off.
+# Strict by default. A team may need warn; somebody working alone should not.
+git_boundary = "block"
+protect_files = "block"
+
+# [rules] is deliberately absent, and that is the point.
+# Rules are not switched off here. Dropping one is an edit to
+# formwork/rules/core.md, which leaves a line in version control with your
+# name on it.

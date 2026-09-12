@@ -1,0 +1,159 @@
+#!/usr/bin/env python3
+"""Check: decision numbers come from the record, and none was guessed.
+
+    decision-ids <directory>
+    decision-ids --next <directory>    print the number a new decision takes
+
+CATCHES  Two decisions sharing a number, because two threads were each reading
+         a different stale state and both were confident. And a placeholder
+         that shipped — a decision carrying a number nobody ever assigned, which
+         everything downstream then cites.
+
+         Also a superseding decision pointing at one that does not exist, which
+         is how a cross-reference breaks silently.
+
+What it does not do is watch how a number was chosen. Nothing can. It checks
+that the result is consistent, which catches the failure without pretending to
+police the act.
+
+Exit status:
+    0   the numbering holds
+    1   it does not, and the problem is named
+    2   the check could not run
+"""
+import os
+import re
+import sys
+
+DECISIONS = os.path.join("docs", "decisions")
+NAMED = re.compile(r"^(\d{1,6})[-_]")
+# Two kinds of placeholder, and they need different rules.
+#
+# These are never English. Anywhere they appear, they are a placeholder.
+OBVIOUS_PLACEHOLDER = re.compile(
+    r"\b(DEC-PENDING|TBD|XXXX+|NNNN+|\?\?\?\?)\b")
+
+# These are ordinary words. They only mean "unfilled" when they stand where an
+# answer should be — alone, or right after a label. "The migration is pending
+# review by the team" and "a TODO list was kept" are things a decision record
+# is entitled to say, and both used to fail the gate with a message accusing
+# the author of shipping a placeholder.
+WORDY_PLACEHOLDER = re.compile(
+    r"(?:^|[:(\[]\s*|^\s*[-*]\s*)(TODO|PENDING)\s*(?:$|[)\].,;])", re.M)
+
+
+def placeholder_in(text):
+    return OBVIOUS_PLACEHOLDER.search(text) or WORDY_PLACEHOLDER.search(text)
+
+
+PLACEHOLDER = OBVIOUS_PLACEHOLDER
+STATUS = re.compile(r"^\s*status\s*:\s*(.+?)\s*$", re.M | re.I)
+SUPERSEDED_BY = re.compile(r"superseded\s+by\s+#?(\d{1,6})", re.I)
+
+ALLOWED_STATUS = {"proposed", "accepted", "rejected", "superseded"}
+
+
+def decision_files(root):
+    d = os.path.join(root, DECISIONS)
+    if not os.path.isdir(d):
+        return None
+    out = []
+    for fn in sorted(os.listdir(d)):
+        if not fn.endswith(".md") or fn.upper().startswith("README"):
+            continue
+        out.append((fn, os.path.join(d, fn)))
+    return out
+
+
+def main(argv):
+    want_next = "--next" in argv
+    args = [a for a in argv[1:] if not a.startswith("--")]
+    if not args:
+        print("usage: decision-ids [--next] <directory>", file=sys.stderr)
+        return 2
+    root = args[0]
+    if not os.path.isdir(root):
+        print("ERROR: not a directory: %s" % root, file=sys.stderr)
+        return 2
+
+    files = decision_files(root)
+    if files is None:
+        if want_next:
+            print("0001")
+            return 0
+        print("no %s directory, nothing claimed" % DECISIONS)
+        return 0
+
+    numbers = {}
+    problems = []
+
+    for fn, path in files:
+        m = NAMED.match(fn)
+        if not m:
+            problems.append("%s — the filename does not start with a number" % fn)
+            continue
+        n = int(m.group(1))
+        numbers.setdefault(n, []).append(fn)
+
+        try:
+            text = open(path, encoding="utf-8", errors="strict").read()
+        except (UnicodeDecodeError, OSError) as e:
+            print("ERROR: cannot read %s: %s" % (path, e), file=sys.stderr)
+            return 2
+
+        ph = placeholder_in(text)
+        if ph:
+            problems.append("%s — still carries the placeholder '%s'"
+                            % (fn, ph.group(1)))
+
+        st = STATUS.search(text)
+        if not st:
+            problems.append("%s — no status" % fn)
+        else:
+            # An empty value used to raise IndexError here, which surfaced
+            # as a traceback and exit 1 — where the contract says a check
+            # that cannot run says 2, and one that finds something names it.
+            words = st.group(1).strip().strip('"\'').split()
+            if not words:
+                problems.append("%s — status is empty" % fn)
+                continue
+            first = words[0].lower()
+            if first not in ALLOWED_STATUS:
+                problems.append("%s — status '%s' is not one of: %s"
+                                % (fn, st.group(1).strip(),
+                                   ", ".join(sorted(ALLOWED_STATUS))))
+
+    highest = max(numbers) if numbers else 0
+    if want_next:
+        print("%04d" % (highest + 1))
+        return 0
+
+    for n, names in sorted(numbers.items()):
+        if len(names) > 1:
+            problems.append("number %04d is used by %d files: %s"
+                            % (n, len(names), ", ".join(names)))
+
+    # A supersession must point at something that exists.
+    for fn, path in files:
+        try:
+            text = open(path, encoding="utf-8", errors="ignore").read()
+        except OSError:
+            continue
+        for target in SUPERSEDED_BY.findall(text):
+            if int(target) not in numbers:
+                problems.append("%s — says it is superseded by %s, which does "
+                                "not exist" % (fn, target))
+
+    if problems:
+        print("%d problem(s) across %d decision(s)" % (len(problems), len(files)))
+        for p in problems:
+            print("  %s" % p)
+        return 1
+
+    print("%d decision(s), numbered without collision, nothing left pending"
+          % len(files))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))
