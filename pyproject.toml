@@ -33,9 +33,9 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Homepage = "https://github.com/muhammadelsherif/formwork"
-Source = "https://github.com/muhammadelsherif/formwork"
-Issues = "https://github.com/muhammadelsherif/formwork/issues"
+Homepage = "https://github.com/makariim/formwork"
+Source = "https://github.com/makariim/formwork"
+Issues = "https://github.com/makariim/formwork/issues"
 
 # The package is formwork-kit. The command is formwork.
 [project.scripts]
