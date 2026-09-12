@@ -46,12 +46,11 @@ One line in `pyproject.toml`:
 version = "0.1.0"
 ```
 
-**What the numbers mean here.** The first number changes when a fork would
-break. The second when something is added. The third for fixes.
+First number: a fork would break. Second: something was added. Third: a fix.
 
 **A rule changing counts as breaking**, even though no code moved. Somebody's
-green gate going red after an upgrade is exactly the surprise this kit exists
-to prevent.
+green gate going red after an upgrade is the surprise this kit exists to
+prevent.
 
 ---
 
@@ -118,14 +117,8 @@ export FORMWORK_STATE_DIR=/tmp/trystate && rm -rf /tmp/trystate
 /tmp/try/bin/formwork test
 ```
 
-**The last two must both be green.** If they are not, the release is broken for
-every new user, and nobody will tell you. They will close the tab.
-
-Then unset it, so you do not keep using the throwaway state:
-
-```
-unset FORMWORK_STATE_DIR
-```
+**Both must be green.** If not, the release is broken for every new user and
+nobody will tell you. Then `unset FORMWORK_STATE_DIR`.
 
 ## Publish
 

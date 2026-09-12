@@ -36,9 +36,8 @@ These do not ask you. They refuse.
 | The agent does not quietly alter the kit's own files | `formwork/guard/protected-files` |
 | A turn does not end while the aggregate is red | `formwork/guard/quality-gate` |
 
-**The last one has a limit worth knowing.** It refuses three times in a session
-and then stands aside, so that a genuinely stuck turn is not trapped for ever.
-Three refusals is loud. Set `gate_budget` in `.formwork.toml` to change it.
+**The last one refuses three times in a session, then stands aside**, so a
+genuinely stuck turn is not trapped for ever. Change it with `gate_budget`.
 
 Run them:
 
@@ -66,13 +65,13 @@ stories belong to somebody else's project.
 
 Several of these rules were learned from failures you have not had.
 
-Each one states what it catches. **If you never hit that, drop it** — delete it
-from `formwork/rules/core.md`, so that losing a rule is a line in your version
-control with your name on it.
+Each one states what it catches. **If you never hit that, delete it** from
+`formwork/rules/core.md`, so losing a rule is a line in your version control
+with your name on it.
 
-There is deliberately no `[rules]` switch in `.formwork.toml`, and a check
-refuses one if you add it. A rule switched off in a settings file disappears
-quietly. A rule deleted from the rules file does not.
+There is no `[rules]` switch in `.formwork.toml`, and a check refuses one if you
+add it. A rule switched off in a settings file disappears quietly. A rule
+deleted from the rules file does not.
 
 A rule you follow without understanding gets dropped quietly later anyway.
 

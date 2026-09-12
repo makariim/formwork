@@ -1,9 +1,6 @@
 # Words this kit uses
 
-Every word here is explained the first time it appears somewhere. This page
-collects them so you never have to go looking.
-
-Plain meanings. No jargon used to explain jargon.
+Plain meanings, collected so you never have to go looking.
 
 ---
 

@@ -19,10 +19,7 @@ gate refuses and tells you which.
 
 ## From somewhere else
 
-There are large public catalogues of ready-made agent definitions — hundreds of
-them, covering almost any speciality you can name. Use them. This kit does not
-try to compete with that and would lose.
-
+There are large public catalogues of ready-made agent definitions. Use them.
 Converting one takes about five minutes:
 
 1. **Keep everything they know.** The domain knowledge is why you took it.
@@ -61,16 +58,15 @@ runtimes and advice on two others**, because the other two cannot express it.
 | **Cursor** | read-only, or not. One bit, nothing finer |
 | **Codex** | a sandbox mode, which is not a tool list at all |
 
-**Gemini CLI needs the qualifier.** It takes a named list and enforces it, so
-in principle the grant binds. In practice the documented name of its
-file-writing tool is not established, and the generator writes no list at all
-for any role that needs `write` rather than guess one and silently remove a
-tool. **Today that is 26 of the 27 roles.** Only the reviewer, which writes
-nothing, gets an enforced grant there.
+**Gemini CLI needs a qualifier.** It takes a named list and would enforce it.
+But the documented name of its file-writing tool is not established, and the
+generator will not guess one and silently remove a tool a role needs. So it
+writes no list for any role that writes, which today is **26 of the 27**. Only
+the reviewer gets an enforced grant there.
 
-So the challenger being denied the ability to start other agents is enforced on
-Claude Code, approximated on Cursor, unrepresentable on Codex — and on Gemini
-CLI it is advice, for the reason above rather than a limit of the runtime.
+So the challenger being denied the power to start other agents is enforced on
+Claude Code, approximated on Cursor, unrepresentable on Codex, and advice on
+Gemini CLI.
 
 **The kit generates a role for all four anyway**, because a Codex forker losing
 most of the team over a restriction they were not relying on is worse than a

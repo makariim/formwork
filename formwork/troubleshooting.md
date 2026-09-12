@@ -45,21 +45,19 @@ If you meant it, record the new state:
 formwork record
 ```
 
-**Why you have to run that yourself.** Recording says "every one of these files
-is as I intend it". If an agent could do that, it could change a guard and then
-tell the kit the change was fine. The guard refuses that command.
+**Why you and not the agent.** Recording says every one of these files is as
+you intend it. An agent that could do that could change a guard and then tell
+the kit it was fine.
 
 ### `no fingerprints recorded at ~/.formwork/fingerprints.txt`
 
 **What happened.** There is no record to compare against.
 
-**Why.** This is a fresh machine, or a fresh clone, or you moved
-`FORMWORK_STATE_DIR`.
+**Why.** A fresh machine, a fresh clone, or you moved `FORMWORK_STATE_DIR`.
 
-**The record lives outside your project, and there is one per project.** It is
-in `~/.formwork/fingerprints/`, named after your project's path. It does not
-travel with a clone, which is the point: a record that travels beside the thing
-it describes protects nothing.
+The record lives outside your project, one file per project, in
+`~/.formwork/fingerprints/`. It does not travel with a clone, which is the
+point: a record kept beside the thing it describes protects nothing.
 
 **What to do.** Run the installer again. It takes the first record for you:
 
@@ -72,14 +70,10 @@ formwork install --runtime claude-code
 **What happened.** Your settings say you use tool X, and the hooks for X are
 not wired up.
 
-**Why.** This kit ships a wiring file for Claude Code only. The other three are
-documented but nobody has run them.
+**Why.** The kit ships a wiring file for Claude Code only.
 
-**What to do.** Open the README in `formwork/adapters/` for the tool you
-use. It says exactly what to put in that file. Then the gate goes green.
-
-**Red is correct until then.** Nothing is guarding you yet, and the kit will
-not say green about that.
+**What to do.** Open your agent's page in `formwork/adapters/`. It says what to
+put in that file. Red is correct until then: nothing is guarding you yet.
 
 ### `doc-links: N link(s) point at nothing`
 
@@ -90,9 +84,8 @@ and the line number.
 
 ### `generated-current: N generated file(s) are not current`
 
-**What happened.** One of three things. You edited a role and the generated
-copies have not caught up. You edited a generated copy by hand. Or you deleted
-a role and left its generated copy behind.
+**What happened.** You edited a role, or edited a generated copy by hand, or
+deleted a role and left its copy behind.
 
 **What to do.**
 
@@ -174,9 +167,8 @@ FORMWORK_PROTECT_FILES=warn
 
 **What to do.** Read what the gate said and fix that.
 
-**It gives up after three.** Once it has refused three times in a session it stands aside
-and says so in capitals. That is deliberate, so a stuck turn is not stuck for
-ever.
+**It gives up after three.** Then it stands aside and says so in capitals, so
+a stuck turn is not stuck for ever.
 
 ---
 
@@ -235,11 +227,10 @@ On the other three, wiring is documented and untried.
 ## Something is being blocked that should not be
 
 **This matters as much as the opposite.** A guard that is wrong about ordinary
-work is a guard people switch off, and then nothing is guarded.
+work gets switched off, and then nothing is guarded. Report it: the command you
+ran is all anybody needs.
 
-**Report it.** The command you ran is all anybody needs.
-
-**Meanwhile, get on with your work:**
+Meanwhile:
 
 ```
 FORMWORK_GIT_BOUNDARY=off
@@ -250,12 +241,6 @@ FORMWORK_PROTECT_FILES=off
 
 ## Nothing here matches
 
-Two commands worth running before you ask:
-
-```
-formwork check    run every check
-formwork demo     watch each check refuse a broken input
-```
-
-If both look right and the problem is still there, it is probably a real bug.
-Open an issue with the exact message and what you ran.
+Run `formwork check` and `formwork demo`. If both look right and the problem
+is still there, it is probably a real bug. Open an issue with the exact message
+and what you ran.
