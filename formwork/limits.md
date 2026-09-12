@@ -1,25 +1,16 @@
 # What this kit cannot do
 
-**Written after an audit walked through the guards.** Everything below was
-confirmed by running it, not guessed.
-
-Most pages in a repository tell you what something does. This one tells you
-where it stops, because a guard you trust further than it deserves is worse
-than no guard at all.
-
----
+**Everything below was confirmed by running it, not guessed.** A guard you
+trust further than it deserves is worse than no guard at all.
 
 ## The short version
 
-**The guards stop the ordinary path, not a determined one.**
+**The guards stop the ordinary path, not a determined one.** They are pattern
+matching over a command line. An agent that wants past them can get past them.
+The value is that an agent not trying to, which is nearly always, is stopped
+from doing the everyday thing that should have been your decision.
 
-They are pattern matching over a command line. An agent that wants to get past
-them can. The value is that an agent which is not trying to get past them —
-which is nearly always — is stopped from doing the everyday thing that should
-have been your decision.
-
-**If you need containment, this is not it.** Use a sandbox, a container, or a
-machine you do not mind losing.
+**If you need containment, this is not it.** Use a sandbox.
 
 ---
 
@@ -40,10 +31,9 @@ These were all closed during the audit, and are now tested:
   built-in version control.
 - **`xargs`.** `echo <path> | xargs rm` — the path is an argument to `echo`.
 
-**Why these stay open.** Each fix is a longer pattern, and a longer pattern has
-more false positives. A guard that refuses ordinary work gets switched off
-permanently, and then nothing is guarded. That trade is the reason this page
-exists instead of a longer regular expression.
+**Why these stay open.** Each fix is a longer pattern, and a longer pattern
+refuses more ordinary work. A guard that does that gets switched off, and then
+nothing is guarded.
 
 ---
 

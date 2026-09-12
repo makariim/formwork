@@ -1,9 +1,6 @@
 # What this costs to run
 
-Stated before you commit to it, not afterwards.
-
-Two of the three numbers below are measured. The most important one is not, and
-this page says so rather than inventing it.
+Two of the three numbers below are measured. The most important one is not.
 
 ---
 

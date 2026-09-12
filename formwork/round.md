@@ -10,15 +10,12 @@ written down nowhere, which is the kind of thing this kit is supposed to catch.
 
 ## When a round is worth it
 
-Not often. A round costs real money — see [`COSTS.md`](COSTS.md) — and most
-work does not need one.
+Not often. A round costs real money, see [`COSTS.md`](COSTS.md).
 
 Use one when **a decision is expensive to reverse** and you do not yet know the
-answer. A shape you will build on for a year. A dependency you will not easily
-drop. Something where being wrong is costly and being slow is not.
-
-For ordinary work, use the loop in [`loop.md`](loop.md). One brief, one agent,
-one report.
+answer. A shape you will build on for a year. A dependency you cannot easily
+drop. For everything else use the loop in [`loop.md`](loop.md): one brief, one
+agent, one report.
 
 ---
 
@@ -46,12 +43,11 @@ below for exactly what it can and cannot tell.
 **1. You write the brief.** Use [`templates/brief.md`](templates/brief.md). It
 is six headings and it is the whole input, so it is worth the twenty minutes.
 
-**2. The challenger writes `predictions.md` first.** Before anybody has
-proposed anything. It names the failures it expects, and the result that would
-show each expectation was mistaken.
-
-This is the rule people skip, and it is the reason a round is worth anything.
-**A prediction written after the answer is not a prediction, it is agreement.**
+**2. The challenger writes `predictions.md` first**, before anybody has
+proposed anything. It names the failures it expects and what result would show
+each one was mistaken. **A prediction written after the answer is not a
+prediction, it is agreement.** This is the rule people skip, and it is the
+reason a round is worth anything.
 
 **3. Everybody else works, at the same time.** Each writes their own file, named
 for their role. They do not read each other's yet.

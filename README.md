@@ -22,60 +22,45 @@ own. Projects never had that. Now they do.*
 
 They die at what comes next.
 
-You know what you want to build. Now you need help.
-
-You need someone to find the holes in your plan. Someone to think about how it
-should be put together. Someone who knows what breaks at 3am. Someone who knows
-what a screen should do. Someone who knows what a word should say. Someone who
-reads the small print.
-
-You need your choices written down. Then you will not argue about the same
-thing again next month.
-
-Most of all, you need someone who will tell you no.
+You need someone to find the holes in your plan. Someone who knows what breaks
+at 3am, what a screen should do, what the small print means. You need your
+choices written down so you are not arguing about them again next month. Most
+of all you need someone who will tell you no.
 
 That used to mean hiring people. People cost money. Hiring takes time.
 
 **Now it is a folder you copy into your project.**
 
-Twenty seven roles. Already written. Ready to work.
-
-A lead to run things. A challenger to attack your plan. An architect. A researcher.
-A reviewer. Engineers for the back end, the front end, phones, data, servers,
-and safety. A designer. A writer. A product person. A marketer. Someone who
-tells you when to call a real lawyer.
+Twenty seven roles, already written. A lead, a challenger, an architect, a
+researcher, a reviewer. Engineers for the back end, the front end, phones,
+data, servers and safety. A designer, a writer, a product person, a marketer.
+Someone who tells you when to call a real lawyer.
 
 Nobody to hire. Nobody to wait for. They are in the folder.
-
-**So the thing stopping you is not the thing you thought.**
 
 ## Who it is for
 
 **Anyone building something with an AI agent.**
 
-**Never run a project before?** This is the part nobody gives you. The team.
-The order of work. The notes. The rules. It all works as soon as you install
-it. You bring the idea.
+**New to this?** The team, the order of work, the notes and the rules all
+arrive working. You bring the idea.
 
-**Done this many times?** Then you know most of it already. What is new is that
-it now sits where your agents can read it. And some of it they cannot ignore.
-Delete the rules you do not like. Rewrite any role you know better.
+**Done it many times?** Now it sits where your agents can read it, and some of
+it they cannot ignore. Delete the rules you disagree with. Rewrite any role you
+know better.
 
 **Expert in one thing?** Your role file will be thinner than you are. Replace
-it with what you know. Everything else keeps working around it.
+it. Everything else keeps working around it.
 
 ## What you get
 
-**A way of working.** Every job goes the same way. You say what you want. The
-agent works. The checks run. It tells you what it did. Then it stops and waits
-for you.
+**A way of working.** You say what you want. The agent works. The checks run.
+It tells you what it did, then stops and waits for you.
 
-**Notes that write themselves.** Choices get a number and a page. Nothing
-important is left in a chat you will close and lose.
+**Notes that write themselves.** Choices get a number and a page, instead of
+living in a chat you will close and lose.
 
 **Rules your agent cannot ignore.** Not tips. Real refusals.
-
-Ask your agent to save your work to git, and nothing happens:
 
 ```
 you:    commit this for me
@@ -85,47 +70,20 @@ agent:  REFUSED by the version-control boundary: git commit changes
 
 Nobody read you a rule. You watched it work.
 
-**That is the whole idea.** You think about what you are building. The kit
-holds the rest.
-
-## Before you install
-
-| You need | How to check |
-|---|---|
-| **Python 3.8 or newer** | run `python3 --version`. Mac and most Linux have it |
-| **git** | run `git --version` |
-| **An AI coding agent** | Claude Code, Codex, Cursor or Gemini CLI |
-
-**No packages to install.** The kit itself is text files and small Python
-programs. They use only what comes with Python.
-
-| System | Does it work? |
-|---|---|
-| **macOS** | Yes. Built and used here |
-| **Linux** | Should do. Nobody has tried. **Try it and tell us** |
-| **Windows** | The command installs. The guards assume a unix shell and nobody has run them there. **If you get it working, that helps everyone** |
-
 ## Install
 
-**1. Get the command.**
+| You need | Check it |
+|---|---|
+| **Python 3.8 or newer** | `python3 --version` |
+| **git** | `git --version` |
+| **An AI coding agent** | Claude Code, Codex, Cursor or Gemini CLI |
+
+No packages, no setup. The kit is text files and small Python programs.
 
 ```
 pipx install formwork-kit
-```
 
-The command is `formwork`.
-
-**pipx is worth it here.** Plain `pip install formwork-kit` also works, but pip
-often puts the command in a folder your shell does not look in, and you get
-`command not found` with no obvious cause.
-
-**Do not want to install anything?** Skip to the bottom of this section.
-
-**2. Go to your project and set it up.**
-
-```
 cd /your/project
-
 formwork init
 formwork install --runtime claude-code
 formwork check
@@ -133,15 +91,14 @@ formwork check
 
 That last line should say green.
 
-**What each one did.** `init` put a `formwork/` folder and `FORMWORK.md` in your
-project. `install` wired the guards into your agent and wrote your role files.
-`check` ran all nine checks.
+`init` puts `formwork/` and `FORMWORK.md` in your project. `install` wires the
+guards into your agent and writes your role files. Type `formwork` on its own
+to see the rest.
 
-Type `formwork` on its own to see everything it can do.
+**Use pipx, not pip.** Plain pip works, but often puts the command somewhere
+your shell does not look, and you get `command not found` with no clue why.
 
-### Or without installing anything
-
-The kit is just files. Copy them in and run them by path:
+**Or install nothing.** The kit is just files:
 
 ```
 git clone https://github.com/makariim/formwork.git  the-kit
@@ -152,10 +109,15 @@ formwork/fw install --runtime claude-code
 formwork/fw check
 ```
 
-**What it touches.** It adds `formwork/` and `FORMWORK.md`. It writes your
-agent's settings file, keeping anything already in it and saving a copy first.
-And it writes one file outside your project, in `~/.formwork/`, holding a
-fingerprint of each file that enforces a rule. Nothing else.
+**What it touches.** It adds `formwork/` and `FORMWORK.md`, writes your agent's
+settings file keeping anything already there, and puts one file in
+`~/.formwork/` holding a fingerprint of each file that enforces a rule.
+
+| System | Does it work? |
+|---|---|
+| **macOS** | Yes. Built and used here |
+| **Linux** | Should do. Nobody has tried. **Try it and tell us** |
+| **Windows** | The command installs. The guards assume a unix shell and nobody has run them there |
 
 ## What is inside
 
@@ -174,17 +136,9 @@ hidden. Nothing is sent anywhere.
 
 A check nobody has seen fail proves nothing.
 
-So each check ships test cases of both kinds. At least one it must say no to,
-at least one it must say yes to. It has to tell them apart.
-
-Try it:
-
-```
-formwork demo
-```
-
-Before a check runs, its test files are copied into folders with random names.
-So a check cannot pass by knowing the file name. It has to look.
+So each check ships test cases of both kinds: at least one it must reject, at
+least one it must accept. It has to tell them apart. Watch it yourself with
+`formwork demo`.
 
 ## Which agents work
 
@@ -195,39 +149,31 @@ So a check cannot pass by knowing the file name. It has to look.
 | **Cursor** | It should. Nobody has tried |
 | **Gemini CLI** | It should. Nobody has tried |
 
-For the three nobody has tried, `formwork check` stays red until you set up
-the hooks yourself. The file in `formwork/adapters/` for your agent tells you
-what to write.
+For the three nobody has tried, `formwork check` stays red until you write the
+hook file yourself. Your agent's page in `formwork/adapters/` says what goes in
+it. Red is the right answer there: nothing is guarding you yet.
 
-Red is the right answer there. Nothing is guarding you yet, and the kit will
-not say green about that.
-
-**Those three are the easiest way to help.** Set one up. Ask your agent to
-commit something. Tell us what happened. If it said no, that turns a guess into
-a fact. If it did not, we need to fix it. Either way, open an issue.
+**Those three are the easiest way to help.** Set one up, ask your agent to
+commit something, and tell us what happened. Either answer is useful.
 
 ## What this will not pretend
 
-Every number here comes with the command that made it. If something has not
-been measured, the page says so in capital letters instead of guessing.
+Every number here comes with the command that made it. Anything unmeasured says
+so in capitals rather than guessing. There are three:
 
-There are three of those. Know them before you fork:
+**Nobody knows what a round costs in money.**
+[`formwork/COSTS.md`](formwork/COSTS.md) says NOT ESTABLISHED instead of a made
+up number.
 
-**Nobody knows what a round costs in money.** Not once measured. See
-[`formwork/COSTS.md`](formwork/COSTS.md). It says NOT ESTABLISHED instead of a
-made up number.
+**The guards stop the normal way, not a clever one.**
+[`formwork/limits.md`](formwork/limits.md) lists every way around them anybody
+has found. If you need real safety, use a sandbox.
 
-**The guards stop the normal way, not a clever one.** They read the command and
-look for patterns. [`formwork/limits.md`](formwork/limits.md) lists every way
-around them that we found, what got fixed, and what cannot be fixed this way.
-If you need real safety, use a sandbox.
-
-**Three of the four agents are untried.** Claude Code has been seen saying no.
-The other three have not.
+**Three of the four agents are untried.**
 
 Every time this kit failed on the person who wrote it, the failure went into
-[`docs/dogfood.md`](docs/dogfood.md). Nothing was quietly patched. That page is
-the best reason to trust the rest.
+[`docs/dogfood.md`](docs/dogfood.md) instead of being quietly patched. That page
+is the best reason to trust the rest.
 
 ## Where to start
 
@@ -256,44 +202,29 @@ page says so.
 
 ## Contributing
 
-Forks are the point. Take it. Change it. Keep what you like.
+Forks are the point. Take it, change it, keep what you like.
 
-If you want to send something back, these help most:
+What helps most, in order:
 
-**A command that got past a guard.** One line is enough. You do not need a fix.
+- **A command that got past a guard.** One line is enough, no fix needed.
+- **A normal command that was wrongly stopped.** Just as useful. A guard that
+  blocks real work is a guard people switch off.
+- **A report from an untried agent.** Codex, Cursor or Gemini CLI. Worked or
+  not, both answers help.
+- **A new role.** Copy `formwork/roles/TEMPLATE.md` and read
+  [`HOW-TO-ADD-A-ROLE.md`](formwork/roles/HOW-TO-ADD-A-ROLE.md) first.
 
-**A normal command that was wrongly stopped.** Just as useful. A guard that
-blocks normal work is a guard people switch off. Then nothing is guarded.
-
-**A report from an untried agent.** Codex, Cursor or Gemini CLI. Tell us if it
-worked or not. Both answers help.
-
-**A new role.** Copy `formwork/roles/TEMPLATE.md`. Read
-[`formwork/roles/HOW-TO-ADD-A-ROLE.md`](formwork/roles/HOW-TO-ADD-A-ROLE.md)
-first. The kit will refuse a role that does not say what it does.
-
-### Before you open a pull request
+Before you open a pull request:
 
 ```
 formwork check    must say green
-formwork demo     must say no to every broken test case
-formwork test     all 295 tests must pass
+formwork demo     must reject every broken test case
+formwork test     all 295 must pass
 ```
 
-Two house rules, taken from the kit itself:
-
-**Change a guard or a check? Add the test that would have caught the bug.**
-Then show it failing without your fix. A check nobody has seen fail proves
-nothing.
-
-**Write down a number? Write down the command that made it.**
-
-### Good first jobs
-
-- Set up the hooks for Codex, Cursor or Gemini CLI and tell us if they work
-- Translate the first run page
-- Add a role for something the twenty seven do not cover
-- Find a command that gets past a guard
+Two house rules, taken from the kit itself. **Change a guard or a check, and
+add the test that would have caught the bug**, shown failing without your fix.
+**Write down a number, and write down the command that made it.**
 
 ## Licence
 
