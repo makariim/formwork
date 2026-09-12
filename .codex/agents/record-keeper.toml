@@ -1,5 +1,5 @@
 # GENERATED FROM formwork/roles/method/record-keeper.md — DO NOT EDIT.
-# Change the source and run formwork/build. A hand-edit here fails the gate.
+# Change the source and run formwork roles. A hand-edit here fails the gate.
 
 name = "record-keeper"
 description = "The documents, the decision numbers, the checks, and the boundaries. Whether this repository can still be trusted by somebody who was not here."

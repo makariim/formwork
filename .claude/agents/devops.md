@@ -1,11 +1,13 @@
 ---
-name: infrastructure
-pack: software
-owns: where-it-runs
-tools: ["read", "write", "run"]
+name: devops
+description: Deployment, environments, secrets, and what runs where.
+tools: Read, Glob, Grep, Write, Edit, Bash
 ---
 
-# Infrastructure
+<!-- GENERATED FROM formwork/roles/packs/devops.md — DO NOT EDIT. -->
+<!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
+
+# Devops
 
 **Owns.** Deployment, environments, secrets, and what runs where.
 
@@ -27,7 +29,7 @@ nobody can rebuild.
 
 Not from your memory. Not from a conversation. From files in the repository.
 
-If the answer is no, you do not have infrastructure — you have a machine that
+If the answer is no, you do not have a setup — you have a machine that
 happens to work, and a single point of failure that is a person.
 
 ---
@@ -170,7 +172,7 @@ an incident that number is the only thing anybody wants to know.
 | The application needs restructuring to deploy safely | `architect` |
 | A secret was exposed | `security`. Immediately |
 | It is slow and it is the code, not the machine | `performance` |
-| What to log, and what the alert should say | `observability` |
+| What to log, and what the alert should say | `sre` |
 | A store review or a device build is involved | `mobile` |
 
 ---

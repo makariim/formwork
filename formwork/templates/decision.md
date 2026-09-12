@@ -23,9 +23,11 @@ informed: [who was told afterwards]
 ---
 
 <!-- Save as docs/decisions/0007-short-title.md — the number and the hyphen
-     are required. `formwork/check/checks/decision-ids --next .` tells you the
-     next free number; do not count the files yourself, because gaps are
-     allowed and counting collides. -->
+     are required. `formwork check` verifies the numbering. For the next free
+     number, run `formwork/check/checks/decision-ids --next .` and ignore any
+     other output it prints: run on its own it also scans the kit's test
+     fixtures. Do not count the files yourself, because gaps are allowed and
+     counting collides. -->
 
 # 0007. Short title in plain words
 
@@ -72,7 +74,14 @@ The thing that would have to become true. If you cannot name one, say so.
 
 ## Numbering
 
-The number comes from the directory — count what is there, add one. Nobody
+The number comes from the check, not from counting:
+
+```
+formwork/check/checks/decision-ids --next .
+```
+
+**Do not count the files.** Gaps are allowed, and counting collides with a
+number that is already taken. Nobody
 assigns it by hand and nobody guesses.
 
 Gaps are fine. **Renumbering is never fine**, because references break quietly.

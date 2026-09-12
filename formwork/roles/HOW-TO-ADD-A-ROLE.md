@@ -7,8 +7,8 @@
 2. Copy `TEMPLATE.md` into `formwork/roles/project/<name>.md`.
 3. Fill in the five sections **and the four frontmatter fields**. A role with
    the sections and no frontmatter does not load.
-4. Run `formwork/build` to generate it for your runtime.
-5. Run `formwork/check/run`.
+4. Run `formwork roles` to generate it for your runtime.
+5. Run `formwork check`.
 
 **There is no step that registers it anywhere.** Every role in
 `formwork/roles/` is available. Nothing to add to `.formwork.toml` — and a

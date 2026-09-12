@@ -199,6 +199,44 @@ def main():
     print("  [%s] %-52s %s" % ("pass" if ok else "FAIL",
                                "heredoc fed to a shell", "REFUSE"))
 
+    print("THE FRONT DOOR — the short command must not be a way round")
+    for c in ["formwork record", "formwork/fw record", "./formwork/fw record"]:
+        expect(c, REFUSE, command=c)
+    for c in ["formwork check", "formwork/fw check", "formwork test",
+              "formwork init", "formwork install --runtime claude-code",
+              "formwork where"]:
+        expect(c, ALLOW, command=c)
+
+    print("THIRD AUDIT — routes found by the third audit")
+    for c in ["sudo -n rm formwork/guard/git-boundary",
+              "env -i rm formwork/guard/git-boundary",
+              "if rm formwork/check/run; then echo x; fi",
+              "while rm formwork/check/run; do :; done",
+              "python3 formwork/fw record",
+              "python3 formwork/check/checks/kit-integrity --record .",
+              "uv run formwork/fw record",
+              "rm -rf *", "rm -rf ./*",
+              "dd if=/dev/zero of=formwork/check/run",
+              "unlink formwork/guard/git-boundary",
+              "rsync /tmp/x formwork/check/run"]:
+        expect(c, REFUSE, command=c)
+    got, _ = run(command="bash <<'EOF'\nrm formwork/check/run\nEOF\n")
+    ok = got == REFUSE
+    results.append(ok)
+    print("  [%s] %-52s %s" % ("pass" if ok else "FAIL",
+                               "heredoc into a shell", "REFUSE"))
+
+    print("THIRD AUDIT — siblings and ordinary globs, wrongly refused")
+    for c in ["rm .formwork.toml.bak", "rm formwork/check/run.orig",
+              "rm *.pyc", "rm build/*", "rm docs/*.tmp",
+              "sudo -n ls", "env -i ls", "python3 formwork/fw check"]:
+        expect(c, ALLOW, command=c)
+    got, _ = run(fmt="claude-code", payload='{"tool_input":{"command":123}}')
+    ok = got == REFUSE
+    results.append(ok)
+    print("  [%s] %-52s %s" % ("pass" if ok else "FAIL",
+                               "a command that is not a string", "REFUSE"))
+
     print("SECOND AUDIT — ordinary work that was wrongly refused")
     for c in ["python3 -m pytest formwork/guard/test_boundary.py",
               "cp formwork/check/run /tmp/backup-run",

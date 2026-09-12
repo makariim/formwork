@@ -10,14 +10,14 @@ this page says so rather than inventing it.
 ## The gate — measured
 
 ```
-$ time formwork/check/run
+$ time formwork check
 real 1.89
 real 2.27
 real 2.20
 ```
 
 About two seconds on this repository, over three runs. That is one run of all
-nine checks over 126 files, including the fixtures each check is tried
+nine checks over 129 files, including the fixtures each check is tried
 against. It runs at the end of
 every turn in which something changed.
 
@@ -29,10 +29,10 @@ this line.
 
 ```
 $ find formwork -type f | wc -l
-126
+129
 ```
 
-126 files. Plain text and a few small programs. Python 3, standard library only,
+129 files. Plain text and a few small programs. Python 3, standard library only,
 no dependencies of any kind. It costs nothing to carry and nothing to install.
 
 ---
@@ -51,9 +51,9 @@ happens.
 
 | | words |
 |---|---|
-| the core everybody reads — the page, the loop, the core rules | 2,234 |
+| the core everybody reads — the page, the loop, the core rules | 2,276 |
 | five role files, one per participant | 7,733 |
-| **five participants, each reading the core plus their role** | **18,903** |
+| **five participants, each reading the core plus their role** | **19,113** |
 
 ```
 wc -w FORMWORK.md formwork/loop.md formwork/rules/core.md \

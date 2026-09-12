@@ -5,7 +5,7 @@ tools: Read, Glob, Grep, Write, Edit, Bash
 ---
 
 <!-- GENERATED FROM formwork/roles/packs/accessibility.md — DO NOT EDIT. -->
-<!-- Change the source and run formwork/build. A hand-edit here fails the gate. -->
+<!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
 # Accessibility
 
@@ -202,8 +202,8 @@ retrofit costs a rebuild.
 | The situation | Whose it is |
 |---|---|
 | The contrast fails because of the brand colour | `product`. A real trade |
-| A control cannot be made accessible as designed | `visual`, then `experience` |
-| The flow needs restructuring | `experience` |
+| A control cannot be made accessible as designed | `visual`, then `ux` |
+| The flow needs restructuring | `ux` |
 | It needs a real person with assistive technology | `user-researcher`, and say so |
 | There is a legal obligation with a deadline | `legal`, now |
 

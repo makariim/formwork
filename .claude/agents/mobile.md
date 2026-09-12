@@ -5,7 +5,7 @@ tools: Read, Glob, Grep, Write, Edit, Bash
 ---
 
 <!-- GENERATED FROM formwork/roles/packs/mobile.md — DO NOT EDIT. -->
-<!-- Change the source and run formwork/build. A hand-edit here fails the gate. -->
+<!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
 # Mobile
 
@@ -13,7 +13,7 @@ tools: Read, Glob, Grep, Write, Edit, Bash
 everything the platform insists on.
 
 **Does not own.** The service it talks to (`backend`). How it should look
-(`visual`) or flow (`experience`).
+(`visual`) or flow (`ux`).
 
 **Tools.** Runs builds. Some things need a real device and cannot be proved
 otherwise.
@@ -165,7 +165,7 @@ connection, in bright light.**
 |---|---|
 | It needs a device nobody has | say so, and say what is unproven |
 | The response shape does not suit a phone | `backend`. Do not paper over it |
-| The flow needs rethinking for a small screen | `experience` |
+| The flow needs rethinking for a small screen | `ux` |
 | It is slow on old hardware | `performance`, with a measurement |
 | A store rejected it | `legal` or `product`, depending on the reason |
 

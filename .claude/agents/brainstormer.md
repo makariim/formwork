@@ -5,7 +5,7 @@ tools: Read, Glob, Grep, Write, Edit, WebFetch, WebSearch
 ---
 
 <!-- GENERATED FROM formwork/roles/packs/brainstormer.md — DO NOT EDIT. -->
-<!-- Change the source and run formwork/build. A hand-edit here fails the gate. -->
+<!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
 # Brainstormer
 

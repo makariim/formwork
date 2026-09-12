@@ -5,7 +5,7 @@ tools: Read, Glob, Grep, Write, Edit
 ---
 
 <!-- GENERATED FROM formwork/roles/packs/writer.md — DO NOT EDIT. -->
-<!-- Change the source and run formwork/build. A hand-edit here fails the gate. -->
+<!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
 # Writer
 
@@ -163,7 +163,7 @@ who is stuck that this was supposed to be easy.
 | The situation | Whose it is |
 |---|---|
 | It cannot be named because it does two things | `architect`, or `product` |
-| The flow is what is confusing, not the words | `experience` |
+| The flow is what is confusing, not the words | `ux` |
 | It makes a promise about the product | `product`, then `marketing` |
 | It states something legally binding | `legal`. Always |
 | The words are fine and people still fail | `user-researcher` |

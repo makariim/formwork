@@ -5,7 +5,7 @@ tools: Read, Glob, Grep, Write, Edit
 ---
 
 <!-- GENERATED FROM formwork/roles/method/challenger.md — DO NOT EDIT. -->
-<!-- Change the source and run formwork/build. A hand-edit here fails the gate. -->
+<!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
 # Challenger
 

@@ -18,7 +18,7 @@ migrations, anything that touched the world outside this repository.
 
 ## The check
 
-The full result of `formwork/check/run`, named as the whole thing rather than a
+The full result of `formwork check`, named as the whole thing rather than a
 part of it.
 
 If it is red, say so first. A red gate is the headline, not a footnote.

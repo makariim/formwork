@@ -1,5 +1,5 @@
 # GENERATED FROM formwork/roles/packs/backend.md — DO NOT EDIT.
-# Change the source and run formwork/build. A hand-edit here fails the gate.
+# Change the source and run formwork roles. A hand-edit here fails the gate.
 
 name = "backend"
 description = "What runs on a server. Endpoints, business rules, and the work that happens between a request arriving and a response leaving."

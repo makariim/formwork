@@ -38,6 +38,7 @@ Prevention is not available. Silence is what is being removed.
 
 Python 3, standard library only, no dependencies.
 """
+import fnmatch
 import json
 import os
 import re
@@ -72,17 +73,25 @@ PROTECTED_HOME = (
     ".formwork/denylist-exact.txt",
     ".formwork/denylist-capitalised.txt",
     ".formwork/allowlist.txt",
+    # Both shapes. The record moved to one file per project under
+    # fingerprints/, and for a while the guard was still watching only the old
+    # flat file, so `rm -rf ~/.formwork/fingerprints` was allowed and wiped
+    # every record on the machine.
     ".formwork/fingerprints.txt",
+    ".formwork/fingerprints",
     ".formwork/source-repos.txt",
 )
 
 # Programs that always write when pointed at a path.
 # Of the writers, the ones that take something away rather than add to it.
 # Only these make the directory HOLDING a protected file protected too.
-DESTROYERS = {"rm", "mv", "shred", "rmdir", "trash"}
+DESTROYERS = {"rm", "mv", "shred", "rmdir", "trash", "unlink", "gio"}
 
 WRITERS = {
     "tee", "cp", "mv", "rm", "rmdir", "install", "truncate", "dd", "ln",
+    "unlink", "rsync", "gio",
+    # Editors driven by a script write files without anybody watching.
+    "ex", "vim", "vi", "nvim", "emacs", "gsed",
     "touch", "chown", "shred", "patch", "ed", "sponge",
     "python", "python3", "perl", "ruby", "node",
 }
@@ -93,6 +102,8 @@ WRITERS = {
 CONDITIONAL_WRITERS = {
     # a stream editor prints to standard output unless asked to edit in place
     "sed": ("-i", "--in-place"),   # the long form is the Linux spelling
+    # The Homebrew GNU sed, which is on a great many Macs.
+    "gsed": ("-i", "--in-place"),
     "awk": ("-i", "-i.bak", "--in-place"),
     "gawk": ("-i", "--in-place"),
     # perl is deliberately NOT here: it is in WRITERS, and being in both
@@ -108,6 +119,10 @@ def chmod_disarms(words):
     editing a byte of it.
     """
     for w in words[1:]:
+        # `chmod --reference=FILE` copies another file's mode. It can remove
+        # execute without ever naming a mode this function understands.
+        if w.startswith("--reference"):
+            return True
         if w.startswith("-") and not w.startswith("--"):
             if "x" in w or "r" in w or "w" in w:
                 return True          # -x, -rwx and friends
@@ -149,7 +164,21 @@ READERS = {
 PREFIXES = {"sudo", "env", "time", "nohup", "nice", "command", "exec",
             "doas", "stdbuf", "timeout"}
 
-WRAPPER_FLAGS_WITH_VALUE = {"-n", "-u", "-s", "-k", "-i", "-C", "-o", "-g"}
+# Which flags each wrapper takes a VALUE for. One shared set was wrong: `sudo
+# -n` and `env -i` take no value, so the program name after them was eaten and
+# `sudo -n rm <a guard>` was allowed.
+WRAPPER_VALUE_FLAGS = {
+    "nice":    {"-n", "--adjustment"},
+    "timeout": {"-k", "-s", "--kill-after", "--signal"},
+    "env":     {"-u", "-C", "--unset", "--chdir"},
+    "sudo":    {"-u", "-g", "-p", "-C", "-r", "-t", "--user", "--group"},
+    "doas":    {"-u", "-C"},
+    "stdbuf":  {"-i", "-o", "-e"},
+    "command": set(),
+    "exec":    set(),
+    "time":    set(),
+    "nohup":   set(),
+}
 
 # Given a protected file as their first argument, these run it. They do not
 # write to it.
@@ -170,6 +199,46 @@ def ungroup(text):
 SPLIT = re.compile(r"(?:&&|\|\||[;&|\n])")
 ASSIGNMENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
 REDIRECT = re.compile(r"(\d?>>?|>\|)\s*([^\s;|&]+)")
+
+# Does this filesystem treat two spellings as the same file? Asked once, of
+# the filesystem itself, rather than guessed from the platform name.
+try:
+    _CASE_BLIND = os.path.exists(__file__.upper()) or os.path.exists(
+        __file__.lower()) and __file__ != __file__.lower() and os.path.exists(
+        __file__.lower())
+except OSError:
+    _CASE_BLIND = False
+
+
+def project_root():
+    """The project this guard is guarding.
+
+    Without this, the guard matched on the path tail anywhere on the disk. A
+    kit installed in one project then protected every `.claude/settings.json`
+    on the machine, in every other project, forever. A tester hit it while
+    trying to create an unrelated project and could not.
+    """
+    root = os.environ.get("CLAUDE_PROJECT_DIR")
+    if root:
+        return os.path.realpath(root)
+    here = os.path.dirname(os.path.abspath(__file__))
+    return os.path.realpath(os.path.dirname(os.path.dirname(here)))
+
+
+PROJECT = project_root()
+
+
+def inside_project(absolute):
+    """Is this path inside the project this guard belongs to?"""
+    try:
+        real = os.path.realpath(absolute)
+    except OSError:
+        real = absolute
+    if _CASE_BLIND:
+        real, root = real.lower(), PROJECT.lower()
+    else:
+        root = PROJECT
+    return real == root or real.startswith(root.rstrip("/") + "/")
 
 
 def is_protected(path, holder=False):
@@ -192,15 +261,38 @@ def is_protected(path, holder=False):
     # protected" — and `rm formwork/guard/*` deleted every guard. Match the
     # pattern against the protected list before asking the filesystem.
     if any(ch in p for ch in "*?["):
-        stem = re.split(r"[*?\[]", p, maxsplit=1)[0].lstrip("./")
-        if stem:
-            for prefix in PROTECTED + PROTECTED_HOME:
-                tail = prefix.rstrip("/")
-                # Either the glob expands into a protected thing, or it names
-                # part of one. `formwork/guard/git-bound*` is the second.
-                if tail.startswith(stem) or stem.rstrip("/").startswith(tail):
+        # `rm -rf *` and `rm -rf /abs/path/formwork/guard/*` were both
+        # allowed: the first has no stem to compare, the second never matched
+        # a relative entry. Match the pattern itself against each protected
+        # path and every parent of it.
+        pat = p.lstrip("./")
+        for prefix in PROTECTED + PROTECTED_HOME:
+            tail = prefix.rstrip("/")
+            parts = tail.split("/")
+            candidates = ["/".join(parts[:i + 1]) for i in range(len(parts))]
+            candidates.append(os.path.basename(tail))
+            for c in candidates:
+                if fnmatch.fnmatch(c, pat) or fnmatch.fnmatch(c, pat.lstrip("/")):
                     return prefix
+                # An absolute or deeper pattern: compare on the tail.
+                if pat.endswith("/*") and (pat[:-2].endswith("/" + c)
+                                           or pat[:-2].endswith(c)):
+                    return prefix
+            stem = re.split(r"[*?\[]", pat, maxsplit=1)[0]
+            if stem and (tail.startswith(stem.lstrip("/"))
+                         or stem.lstrip("/").startswith(tail)):
+                return prefix
         return None
+
+    # The word lists and the integrity record are protected by name, whether
+    # or not they exist yet. A record directory that has not been created is
+    # still the thing a later command would destroy.
+    expanded = os.path.abspath(os.path.expanduser(p)).replace("\\", "/")
+    for h in PROTECTED_HOME:
+        hn = h.replace("/", "/")
+        if expanded.endswith("/" + hn) or expanded.rstrip("/").endswith("/" + hn) \
+                or p.rstrip("/").endswith(hn):
+            return h
 
     if not os.path.exists(os.path.abspath(os.path.expanduser(p))):
         return None
@@ -224,14 +316,33 @@ def is_protected(path, holder=False):
         if absolute == os.path.join(home, h):
             return h
     # Compare on the tail, so both a relative and an absolute path match.
+    #
+    # Case-folded. On macOS and Windows the filesystem does not care about
+    # case, so `formwork/GUARD/git-boundary` opens the real guard while a
+    # case-sensitive string compare said it was something else entirely. That
+    # was a master key to every protected file.
     norm = absolute.replace("\\", "/")
+    if _CASE_BLIND:
+        norm = norm.lower()
+        p = p.lower()
+    # Only files inside this project. The word lists above are matched
+    # wherever they live, because they are one person's and follow them.
+    if not inside_project(absolute):
+        return None
+
     for prefix in PROTECTED:
-        if norm.endswith("/" + prefix.rstrip("/")) or ("/" + prefix) in norm + "/":
+        tail = prefix.rstrip("/")
+        cmp_tail = tail.lower() if _CASE_BLIND else tail
+        # Boundary aware. `.formwork.toml.bak` and `run.orig` are the files a
+        # merge leaves behind, and refusing them was a false positive.
+        if norm == cmp_tail or norm.endswith("/" + cmp_tail) \
+                or ("/" + cmp_tail + "/") in norm + "/":
             return prefix
         # Boundary-aware: a file whose name merely starts with a protected
         # path is a different file.
-        if p == prefix or p.rstrip("/") == prefix.rstrip("/") \
-                or p.startswith(prefix.rstrip("/") + "/"):
+        cmp_prefix = prefix.lower() if _CASE_BLIND else prefix
+        if p == cmp_prefix or p.rstrip("/") == cmp_prefix.rstrip("/") \
+                or p.startswith(cmp_prefix.rstrip("/") + "/"):
             return prefix
 
     # A directory that CONTAINS protected things is protected too — but only
@@ -270,8 +381,9 @@ def strip_prefixes(words):
             continue
         if ASSIGNMENT.match(w) or w in PREFIXES:
             i += 1
+            takes = WRAPPER_VALUE_FLAGS.get(w, set())
             while i < len(words) and words[i].startswith("-"):
-                takes_value = words[i] in WRAPPER_FLAGS_WITH_VALUE
+                takes_value = words[i] in takes
                 i += 1
                 if takes_value and i < len(words):
                     i += 1
@@ -298,6 +410,26 @@ def verdict_for(segment):
     # Running a protected program is exactly what it is for — with one
     # exception. The integrity check can rewrite the record it checks
     # against, which disarms it, so that one is a decision for the human.
+    # Re-recording, however it is spelled. This runs before every exemption
+    # below, because `python3 formwork/fw record` and
+    # `uv run <kit>/kit-integrity --record .` both reached the fingerprints
+    # through the interpreter exemption.
+    rerecords = ("record" in words[1:] and
+                 any(os.path.basename(w.rstrip("/")) in ("formwork", "fw")
+                     for w in words)) or \
+                ("--record" in words[1:] and
+                 any(os.path.basename(w.rstrip("/")) == "kit-integrity"
+                     for w in words))
+    if rerecords:
+        return ("re-recording the integrity fingerprints. That tells the kit "
+                "every current file is the intended one, so it is a decision, "
+                "not a step. Run it yourself")
+
+    if program in ("formwork", "fw") and "record" in words[1:]:
+        return ("re-recording the integrity fingerprints. That tells the kit "
+                "every current file is the intended one, so it is a decision, "
+                "not a step. Run it yourself")
+
     if is_protected(words[0]):
         if os.path.basename(words[0].rstrip("/")) == "kit-integrity" and \
                 "--record" in words[1:]:
@@ -355,6 +487,13 @@ def verdict_for(segment):
         # which is the thing this guard most wants somebody to do.
         if program == "cp" and len(operands) >= 2:
             operands = operands[-1:]
+        # `dd of=<path>` hides its target inside a token, so the plain
+        # operand scan never saw it.
+        for w in words[1:]:
+            if "=" in w and w.split("=", 1)[0] in ("of", "out", "output"):
+                hit = is_protected(w.split("=", 1)[1])
+                if hit:
+                    return "%s would write to %s" % (program, hit)
         for w in operands:
             hit = is_protected(w, holder=destroys)
             if hit:
@@ -376,10 +515,25 @@ def verdict_for(segment):
 # shell or an interpreter it is code, and stripping it hid the command
 # completely. This was introduced by the fix for the opposite false positive,
 # which is a good reminder that a guard change needs its own test.
-SHELL_SINK = re.compile(
-    r"(?:^|[;&|]|\$\(|`)\s*(?:[A-Za-z_][A-Za-z0-9_]*=\S*\s+)*"
-    r"(?:sudo|env|nice|timeout|command|exec)?\s*"
-    r"(?:/\S*/)?(?:ba|z|k|da)?sh|python[0-9.]*|perl|ruby|node|eval\b")
+# Does this line hand the heredoc to something that will RUN it?
+#
+# The first version was a regular expression with an unparenthesised
+# alternation. Only the shell branch was anchored, so `cat > retrieval.md` was
+# read as `eval` and refused, while `sudo -n bash` was not read as a shell at
+# all and walked through. Tokenising is slower and correct.
+EXECUTES_STDIN = {"sh", "bash", "zsh", "ksh", "dash", "eval", "python",
+                  "python3", "perl", "ruby", "node", "uv", "xargs"}
+
+
+def _sink_runs_it(line):
+    try:
+        words = shlex.split(line)
+    except ValueError:
+        words = tokens(line)
+    words = strip_prefixes(words)
+    if not words:
+        return False
+    return os.path.basename(words[0].strip("'\"")) in EXECUTES_STDIN
 
 
 def strip_heredocs(command):
@@ -387,7 +541,11 @@ def strip_heredocs(command):
     def keep_or_drop(m):
         before = command[:m.start()]
         line = before.rsplit("\n", 1)[-1]
-        if SHELL_SINK.search(line):
+        # Split on the last separator: `x && bash <<EOF` is a shell sink.
+        for sep in ("&&", "||", ";", "|"):
+            if sep in line:
+                line = line.rsplit(sep, 1)[-1]
+        if _sink_runs_it(line):
             return m.group(0)        # it is code. Leave it to be inspected.
         return "<<REDACTED"
     return HEREDOC.sub(keep_or_drop, command)
@@ -401,7 +559,8 @@ SUBSHELL = re.compile(r"\$\(([^()]*)\)|`([^`]*)`")
 # straight through.
 INDIRECT = {"bash", "sh", "zsh", "ksh", "dash", "eval", "xargs", "watch"}
 GROUPING = {"(", "{", "}", ")", "then", "else", "do", "done", "fi", "!",
-            "&&", "||", ";"}
+            "&&", "||", ";", "for", "while", "until", "if", "in", "case",
+            "esac", "elif"}
 
 
 def split_all(command, depth=0):
@@ -419,13 +578,42 @@ def split_all(command, depth=0):
         except ValueError:
             quoted = tokens(segment)
         words = strip_prefixes(quoted)
-        if words and os.path.basename(words[0]) in INDIRECT:
-            for w in words[1:]:
-                if w.startswith("-"):
-                    continue
-                for seg in split_all(w, depth + 1):
+        if not words:
+            continue
+        head = os.path.basename(words[0])
+
+        # `find . -exec <command> ;` runs whatever follows -exec. It was not
+        # inspected at all.
+        if head == "find":
+            for k, w in enumerate(words):
+                if w in ("-exec", "-execdir", "-ok", "-okdir"):
+                    rest = []
+                    for t in words[k + 1:]:
+                        if t in (";", "\\\\;", "+"):
+                            break
+                        rest.append(t)
+                    if rest:
+                        for seg in split_all(" ".join(rest), depth + 1):
+                            yield seg
+            continue
+
+        if head in INDIRECT:
+            rest = [w for w in words[1:]]
+            # A quoted single argument, as in `sh -c "git push"`.
+            first = None
+            for w in rest:
+                if not w.startswith("-"):
+                    first = w
+                    break
+            if first is not None:
+                for seg in split_all(first, depth + 1):
                     yield seg
-                break
+            # And the same command spread across argv, as in `xargs git push`
+            # or `watch -n1 git push`, which was only half read.
+            spread = [w for w in rest if not w.startswith("-")]
+            if len(spread) > 1:
+                for seg in split_all(" ".join(spread), depth + 1):
+                    yield seg
 
 
 def decide(command):
@@ -474,12 +662,16 @@ def from_payload(payload):
     if not isinstance(box, dict):
         return None
     path = box.get("file_path") or box.get("path") or box.get("notebook_path")
-    command = box.get("command") or box.get("cmd") or ""
-    if not isinstance(command, str):
-        command = ""
-    if not isinstance(path, str):
-        path = ""
-    return command, path
+    command = box.get("command")
+    if command is None:
+        command = box.get("cmd")
+    # Present and not a string means a shape this guard does not understand.
+    # Coercing it to "" meant an argv array was waved through in silence.
+    if command is not None and not isinstance(command, str):
+        return None
+    if path is not None and not isinstance(path, str):
+        return None
+    return command or "", path or ""
 
 
 def main(argv):

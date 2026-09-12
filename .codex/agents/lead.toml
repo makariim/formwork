@@ -1,5 +1,5 @@
 # GENERATED FROM formwork/roles/method/lead.md — DO NOT EDIT.
-# Change the source and run formwork/build. A hand-edit here fails the gate.
+# Change the source and run formwork roles. A hand-edit here fails the gate.
 
 name = "lead"
 description = "Running a round. Distributing the questions, forcing the argument, resolving only what the record resolves, and authoring the account of it."

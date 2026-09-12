@@ -11,7 +11,7 @@ tools: ["read", "write", "run"]
 the user's own machine does.
 
 **Does not own.** What the server does (`backend`). What the data looks like at
-rest (`data`). How it should look (`visual`) or flow (`experience`).
+rest (`data`). How it should look (`visual`) or flow (`ux`).
 
 **Tools.** Runs the build and the tests.
 
@@ -190,7 +190,7 @@ A test coupled to structure breaks on every refactor and catches nothing.
 | The situation | Whose it is |
 |---|---|
 | The response shape does not exist yet | `backend`. Do not invent it |
-| The flow itself is confusing | `experience` |
+| The flow itself is confusing | `ux` |
 | It is slow because of what is being sent | `performance`, with a measurement |
 | A control cannot be made accessible | `accessibility` |
 | A rule is duplicated and the two disagree | `backend`. The server wins |

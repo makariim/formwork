@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Set this project up to use the kit.
 
-    formwork/install                    detect the runtime and wire it
-    formwork/install --runtime cursor   say which runtime, rather than guessing
+    formwork install                    detect the runtime and wire it
+    formwork install --runtime cursor   say which runtime, rather than guessing
     formwork/install --dry-run          say what would change, change nothing
 
 Exit status:
@@ -277,9 +277,11 @@ def record_fingerprints(root, dry_run):
     checker = os.path.join(HERE, "check", "checks", "kit-integrity")
     if not (os.path.isfile(checker) and os.access(checker, os.X_OK)):
         return None
-    state = os.environ.get("FORMWORK_STATE_DIR") or os.path.expanduser(
-        "~/.formwork")
-    if os.path.exists(os.path.join(state, "fingerprints.txt")):
+    # Ask the checker where this project's record lives. A single machine-wide
+    # file meant the second project on a machine inherited the first one's
+    # fingerprints and was told its untouched guards had been tampered with.
+    probe = subprocess.run([checker, root], capture_output=True, text=True)
+    if "no fingerprints recorded" not in (probe.stdout + probe.stderr):
         return "already"
     if dry_run:
         return "would"
@@ -380,11 +382,11 @@ def main(argv):
         for item in plan.unfinished:
             print("  - %s" % item)
         print("")
-        print("Then check it took:  formwork/check/run")
+        print("Then check it took:  formwork check")
         return PARTIAL
 
     print("")
-    print("Check it took:  formwork/check/run")
+    print("Check it took:  formwork check")
     print("Then:           formwork/first-run.md")
     return DONE
 

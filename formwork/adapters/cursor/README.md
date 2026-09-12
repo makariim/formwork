@@ -11,7 +11,7 @@ So **the Claude Code output serves Cursor directly.** Generating a second,
 identical tree would be duplication for its own sake, and duplication is what
 the generator exists to remove.
 
-Run `formwork/build --runtime claude-code` and Cursor finds them.
+Run `formwork roles --runtime claude-code` and Cursor finds them.
 
 ## Where the tool grant goes
 
@@ -20,8 +20,12 @@ Cursor has `readonly: true|false`. One bit.
 That can say "this role may not write". It cannot say "this role may write and
 may not start other agents", which is what the challenger needs.
 
-Nothing approximate is emitted. **On Cursor the grant is advice**, and the
-generated file says so.
+Nothing approximate is emitted. **On Cursor the grant is advice.**
+
+**And no file tells you that**, because nothing is generated for Cursor. The
+files Cursor reads are the Claude Code ones, and they carry a Claude Code tool
+list that Cursor cannot act on. This page is the only place that says so, which
+is worth knowing before you rely on it.
 
 ## Blocking
 

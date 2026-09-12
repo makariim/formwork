@@ -223,6 +223,31 @@ def main():
     print("  [%s] %-44s %s" % ("pass" if ok else "FAIL",
                                "heredoc fed to a shell", "REFUSE"))
 
+    print("THIRD AUDIT — wrappers that swallowed the command")
+    for c in ['sudo -n git push', 'env -i git push', 'sudo -s git push',
+              'timeout -k 1 30 git push',
+              'git symbolic-ref HEAD refs/heads/evil']:
+        expect(c, c, REFUSE)
+    for pre in ('bash', 'sudo -n bash', 'nice -n 5 bash', 'timeout 60 bash',
+                'env FOO=1 bash'):
+        code, out = run(command="%s <<'EOF'\ngit push\nEOF\n" % pre)
+        ok = code == REFUSE
+        results.append(ok)
+        print("  [%s] %-44s %s" % ("pass" if ok else "FAIL",
+                                   "heredoc into: " + pre, "REFUSE"))
+
+    print("THIRD AUDIT — reads and branch moves wrongly refused")
+    for c in ['git stash show -p', 'git checkout main', 'git checkout v1.2.0',
+              'git symbolic-ref --short HEAD',
+              'git config --local user.email 2>/dev/null']:
+        expect(c, c, ALLOW)
+    for name in ('retrieval.md', 'node-setup.md', 'ruby-guide.md'):
+        code, out = run(command="cat > docs/%s <<'EOF'\ngit push\nEOF\n" % name)
+        ok = code == ALLOW
+        results.append(ok)
+        print("  [%s] %-44s %s" % ("pass" if ok else "FAIL",
+                                   "heredoc written to " + name, "allow"))
+
     print("SECOND AUDIT — reads that were wrongly refused")
     for c in ['git symbolic-ref --short HEAD',
               'git config --global --get user.name',

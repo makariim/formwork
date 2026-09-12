@@ -5,7 +5,7 @@ tools: Read, Glob, Grep
 ---
 
 <!-- GENERATED FROM formwork/roles/method/reviewer.md — DO NOT EDIT. -->
-<!-- Change the source and run formwork/build. A hand-edit here fails the gate. -->
+<!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
 # Reviewer
 

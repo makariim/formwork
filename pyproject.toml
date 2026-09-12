@@ -1,0 +1,57 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "formwork-kit"
+version = "0.1.0"
+description = "You bring the idea. It brings the whole team. Rules your coding agent cannot ignore."
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+authors = [{ name = "Muhammad Elsherif" }]
+keywords = ["ai", "agents", "claude", "coding-agent", "project-management"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: MacOS",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Quality Assurance",
+]
+
+# No dependencies. That is a promise, not an oversight.
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/muhammadelsherif/formwork"
+Source = "https://github.com/muhammadelsherif/formwork"
+Issues = "https://github.com/muhammadelsherif/formwork/issues"
+
+# The package is formwork-kit. The command is formwork.
+[project.scripts]
+formwork = "formwork_cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["formwork_cli"]
+
+# The kit travels inside the package, so `formwork init` can put it into your
+# project without cloning anything.
+[tool.hatch.build.targets.wheel.force-include]
+"formwork" = "formwork_cli/kit"
+"FORMWORK.md" = "formwork_cli/kit-page/FORMWORK.md"
+
+[tool.hatch.build.targets.sdist]
+# Anchored. Unanchored "README.md" matched at any depth and quietly pulled in
+# docs/README.md and docs/decisions/README.md.
+include = ["/formwork_cli", "/formwork", "/FORMWORK.md", "/README.md",
+           "/LICENSE", "/pyproject.toml"]

@@ -5,7 +5,7 @@ tools: Read, Glob, Grep, Write, Edit, Bash
 ---
 
 <!-- GENERATED FROM formwork/roles/packs/backend.md — DO NOT EDIT. -->
-<!-- Change the source and run formwork/build. A hand-edit here fails the gate. -->
+<!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
 # Backend
 

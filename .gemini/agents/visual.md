@@ -5,7 +5,7 @@ kind: local
 ---
 
 <!-- GENERATED FROM formwork/roles/packs/visual.md — DO NOT EDIT. -->
-<!-- Change the source and run formwork/build. A hand-edit here fails the gate. -->
+<!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
 > **This role's tool grant is not expressed here.** It asks for `read`, `write`, and gemini-cli does not have a documented name for `write`. An incomplete allowlist would quietly remove a tool the role needs, so none is written. The grant is advice on this runtime.
 
@@ -14,7 +14,7 @@ kind: local
 **Owns.** Look, type, colour, spacing, and whether the whole thing appears to
 come from one place.
 
-**Does not own.** Whether a person can use it. That is `experience`, and it wins
+**Does not own.** Whether a person can use it. That is `ux`, and it wins
 wherever the two conflict.
 
 **Tools.** Reads and writes.
@@ -165,7 +165,7 @@ Three cheap tests that catch most problems:
 
 | The situation | Whose it is |
 |---|---|
-| It looks right and people still cannot finish | `experience` |
+| It looks right and people still cannot finish | `ux` |
 | The contrast fails and the brand colour is the reason | `product`. That is a trade, not a detail |
 | It is slow because of images or fonts | `performance` |
 | Assistive technology cannot read it | `accessibility` |

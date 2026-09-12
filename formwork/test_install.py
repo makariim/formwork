@@ -34,9 +34,17 @@ def check(name, got, want, output=""):
             print("        %s" % line)
 
 
+# Every test runs the real installer, and the real installer writes a
+# fingerprint record outside the project. Without this the suite wrote
+# twenty-one records into the developer's own home directory, one per test.
+STATE = tempfile.mkdtemp(prefix="fw-test-state-")
+
+
 def install(project, *args):
+    env = dict(os.environ)
+    env["FORMWORK_STATE_DIR"] = os.path.join(STATE, os.path.basename(project))
     p = subprocess.run([sys.executable, INSTALL] + list(args),
-                       capture_output=True, text=True, cwd=project)
+                       capture_output=True, text=True, cwd=project, env=env)
     return p.returncode, p.stdout + p.stderr
 
 

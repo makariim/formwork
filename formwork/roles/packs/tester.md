@@ -211,7 +211,7 @@ Say it out loud rather than approximating:
 | The logic cannot be reached by a test | `backend` or `architect`. It has to move |
 | It fails only under load | `performance` |
 | A test exposes a permission hole | stop. `security`, now |
-| The suite is slow enough that people skip it | `infrastructure`, and say how slow |
+| The suite is slow enough that people skip it | `devops`, and say how slow |
 
 ---
 

@@ -14,6 +14,7 @@ Exit status:
     1   a runtime is declared and its wiring is missing
     2   the check could not run
 """
+import json
 import os
 import re
 import sys
@@ -31,6 +32,15 @@ MARKERS = ("formwork/guard/git-boundary",
            "formwork/guard/protected-files",
            "formwork/guard/quality-gate")
 MARKER = MARKERS[0]
+
+# Events that actually fire before a tool runs, or at the end of a turn.
+# Anything else is a place to park a hook so it never happens.
+LIVE_EVENTS = {"PreToolUse", "Stop", "SubagentStop", "preToolUse",
+               "beforeShellExecution", "BeforeTool"}
+
+# A matcher that can match a real tool name. "zzz-never-matches" cannot.
+MATCHES_A_TOOL = re.compile(
+    r"(?i)\b(Bash|Write|Edit|NotebookEdit|Task|WebFetch|Read|Glob|Grep|\*|\.\*)\b")
 
 
 def declared_runtime(root):
@@ -80,20 +90,40 @@ def main(argv):
     # all — including inside a key called "_disabled_note", and including
     # inside an echo. The path must START a command value.
     # The value may contain escaped quotes: "\"$CLAUDE_PROJECT_DIR\"/formwork/..."
-    def invoked(marker):
-        pat = (r'"command"\s*:\s*"(?:[^"\\]|\\.)*?%s'
-               % re.escape(marker))
-        toml = r'command\s*=\s*["\'][^\n]*?%s' % re.escape(marker)
-        for m in list(re.finditer(pat, text)) + list(re.finditer(toml, text)):
-            # What sits immediately before the path must be the start of the
-            # value, a quote, a slash, or a variable — not other words.
-            head = m.group(0)[:-len(marker)]
-            tail = head.rstrip()
-            if re.search(r'(?:"|\'|:|=|/|\}|\$\w+|\\")\s*$', tail):
-                return True
+    # A path inside a "command" string was not enough. Every guard was moved
+    # to an event that never fires, with a matcher that matches nothing, and
+    # this check still said wired. It now reads the shape, not just the text.
+    def wired_for(marker):
+        try:
+            data = json.loads(text)
+        except ValueError:
+            # Not JSON. Fall back to the text test, which is all the TOML
+            # runtimes can be given today.
+            return marker in text
+
+        hooks = data.get("hooks")
+        if not isinstance(hooks, dict):
+            return False
+        for event, entries in hooks.items():
+            if event not in LIVE_EVENTS:
+                continue
+            if not isinstance(entries, list):
+                continue
+            for entry in entries:
+                if not isinstance(entry, dict):
+                    continue
+                matcher = entry.get("matcher")
+                if matcher is not None and not MATCHES_A_TOOL.search(str(matcher)):
+                    continue
+                for h in entry.get("hooks") or []:
+                    if not isinstance(h, dict):
+                        continue
+                    cmd = str(h.get("command", ""))
+                    if marker in cmd and not cmd.strip().startswith("echo"):
+                        return True
         return False
 
-    missing = [m for m in MARKERS if not invoked(m)]
+    missing = [m for m in MARKERS if not wired_for(m)]
     if missing:
         print("runtime '%s' is declared and %s exists, but it does not "
               "invoke:" % (runtime, WIRING[runtime]))

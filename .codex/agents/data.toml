@@ -1,5 +1,5 @@
 # GENERATED FROM formwork/roles/packs/data.md — DO NOT EDIT.
-# Change the source and run formwork/build. A hand-edit here fails the gate.
+# Change the source and run formwork roles. A hand-edit here fails the gate.
 
 name = "data"
 description = "How information is stored, how its shape changes over time, and whether a change can be undone."

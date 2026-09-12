@@ -5,7 +5,7 @@ tools: Read, Glob, Grep, Write, Edit, WebFetch, WebSearch
 ---
 
 <!-- GENERATED FROM formwork/roles/packs/marketing.md — DO NOT EDIT. -->
-<!-- Change the source and run formwork/build. A hand-edit here fails the gate. -->
+<!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
 # Marketing
 
@@ -173,7 +173,7 @@ is a faster leak.
 | The honest description is not compelling | `product`. That is a product finding |
 | A claim needs a number nobody has measured | `researcher` or `analyst` |
 | It touches regulated claims, privacy, or comparisons | `legal` |
-| The launch would bring load the system cannot take | `infrastructure`, before the date |
+| The launch would bring load the system cannot take | `devops`, before the date |
 | Nobody knows who this is actually for | the human. Stop until it is decided |
 
 ---

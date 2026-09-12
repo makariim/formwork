@@ -183,7 +183,7 @@ CHANGE MY MIND   it without hesitating.
 | The situation | Whose it is |
 |---|---|
 | The finding is clear, the response is not | `product` |
-| It is a labelling or flow problem | `experience` |
+| It is a labelling or flow problem | `ux` |
 | Somebody wants a number from this | `researcher`, and say the sample was small |
 | You recorded anything personal | `legal`. Before anything else |
 | The finding contradicts a decision already made | report both. Do not resolve it |

@@ -5,7 +5,7 @@ kind: local
 ---
 
 <!-- GENERATED FROM formwork/roles/packs/analyst.md — DO NOT EDIT. -->
-<!-- Change the source and run formwork/build. A hand-edit here fails the gate. -->
+<!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
 > **This role's tool grant is not expressed here.** It asks for `read`, `write`, `run`, and gemini-cli does not have a documented name for `write`. An incomplete allowlist would quietly remove a tool the role needs, so none is written. The grant is advice on this runtime.
 
@@ -199,7 +199,7 @@ this one's.
 | The situation | Whose it is |
 |---|---|
 | The data cannot answer this question | say so. Do not approximate |
-| The instrumentation is missing or wrong | `observability` |
+| The instrumentation is missing or wrong | `sre` |
 | It needs to know why people behaved this way | `user-researcher`. Numbers show what, never why |
 | The number implies a product change | `product`. You do not decide |
 | It involves personal data or profiling | `legal` |

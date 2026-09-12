@@ -1,6 +1,6 @@
 # Your first fifteen minutes
 
-Six steps, on your own project. No tutorial, no sample repository.
+Seven short steps, on your own project. No tutorial, no sample repository.
 
 **Nothing here restructures your work.** The install adds files and touches
 nothing else. It does not need a clean working tree.
@@ -8,8 +8,8 @@ nothing else. It does not need a clean working tree.
 **About the fifteen minutes.** The machine's share is small, and measured:
 
 ```
-$ time formwork/install --dry-run        0.03s
-$ time formwork/check/run --demo-fail    1.0s
+$ time formwork install --dry-run     0.03s
+$ time formwork demo                 1.0s
 ```
 
 Your share has never been timed, because step 4 is you doing real work on your
@@ -19,19 +19,37 @@ telling whoever gave you this.
 
 ---
 
+> **`command not found: formwork`?**
+>
+> You have the kit but not the command. Everything on this page also works
+> with `formwork/fw` from the top of your project:
+>
+> ```
+> formwork/fw check
+> formwork/fw record
+> ```
+>
+> To get the short command: `pipx install formwork-kit`.
+
 ## 0 — Get the kit into your project
 
-**Two things travel: the `formwork/` folder, and `FORMWORK.md` beside it.**
-
-Either fork this repository and work in it, or copy those two into a project
-you already have:
+**The short way**, if you installed the command:
 
 ```
-cp -R path/to/formwork/formwork  .
-cp    path/to/formwork/FORMWORK.md .
+formwork init
 ```
 
-That is all. Nothing else in this repository is needed to run the kit —
+That puts the two things the kit is made of into this folder: `formwork/` and
+`FORMWORK.md`.
+
+**The long way**, if you did not:
+
+```
+cp -R path/to/the-kit/formwork  .
+cp    path/to/the-kit/FORMWORK.md .
+```
+
+Either way, that is all. Nothing else in the source repository is needed.
 `docs/` is how it was built, not part of it.
 
 ---
@@ -39,7 +57,7 @@ That is all. Nothing else in this repository is needed to run the kit —
 ## 1 — Install
 
 ```
-formwork/install
+formwork install
 ```
 
 It works out which runtime you use, writes `.formwork.toml`, wires the guards
@@ -58,14 +76,14 @@ next to it first.
 To see what it would do without doing it:
 
 ```
-formwork/install --dry-run
+formwork install --dry-run
 ```
 
 If it cannot tell which runtime you use, it says so and asks rather than
 guessing:
 
 ```
-formwork/install --runtime cursor
+formwork install --runtime cursor
 ```
 
 **Read the exit code.** `0` finished. `1` got as far as it could, and prints a
@@ -108,13 +126,13 @@ argued for.
 ## 3 — Watch a check go red
 
 ```
-formwork/check/run
+formwork check
 ```
 
 Green. Now:
 
 ```
-formwork/check/run --demo-fail
+formwork demo
 ```
 
 Each check runs against an input built to break it, and you watch each one
@@ -181,6 +199,8 @@ arrives:
 | [`roles/HOW-TO-ADD-A-ROLE.md`](roles/HOW-TO-ADD-A-ROLE.md) | adding your own |
 | [`COSTS.md`](COSTS.md) | what this costs, and the number nobody has |
 | [`limits.md`](limits.md) | what the guards cannot do. Read before trusting them |
+| [`glossary.md`](glossary.md) | any word here you did not recognise |
+| [`troubleshooting.md`](troubleshooting.md) | when something goes wrong |
 
 ---
 
@@ -220,7 +240,7 @@ had established before — please say so. If the commit goes through, the bounda
 is advice on your runtime, and you should know that on day one rather than on a
 bad day.
 
-**Step 3 works either way.** `formwork/check/run --demo-fail` is a program you
+**Step 3 works either way.** `formwork demo` is a program you
 run yourself. It does not depend on hooks, on your runtime, or on anything
 refusing. Every reader gets this one.
 
@@ -228,8 +248,8 @@ refusing. Every reader gets this one.
 report and the stop are all things the agent does because the rules say so, not
 because something blocks it.
 
-So the honest division is: **the checks are yours whatever you run. Half the
-guards may not be.**
+So the honest division is: **the checks are yours whatever you run. None of
+the three guards is, until the hooks are wired.**
 
 What that is worth is not nothing. A rule an agent follows most of the time is
 worth having. It is just not the same as a rule it cannot break, and this kit
