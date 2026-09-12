@@ -144,7 +144,7 @@ Type `formwork` on its own to see everything it can do.
 The kit is just files. Copy them in and run them by path:
 
 ```
-git clone https://github.com/muhammadelsherif/formwork.git  the-kit
+git clone https://github.com/makariim/formwork.git  the-kit
 cp -R  the-kit/formwork  the-kit/FORMWORK.md   /your/project/
 
 cd /your/project
