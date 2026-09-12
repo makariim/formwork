@@ -1,0 +1,393 @@
+#!/usr/bin/env python3
+"""Set this project up to use the kit.
+
+    formwork/install                    detect the runtime and wire it
+    formwork/install --runtime cursor   say which runtime, rather than guessing
+    formwork/install --dry-run          say what would change, change nothing
+
+Exit status:
+    0   installed, or already installed and nothing to do
+    1   installed as far as it can go, and the rest needs your hand
+    2   could not run
+
+WHAT IT ADDS, AND ITS THREE LIMITS
+----------------------------------
+It adds three things:
+
+    .formwork.toml                  which runtime this project uses
+    the hook wiring for your runtime    so the guards are called at all
+    the role files for that runtime     generated from formwork/roles/
+
+The third one used to be a separate program nobody was told about. A fresh
+install passed, and then the very next command — the one this installer
+prints — reported a red gate. Generating them here is the fix.
+
+That is all. It has three limits, and they are the point:
+
+  * **It never needs a clean working tree.** It does not read git, does not
+    look at your changes, and does not care what is uncommitted. Installing a
+    tool should not make you stop what you were doing.
+  * **It never moves or deletes a file.** Only adds. If it has to change an
+    existing file, it writes a copy of the original next to it first.
+  * **It never demands a document.** No brief, no decision record, no
+    structure imposed on a project that already has one.
+
+Running it twice changes nothing the second time.
+
+WHY IT SOMETIMES EXITS 1
+------------------------
+Only one of the four runtimes ships a wiring file in this kit. For the other
+three the wiring is documented by their publishers and **has never been run by
+anybody**, so this installer writes nothing for them. It names the file you
+must write yourself, points at the adapter README that says what goes in it,
+and exits 1 rather than 0.
+
+**Their gate stays red until that file exists.** That is the correct answer:
+nothing is guarding yet, and reporting green would be a lie.
+
+Exit 1 means: you are not finished. Go and look.
+
+Python 3, standard library only.
+"""
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import time
+
+DONE, PARTIAL, CANNOT_RUN = 0, 1, 2
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(HERE)
+ADAPTERS = os.path.join(HERE, "adapters")
+
+# Where each runtime keeps its hooks. Must agree with the guard-wired check,
+# which fails the gate when a runtime is declared and its wiring is missing.
+WIRING = {
+    "claude-code": ".claude/settings.json",
+    "codex":       ".codex/hooks.json",
+    "cursor":      ".cursor/hooks.json",
+    "gemini-cli":  ".gemini/settings.json",
+}
+
+# A directory that means "this runtime is in use here".
+FOOTPRINT = {
+    "claude-code": ".claude",
+    "codex":       ".codex",
+    "cursor":      ".cursor",
+    "gemini-cli":  ".gemini",
+}
+
+# Only this one has a wiring file in the kit, watched refusing a real command.
+TESTED = {"claude-code"}
+
+CONFIG = """\
+# Formwork configuration. Three layers, kept apart on purpose.
+
+[bindings]
+# One person's setup. Change freely.
+runtime = "%s"
+
+[strength]
+# How hard each enforced rule bites: block | warn | off.
+# Strict by default. A team may need warn; somebody working alone should not.
+git_boundary = "block"
+protect_files = "block"
+
+# [rules] is deliberately absent, and that is the point.
+# Rules are not switched off here. Dropping one is an edit to
+# formwork/rules/core.md, which leaves a line in version control with your
+# name on it.
+"""
+
+
+class Plan(object):
+    """Everything that would change, decided before anything is written."""
+
+    def __init__(self, dry_run):
+        self.dry_run = dry_run
+        self.writes = []          # (path, text, why)
+        self.backups = []         # (path, copy_path)
+        self.notes = []
+        self.unfinished = []
+
+    def write(self, path, text, why):
+        self.writes.append((path, text, why))
+
+    def apply(self):
+        for path, copy in self.backups:
+            if self.dry_run:
+                continue
+            if not os.path.exists(copy):
+                shutil.copy2(path, copy)
+            else:
+                # A second install used to overwrite the file while leaving
+                # the first backup in place, so anything added in between
+                # existed in neither. Keep both.
+                stamp = "%s.%d" % (copy, int(time.time()))
+                shutil.copy2(path, stamp)
+        for path, text, _ in self.writes:
+            if self.dry_run:
+                continue
+            parent = os.path.dirname(path)
+            if parent:
+                os.makedirs(parent, exist_ok=True)
+            open(path, "w", encoding="utf-8").write(text)
+
+
+def detect(root):
+    """(runtime, why). runtime is None when it cannot be told from the outside."""
+    found = [r for r, d in sorted(FOOTPRINT.items())
+             if os.path.isdir(os.path.join(root, d))]
+    if len(found) == 1:
+        return found[0], "found %s/" % FOOTPRINT[found[0]]
+    if len(found) > 1:
+        return None, ("more than one runtime is set up here: %s"
+                      % ", ".join(found))
+    return None, "no runtime directory found"
+
+
+def declared(root):
+    path = os.path.join(root, ".formwork.toml")
+    if not os.path.exists(path):
+        return None
+    text = open(path, encoding="utf-8", errors="ignore").read()
+    m = re.search(r'^\s*runtime\s*=\s*["\']([^"\']+)["\']', text, re.M)
+    return m.group(1) if m else None
+
+
+def plan_config(plan, root, runtime):
+    path = os.path.join(root, ".formwork.toml")
+    already = declared(root)
+    if already == runtime:
+        plan.notes.append(".formwork.toml already says runtime = \"%s\"" % runtime)
+        return
+    if os.path.exists(path):
+        # Somebody's configuration, which may carry settings this installer
+        # knows nothing about. Overwriting it would throw those away.
+        plan.unfinished.append(
+            ".formwork.toml exists and says runtime = %s, not \"%s\". Left "
+            "alone. Change that line yourself if you meant to switch."
+            % ('"%s"' % already if already else "nothing", runtime))
+        return
+    plan.write(path, CONFIG % runtime, "declares the runtime")
+
+
+def merge_claude_hooks(existing, adapter):
+    """Add the kit's hooks to whatever is already there. Removes nothing."""
+    out = json.loads(json.dumps(existing))          # copy, leave the original
+    hooks = out.get("hooks")
+    if not isinstance(hooks, dict):
+        # A "hooks" key holding a list, or anything else, used to crash here.
+        hooks = {}
+        out["hooks"] = hooks
+    added = 0
+    for event, entries in adapter.get("hooks", {}).items():
+        current = hooks.get(event)
+        if not isinstance(current, list):
+            current = []
+            hooks[event] = current
+        for entry in entries:
+            matcher = entry.get("matcher")
+            mine = [e for e in current
+                    if isinstance(e, dict) and e.get("matcher") == matcher]
+            if not mine:
+                current.append(json.loads(json.dumps(entry)))
+                added += len(entry.get("hooks", []))
+                continue
+            target = mine[0]
+            if not isinstance(target.get("hooks"), list):
+                target["hooks"] = []
+            have = {h.get("command") for h in target["hooks"]
+                    if isinstance(h, dict)}
+            for h in entry.get("hooks", []):
+                if h.get("command") not in have:
+                    target.setdefault("hooks", []).append(
+                        json.loads(json.dumps(h)))
+                    added += 1
+    return out, added
+
+
+def plan_wiring(plan, root, runtime):
+    rel = WIRING[runtime]
+    path = os.path.join(root, rel)
+    source = os.path.join(ADAPTERS, runtime, "settings.json")
+
+    if not os.path.isfile(source):
+        plan.unfinished.append(
+            "%s has no wiring file in this kit, so nothing was written to %s. "
+            "Its hooks are documented in formwork/adapters/%s/README.md and "
+            "nobody has run them."
+            % (runtime, rel, runtime))
+        return
+
+    adapter = json.load(open(source, encoding="utf-8"))
+
+    if not os.path.exists(path):
+        plan.write(path, json.dumps(adapter, indent=2) + "\n",
+                   "wires the guards")
+        return
+
+    try:
+        existing = json.load(open(path, encoding="utf-8"))
+    except ValueError as e:
+        plan.unfinished.append(
+            "%s exists and is not valid JSON (%s), so it was left untouched. "
+            "Fix it, or merge formwork/adapters/%s/settings.json in by hand."
+            % (rel, e, runtime))
+        return
+
+    if not isinstance(existing, dict):
+        plan.unfinished.append(
+            "%s exists and is not an object, so it was left untouched. Merge "
+            "formwork/adapters/%s/settings.json in by hand." % (rel, runtime))
+        return
+
+    merged, added = merge_claude_hooks(existing, adapter)
+    if not added:
+        plan.notes.append("%s already calls the guards" % rel)
+        return
+    plan.backups.append((path, path + ".before-formwork"))
+    kept = 0
+    old_hooks = existing.get("hooks")
+    if isinstance(old_hooks, dict):
+        for entries in old_hooks.values():
+            if isinstance(entries, list):
+                for e in entries:
+                    if isinstance(e, dict) and isinstance(e.get("hooks"), list):
+                        kept += len(e["hooks"])
+    plan.write(path, json.dumps(merged, indent=2) + "\n",
+               "adds %d hook(s), keeping the %d you already had"
+               % (added, kept))
+
+
+def record_fingerprints(root, dry_run):
+    """Take the first integrity record, if there is not one already.
+
+    The integrity check refuses to pass until something is recorded, and the
+    self-protection guard refuses to let an agent re-record. Without this step
+    a fresh fork was deadlocked: the gate said run --record, and the guard
+    said no.
+
+    Only the FIRST record happens here. Re-recording after a change stays a
+    human decision, which is the whole point of the record.
+    """
+    checker = os.path.join(HERE, "check", "checks", "kit-integrity")
+    if not (os.path.isfile(checker) and os.access(checker, os.X_OK)):
+        return None
+    state = os.environ.get("FORMWORK_STATE_DIR") or os.path.expanduser(
+        "~/.formwork")
+    if os.path.exists(os.path.join(state, "fingerprints.txt")):
+        return "already"
+    if dry_run:
+        return "would"
+    try:
+        p = subprocess.run([checker, "--record", root], capture_output=True,
+                           text=True, timeout=120)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    return "done" if p.returncode == 0 else None
+
+
+def generate_roles(root, runtime, dry_run):
+    """Write the role files for one runtime. Returns how many, or None.
+
+    Roles are the kit's headline feature and the installer used not to place
+    any of them. The generator lives beside this program; it is run rather
+    than reimplemented, so there is one source of truth for the format.
+    """
+    build = os.path.join(HERE, "build")
+    if not (os.path.isfile(build) and os.access(build, os.X_OK)):
+        return None
+    args = [build, "--runtime", runtime]
+    if dry_run:
+        args.append("--check")
+    try:
+        p = subprocess.run(args, capture_output=True, text=True, cwd=root,
+                           timeout=120)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    m = re.search(r"(\d+)\s+(?:role|generated) file", p.stdout or "")
+    return int(m.group(1)) if m else None
+
+
+def main(argv):
+    args = argv[1:]
+    dry_run = "--dry-run" in args
+    root = os.getcwd()
+
+    if "--runtime" in args:
+        i = args.index("--runtime")
+        if i + 1 >= len(args):
+            print("ERROR: --runtime needs a name: %s"
+                  % ", ".join(sorted(WIRING)), file=sys.stderr)
+            return CANNOT_RUN
+        runtime, why = args[i + 1], "you said so"
+        if runtime not in WIRING:
+            print("ERROR: '%s' is not a runtime this kit can wire. Known: %s"
+                  % (runtime, ", ".join(sorted(WIRING))), file=sys.stderr)
+            return CANNOT_RUN
+    else:
+        runtime, why = detect(root)
+        if runtime is None:
+            print("Cannot tell which runtime this project uses: %s." % why)
+            print("Say which, and run again:")
+            for r in sorted(WIRING):
+                print("  formwork/install --runtime %s" % r)
+            return CANNOT_RUN
+
+    plan = Plan(dry_run)
+    plan_config(plan, root, runtime)
+    plan_wiring(plan, root, runtime)
+    plan.apply()
+    generated = generate_roles(root, runtime, dry_run)
+    recorded = record_fingerprints(root, dry_run)
+
+    verb = "would write" if dry_run else "wrote"
+    print("runtime: %s (%s)" % (runtime, why))
+    for path, _, reason in plan.writes:
+        print("  %s  %s — %s" % (verb, os.path.relpath(path, root), reason))
+    for path, copy in plan.backups:
+        print("  %s  %s — a copy of the original, before the merge"
+              % ("would keep" if dry_run else "kept",
+                 os.path.relpath(copy, root)))
+    if generated is not None:
+        print("  %s  %d role file(s) for %s"
+              % ("would generate" if dry_run else "generated", generated,
+                 runtime))
+    if recorded == "done":
+        print("  recorded  what every guard and check looks like right now")
+    elif recorded == "would":
+        print("  would record  what every guard and check looks like right now")
+    elif recorded == "already":
+        print("  already done  an integrity record exists; not touching it")
+    for note in plan.notes:
+        print("  already done  %s" % note)
+    if not plan.writes and not plan.notes:
+        print("  nothing to write")
+
+    if runtime not in TESTED:
+        plan.unfinished.append(
+            "This runtime is untested. Its wiring is documented by its "
+            "publisher and nobody has watched it refuse anything. Read "
+            "formwork/adapters/%s/README.md before relying on it." % runtime)
+
+    if plan.unfinished:
+        print("")
+        print("NOT FINISHED:")
+        for item in plan.unfinished:
+            print("  - %s" % item)
+        print("")
+        print("Then check it took:  formwork/check/run")
+        return PARTIAL
+
+    print("")
+    print("Check it took:  formwork/check/run")
+    print("Then:           formwork/first-run.md")
+    return DONE
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

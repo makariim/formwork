@@ -1,0 +1,170 @@
+#!/usr/bin/env python3
+"""Check: every role is complete, and no two roles claim the same job.
+
+    role-shape <directory>
+
+Over every role in formwork/roles/:
+
+  1. it declares name, pack, owns and tools
+  2. it has all five sections
+  3. no other role claims the same `owns` slug
+  4. only the lead may hold `spawn`
+
+CATCHES  A role with no stated boundary, which wanders into somebody else's
+         work and nobody notices because nothing said where the edge was.
+
+         And two roles owning one thing, which is how two agents produce
+         opposite answers with equal confidence.
+
+Exit status:
+    0   every role complete, every job owned once
+    1   at least one problem, named
+    2   the check could not run
+"""
+import os
+import re
+import sys
+
+ROLES_SUBDIR = os.path.join("formwork", "roles")
+SKIP = {"TEMPLATE.md", "HOW-TO-ADD-A-ROLE.md", "README.md"}
+SECTIONS = ("Owns", "Does not own", "Tools", "Stops when", "Would be wrong if")
+FIELDS = ("name", "pack", "owns", "tools")
+MAY_SPAWN = {"lead"}
+
+SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv"}
+# Paths the runner has told this check to stay out of.
+EXCLUDED = [os.path.abspath(p) for p in
+            os.environ.get("FORMWORK_EXCLUDE", "").split(os.pathsep) if p]
+
+# Which runtimes can actually hold a role to its tool grant, established by
+# reading each publisher's own documentation. Recorded in docs/role-formats.md.
+#
+#   Claude Code, Gemini CLI   a named list of permitted tools
+#   Cursor                    read-only, or not. One bit, nothing finer
+#   Codex                     a sandbox mode, which is not a tool list at all
+ENFORCES_GRANTS = {"claude-code"}
+# Gemini CLI takes a named list and would enforce it. The documented name of
+# its file-writing tool is not established, so the generator writes no list for
+# any role that writes — which today is 26 of 27. Enforced in principle,
+# advisory in practice, and this check reports the practice.
+ADVISORY_GRANTS = {"cursor", "codex", "gemini-cli (for now)"}
+
+# A claim that a grant binds somewhere it cannot. Written as a check rather
+# than a sentence, because a sentence gets deleted by somebody tidying up.
+OVERCLAIM = re.compile(
+    r"(?i)(?:tool\s+grants?|grants?)\s+(?:are\s+|is\s+)?enforced\s+(?:on|in|by)"
+    r"\s+(?:all\s+(?:four\s+)?runtimes|every\s+runtime|cursor|codex)")
+
+
+def frontmatter(text):
+    m = re.match(r"^---\n(.*?)\n---\n", text, re.S)
+    if not m:
+        return None
+    out = {}
+    for line in m.group(1).split("\n"):
+        if ":" in line:
+            k, v = line.split(":", 1)
+            out[k.strip()] = v.strip()
+    return out
+
+
+def role_files(root):
+    base = os.path.join(root, ROLES_SUBDIR)
+    if not os.path.isdir(base):
+        return None
+    found = []
+    for dirpath, dirnames, filenames in os.walk(base):
+        for fn in sorted(filenames):
+            if fn.endswith(".md") and fn not in SKIP:
+                found.append(os.path.join(dirpath, fn))
+    return found
+
+
+def main(argv):
+    if len(argv) < 2:
+        print("usage: role-shape <directory>", file=sys.stderr)
+        return 2
+    root = argv[1]
+    if not os.path.isdir(root):
+        print("ERROR: not a directory: %s" % root, file=sys.stderr)
+        return 2
+
+    files = role_files(root)
+    if files is None:
+        print("no roles directory, nothing claimed")
+        return 0
+    if not files:
+        print("ERROR: a roles directory with no roles in it", file=sys.stderr)
+        return 2
+
+    problems = []
+    claimed = {}
+    for path in files:
+        rel = os.path.relpath(path, root)
+        try:
+            text = open(path, encoding="utf-8", errors="strict").read()
+        except (UnicodeDecodeError, OSError) as e:
+            print("ERROR: cannot read %s: %s" % (path, e), file=sys.stderr)
+            return 2
+
+        fm = frontmatter(text)
+        if fm is None:
+            problems.append("%s — no frontmatter" % rel)
+            continue
+        for field in FIELDS:
+            if not fm.get(field):
+                problems.append("%s — no '%s' declared" % (rel, field))
+
+        for section in SECTIONS:
+            if not re.search(r"^\*\*%s\.?\*\*" % re.escape(section), text, re.M):
+                problems.append("%s — no '%s' section" % (rel, section))
+
+        owns = fm.get("owns")
+        if owns:
+            if owns in claimed:
+                problems.append("%s — claims '%s', already owned by %s"
+                                % (rel, owns, claimed[owns]))
+            else:
+                claimed[owns] = rel
+
+        if "spawn" in fm.get("tools", "") and fm.get("name") not in MAY_SPAWN:
+            problems.append("%s — holds 'spawn', which only the lead may hold"
+                            % rel)
+
+    # Nothing in the kit may claim a grant binds where the runtime cannot
+    # express it. Two of the four can only approximate one.
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
+        here = os.path.abspath(dirpath)
+        if any(here == e or here.startswith(e + os.sep) for e in EXCLUDED):
+            dirnames[:] = []
+            continue
+        for fn in sorted(filenames):
+            if not fn.endswith(".md"):
+                continue
+            full = os.path.join(dirpath, fn)
+            try:
+                text = open(full, encoding="utf-8", errors="ignore").read()
+            except OSError:
+                continue
+            for m in OVERCLAIM.finditer(text):
+                line = text[:m.start()].count("\n") + 1
+                problems.append("%s:%d — claims a tool grant is enforced where "
+                                "it cannot be. It binds on %s and is advice on "
+                                "%s" % (os.path.relpath(full, root), line,
+                                        ", ".join(sorted(ENFORCES_GRANTS)),
+                                        ", ".join(sorted(ADVISORY_GRANTS))))
+
+    if problems:
+        print("%d problem(s) across %d role(s)" % (len(problems), len(files)))
+        for p in problems:
+            print("  %s" % p)
+        return 1
+
+    print("%d role(s), each complete, each owning something nobody else does"
+          % len(files))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

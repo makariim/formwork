@@ -1,0 +1,325 @@
+#!/usr/bin/env python3
+"""The gate. One command, and the only one a brief may name.
+
+    formwork/check/run                run every check over the project
+    formwork/check/run --demo-fail    watch each check refuse a broken input
+    formwork/check/run --list         what exists
+
+Exit status is the contract. Every adapter and every brief depends on it:
+
+    0   clean
+    1   something is wrong, and it is named
+    2   the gate could not run, so this is NOT a pass
+
+Status 2 exists because the most dangerous outcome is a gate reporting success
+when it never ran.
+
+WHAT A CHECK MUST SHIP, AND WHY IT IS TWO THINGS
+------------------------------------------------
+Every check ships inputs of both kinds:
+
+    fixtures/<check>/must-fail/<case>/   the check must reject these
+    fixtures/<check>/must-pass/<case>/   the check must accept these
+
+A case may also carry a `state/` directory. If it does, the runner points
+FORMWORK_STATE_DIR at it, so a check that reads something kept outside the
+repository can still be exercised.
+
+An earlier version demanded only the first, and an audit broke it in one
+minute: a check that ignores its input and fails on any directory named
+"broken" passed the gate while examining nothing at all. Rejecting something
+proves a check can say no. It does not prove the check looked.
+
+**Requiring both means a check has to discriminate.** A check missing either
+kind does not run — status 2, not a pass.
+
+And every fixture is copied to a directory with a random name before the check
+sees it, so a check cannot cheat by recognising "must-fail" or the case name.
+It has to look at the contents.
+
+TIMEOUTS
+--------
+A check that never returns used to hang the gate forever, which in a hook
+freezes the agent until somebody kills it. Every check now has a deadline, and
+exceeding it is "could not run", never "fine".
+
+Python 3, standard library only, no dependencies.
+"""
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+CHECKS_DIR = os.path.join(HERE, "checks")
+FIXTURES_DIR = os.path.join(HERE, "fixtures")
+PROJECT_ROOT = os.path.dirname(os.path.dirname(HERE))
+
+CLEAN, FINDINGS, CANNOT_RUN = 0, 1, 2
+
+# Seconds a single check may take. Generous for a repository check, and far
+# short of a hook timeout.
+def _seconds(name, default):
+    """A malformed timeout must not become a traceback on the blocking path."""
+    raw = os.environ.get(name, str(default))
+    try:
+        v = int(raw)
+    except (TypeError, ValueError):
+        return None
+    return v if v > 0 else None
+
+
+DEADLINE = _seconds("FORMWORK_CHECK_TIMEOUT", 60)
+
+MUST_FAIL, MUST_PASS = "must-fail", "must-pass"
+
+
+def cases(check_name, kind):
+    d = os.path.join(FIXTURES_DIR, check_name, kind)
+    if not os.path.isdir(d):
+        return []
+    return [os.path.join(d, c) for c in sorted(os.listdir(d))
+            if os.path.isdir(os.path.join(d, c))]
+
+
+def discover():
+    """Every file in checks/, with the inputs it ships and whether it can run.
+
+    Non-executable files are listed rather than skipped. A check silently
+    absent is the one failure a gate must never report as success, and an
+    audit removed one with a single allowed `chmod` and watched the gate
+    report green over the remaining eight.
+    """
+    if not os.path.isdir(CHECKS_DIR):
+        return None
+    found = []
+    for name in sorted(os.listdir(CHECKS_DIR)):
+        path = os.path.join(CHECKS_DIR, name)
+        if name.startswith(".") or not os.path.isfile(path):
+            continue
+        found.append((name, path, cases(name, MUST_FAIL), cases(name, MUST_PASS),
+                      os.access(path, os.X_OK)))
+    return found
+
+
+def anonymised(fixture):
+    """A copy of a fixture under a name that carries no information.
+
+    Without this, a check can pass the gate by recognising the word
+    "must-fail" or the case name, while examining nothing. An audit did
+    exactly that in about a minute.
+    """
+    tmp = tempfile.mkdtemp(prefix="fw-")
+    dest = os.path.join(tmp, "subject")
+    shutil.copytree(fixture, dest)
+    return tmp, dest
+
+
+def invoke(path, target, exclude=()):
+    """Run a check over a directory, with a deadline.
+
+    FORMWORK_EXCLUDE carries paths the check must not descend into. The
+    fixtures are wrong on purpose, so a check run over the project would find
+    them and be right to complain. The runner owns that knowledge; a check
+    must not have to know where the kit stores things.
+
+    Returns (exit_code, output). A check that overruns returns CANNOT_RUN,
+    because a gate that hangs is worse than one that fails.
+    """
+    env = dict(os.environ)
+    env["FORMWORK_EXCLUDE"] = os.pathsep.join(exclude)
+    # A check may depend on state kept outside the repository — a word list, a
+    # set of fingerprints. A fixture supplies its own by carrying a `state/`
+    # directory, and without this such a check could never ship a fixture,
+    # which the gate requires. So it could never ship at all.
+    state = os.path.join(target, "state")
+    if os.path.isdir(state):
+        env["FORMWORK_STATE_DIR"] = state
+    try:
+        p = subprocess.run([path, target], capture_output=True, text=True,
+                           env=env, timeout=DEADLINE)
+    except subprocess.TimeoutExpired:
+        return CANNOT_RUN, ("took longer than %ds and was stopped. A check that "
+                            "does not return is not a pass." % DEADLINE)
+    except OSError as e:
+        return CANNOT_RUN, "could not be started: %s" % e
+    return p.returncode, (p.stdout + p.stderr).strip()
+
+
+KNOWN_FLAGS = {"--list", "--demo-fail"}
+
+
+def main(argv):
+    args = set(argv[1:])
+    unknown = sorted(a for a in args if a.startswith("-")
+                     and a not in KNOWN_FLAGS)
+    if unknown:
+        print("ERROR: unknown option(s): %s" % ", ".join(unknown),
+              file=sys.stderr)
+        print("       Known: %s. A mistyped --demo-fail used to run the whole "
+              "gate for real." % ", ".join(sorted(KNOWN_FLAGS)), file=sys.stderr)
+        return CANNOT_RUN
+    checks = discover()
+
+    if checks is None:
+        print("ERROR: no checks directory at %s" % CHECKS_DIR, file=sys.stderr)
+        print("       The gate did not run. This is not a pass.", file=sys.stderr)
+        return CANNOT_RUN
+    if DEADLINE is None:
+        print("ERROR: FORMWORK_CHECK_TIMEOUT is not a positive whole number of "
+              "seconds: %r" % os.environ.get("FORMWORK_CHECK_TIMEOUT"),
+              file=sys.stderr)
+        print("       The gate did not run. This is not a pass.", file=sys.stderr)
+        return CANNOT_RUN
+
+    if not checks:
+        print("ERROR: no checks found in %s" % CHECKS_DIR, file=sys.stderr)
+        print("       A gate with nothing in it reports success about nothing.",
+              file=sys.stderr)
+        return CANNOT_RUN
+
+    # A check that cannot be executed is not a check that passed. The gate
+    # refuses rather than quietly running the remainder.
+    unrunnable = [n for n, _p, _f, _q, ok in checks if not ok]
+    if unrunnable:
+        print("ERROR: %d check(s) present but not executable:" % len(unrunnable),
+              file=sys.stderr)
+        for n in unrunnable:
+            print("       %s" % n, file=sys.stderr)
+        print("       The gate did not run. A check that cannot run has not "
+              "passed. Restore the execute bit: chmod +x formwork/check/checks/*",
+              file=sys.stderr)
+        return CANNOT_RUN
+
+    # A check that ships only one kind of input cannot be trusted. One kind
+    # proves it can say no; the other proves it was listening.
+    incomplete = []
+    for name, _, fails, passes, _x in checks:
+        if not fails:
+            incomplete.append("%s has no must-fail input" % name)
+        if not passes:
+            incomplete.append("%s has no must-pass input" % name)
+    if incomplete:
+        print("ERROR: %d check(s) are not properly equipped:" % len(incomplete),
+              file=sys.stderr)
+        for i in incomplete:
+            print("       %s" % i, file=sys.stderr)
+        print("       A check needs an input it rejects AND one it accepts, or "
+              "it has not been shown to discriminate.", file=sys.stderr)
+        return CANNOT_RUN
+
+    if "--list" in args:
+        for name, _, fails, passes, _x in checks:
+            print("%-20s %d must-fail, %d must-pass"
+                  % (name, len(fails), len(passes)))
+            for f in fails:
+                print("%-20s   reject  %s" % ("", os.path.basename(f)))
+            for p in passes:
+                print("%-20s   accept  %s" % ("", os.path.basename(p)))
+        return CLEAN
+
+    problems = []
+
+    if "--demo-fail" in args:
+        print("Each check, against the input it is meant to reject.")
+        print()
+        for name, path, fails, _p, _x in checks:
+            for fixture in fails:
+                tmp, subject = anonymised(fixture)
+                code, out = invoke(path, subject)
+                shutil.rmtree(tmp, ignore_errors=True)
+                case = os.path.basename(fixture)
+                if code == 0:
+                    print("  %-14s %-24s ACCEPTED — and it must not"
+                          % (name, case))
+                    problems.append("%s/%s was accepted" % (name, case))
+                elif code == CANNOT_RUN:
+                    print("  %-14s %-24s could not run: %s"
+                          % (name, case, out.split("\n")[0]))
+                    problems.append("%s/%s could not run" % (name, case))
+                else:
+                    first = out.split("\n")[0] if out else "(no output)"
+                    print("  %-14s %-24s rejected, as it should: %s"
+                          % (name, case, first))
+        print()
+        if problems:
+            print("GATE: %d check(s) did not behave." % len(problems))
+            return FINDINGS
+        print("GATE: every check rejected its broken input. That is the point.")
+        return CLEAN
+
+    # Pass 1 — the project itself.
+    for name, path, _f, _p, _x in checks:
+        code, out = invoke(path, PROJECT_ROOT, exclude=[FIXTURES_DIR])
+        if code == CANNOT_RUN:
+            print("ERROR: check %s could not run:\n%s" % (name, out),
+                  file=sys.stderr)
+            return CANNOT_RUN
+        if code != 0:
+            problems.append(name)
+            print("FAIL  %s" % name)
+            for line in out.split("\n"):
+                if line.strip():
+                    print("      %s" % line)
+        else:
+            print("ok    %s" % name)
+
+    # Pass 2 — prove each check rejects what it should.
+    accepted = []
+    for name, path, fails, _p, _x in checks:
+        for fixture in fails:
+            tmp, subject = anonymised(fixture)
+            code, out = invoke(path, subject)
+            shutil.rmtree(tmp, ignore_errors=True)
+            if code == CANNOT_RUN:
+                print("ERROR: %s could not run on %s: %s"
+                      % (name, os.path.basename(fixture), out), file=sys.stderr)
+                return CANNOT_RUN
+            if code == 0:
+                accepted.append("%s/%s" % (name, os.path.basename(fixture)))
+
+    # Pass 3 — prove each check accepts what it should. Without this a check
+    # that simply always fails would look rigorous.
+    rejected = []
+    for name, path, _f, passes, _x in checks:
+        for fixture in passes:
+            tmp, subject = anonymised(fixture)
+            code, out = invoke(path, subject)
+            shutil.rmtree(tmp, ignore_errors=True)
+            if code == CANNOT_RUN:
+                print("ERROR: %s could not run on %s: %s"
+                      % (name, os.path.basename(fixture), out), file=sys.stderr)
+                return CANNOT_RUN
+            if code != 0:
+                rejected.append("%s/%s" % (name, os.path.basename(fixture)))
+
+    if accepted:
+        print()
+        print("FAIL  these inputs are meant to be rejected, and were not:")
+        for a in accepted:
+            print("      %s" % a)
+        print("      A check that cannot fail is not evidence.")
+
+    if rejected:
+        print()
+        print("FAIL  these inputs are meant to be accepted, and were not:")
+        for r in rejected:
+            print("      %s" % r)
+        print("      A check that refuses everything has not been shown to "
+              "look at anything.")
+
+    print()
+    if problems or accepted or rejected:
+        print("GATE: red. %d check(s) failed on the project, %d input(s) "
+              "wrongly accepted, %d wrongly rejected."
+              % (len(problems), len(accepted), len(rejected)))
+        return FINDINGS
+
+    print("GATE: green. %d check(s), each shown to reject the wrong and accept "
+          "the right." % len(checks))
+    return CLEAN
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

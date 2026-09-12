@@ -1,0 +1,25 @@
+# macOS
+.DS_Store
+
+# The denylist lives outside this repository and is never committed. A file
+# that cannot be committed cannot be published by accident. These guards are
+# the second line of defence, not the first.
+
+# Python
+__pycache__/
+*.pyc
+
+# Working documents are kept outside this repository.
+#   plan.md       planning history       (K0 decision 9)
+#   inventory.md  the mechanism inventory (K0 decision 10)
+# Both are inputs to K3, K4 and K5, not parts of the kit. These guards stop a
+# copy slipping back in.
+plan.md
+docs/plan.md
+inventory.md
+docs/inventory.md
+
+# The scanners live outside this repository too. They are build-time only:
+# they describe the private material they compare against, and that
+# description is itself a disclosure. Guard, not first line of defence.
+tools/

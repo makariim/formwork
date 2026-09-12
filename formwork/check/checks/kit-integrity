@@ -1,0 +1,144 @@
+#!/usr/bin/env python3
+"""Check: nothing that does the enforcing has been changed without saying so.
+
+    kit-integrity <directory>
+    kit-integrity --record <directory>    write down what is there now
+
+CATCHES  A guard, a check, the gate, or a piece of wiring, quietly altered.
+         Four characters turn the strongest rule in this kit off, and before
+         this check nothing anywhere noticed.
+
+         It catches the routes the guard cannot: an interpreter assembling a
+         path, a human editing in their own editor, a file replaced while the
+         hook was disabled.
+
+The fingerprints live OUTSIDE the repository, beside the word lists. A record
+kept next to the thing it describes protects nothing.
+
+Exit status:
+    0   every protected file matches its fingerprint
+    1   something changed, was added, or went missing
+    2   the check could not run — including no fingerprints recorded yet
+"""
+import hashlib
+import os
+import sys
+
+PROTECTED = (
+    "formwork/guard",
+    "formwork/check/run",
+    "formwork/check/checks",
+    "formwork/adapters",
+    ".formwork.toml",
+    ".claude/settings.json",
+)
+
+STATE = os.environ.get("FORMWORK_STATE_DIR") or os.environ.get(
+    "FORMWORK_DENYLIST_DIR", os.path.expanduser("~/.formwork"))
+RECORD = os.path.join(STATE, "fingerprints.txt")
+
+
+def digest(path):
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for block in iter(lambda: f.read(65536), b""):
+            h.update(block)
+    return h.hexdigest()
+
+
+def protected_files(root):
+    found = {}
+    for rel in PROTECTED:
+        full = os.path.join(root, rel)
+        if os.path.isfile(full):
+            found[rel] = digest(full)
+        elif os.path.isdir(full):
+            for dp, dn, fns in os.walk(full):
+                dn[:] = [d for d in dn if d not in ("__pycache__", "state")]
+                for fn in sorted(fns):
+                    if fn.endswith(".pyc"):
+                        continue
+                    p = os.path.join(dp, fn)
+                    found[os.path.relpath(p, root)] = digest(p)
+    return found
+
+
+def load_record():
+    if not os.path.exists(RECORD):
+        return None
+    out = {}
+    for line in open(RECORD, encoding="utf-8"):
+        line = line.split("#", 1)[0].strip()
+        if not line or " " not in line:
+            continue
+        h, rel = line.split(None, 1)
+        out[rel.strip()] = h
+    return out
+
+
+def main(argv):
+    record_mode = "--record" in argv
+    args = [a for a in argv[1:] if not a.startswith("--")]
+    if not args:
+        print("usage: kit-integrity [--record] <directory>", file=sys.stderr)
+        return 2
+    root = args[0]
+    if not os.path.isdir(root):
+        print("ERROR: not a directory: %s" % root, file=sys.stderr)
+        return 2
+
+    now = protected_files(root)
+
+    if record_mode:
+        os.makedirs(os.path.dirname(RECORD), exist_ok=True)
+        with open(RECORD, "w", encoding="utf-8") as f:
+            f.write("# Fingerprints of everything that enforces a rule.\n")
+            f.write("# Kept outside the repository on purpose: a record beside\n")
+            f.write("# the thing it describes protects nothing.\n")
+            f.write("# Re-record deliberately, after reviewing what changed.\n")
+            for rel in sorted(now):
+                f.write("%s  %s\n" % (now[rel], rel))
+        print("recorded %d file(s) to %s" % (len(now), RECORD))
+        return 0
+
+    if not now:
+        # Every other check in this kit treats "the watcher is not watching"
+        # as status 2. This one used to call it a pass.
+        print("ERROR: none of the protected files are here", file=sys.stderr)
+        print("       Nothing is being watched, and that is not a pass.",
+              file=sys.stderr)
+        return 2
+
+    was = load_record()
+    if was is None:
+        print("ERROR: no fingerprints recorded at %s" % RECORD, file=sys.stderr)
+        print("       Run: formwork/check/checks/kit-integrity --record .",
+              file=sys.stderr)
+        print("       Until then nothing is watching the guards, and that is "
+              "not a pass.", file=sys.stderr)
+        return 2
+
+    changed = sorted(r for r in now if r in was and now[r] != was[r])
+    added = sorted(r for r in now if r not in was)
+    missing = sorted(r for r in was if r not in now)
+
+    if changed or added or missing:
+        print("%d protected file(s) differ from the record"
+              % (len(changed) + len(added) + len(missing)))
+        for r in changed:
+            print("  changed  %s" % r)
+        for r in added:
+            print("  added    %s" % r)
+        for r in missing:
+            print("  missing  %s" % r)
+        print()
+        print("These files enforce every other rule. If you meant it, review "
+              "the change and re-record.")
+        return 1
+
+    print("%d protected file(s), all matching the record" % len(now))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

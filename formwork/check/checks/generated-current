@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+"""Check: every generated file matches what its source produces.
+
+    generated-current <directory>
+
+CATCHES  A hand-edit to a generated file. It works, for exactly as long as
+         nobody regenerates — then it vanishes, and whoever made it does not
+         find out.
+
+         And a generated file left behind after its source changed, which is
+         the drift that copying was supposed to remove and quietly reintroduces
+         it.
+
+The real work is done by `formwork/build --check`, which regenerates in memory
+and compares bytes. This check exists so that comparison happens on every turn
+rather than when somebody remembers.
+
+Exit status:
+    0   everything current, or nothing is generated here
+    1   something is stale or hand-edited, and it is named
+    2   the check could not run
+"""
+import os
+import subprocess
+import sys
+
+TIMEOUT = 120
+
+
+def main(argv):
+    args = [a for a in argv[1:] if not a.startswith("--")]
+    if not args:
+        print("usage: generated-current <directory>", file=sys.stderr)
+        return 2
+    root = args[0]
+    if not os.path.isdir(root):
+        print("ERROR: not a directory: %s" % root, file=sys.stderr)
+        return 2
+
+    # Absolute, because the generator is run with the project as its working
+    # directory and a relative path would then resolve against the wrong root.
+    build = os.path.abspath(os.path.join(root, "formwork", "build"))
+    if not os.path.isfile(build):
+        print("no generator here, nothing generated")
+        return 0
+    if not os.access(build, os.X_OK):
+        print("ERROR: %s is not executable, so nothing can be compared"
+              % os.path.relpath(build, root), file=sys.stderr)
+        return 2
+
+    try:
+        # No --all: the generator checks the configured runtime plus any
+        # generated tree already present. Demanding --all made a fork that
+        # uses one runtime generate files for three, or live with a red gate.
+        p = subprocess.run([build, "--check"], capture_output=True,
+                           text=True, cwd=root, timeout=TIMEOUT)
+    except subprocess.TimeoutExpired:
+        print("ERROR: the generator took longer than %ds" % TIMEOUT,
+              file=sys.stderr)
+        return 2
+    except OSError as e:
+        print("ERROR: could not run the generator: %s" % e, file=sys.stderr)
+        return 2
+
+    out = (p.stdout + p.stderr).strip()
+    if p.returncode == 2:
+        print("ERROR: the generator could not run:\n%s" % out, file=sys.stderr)
+        return 2
+    print(out)
+    return 1 if p.returncode else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

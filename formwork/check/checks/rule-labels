@@ -1,0 +1,115 @@
+#!/usr/bin/env python3
+"""Check: every rule is labelled, says what it catches, and does not lie.
+
+    rule-labels <directory>
+
+Three things, over every rule in formwork/rules/:
+
+  1. it says whether it is Enforced or Advice
+  2. it has a "Catches:" line
+  3. if it claims to be enforced, the check it names exists
+
+CATCHES  A rule that says it is enforced when nothing enforces it. Everything
+         reads correctly, the rule is in the file, and no program will ever
+         refuse anything. That is worse than honest advice, because you stop
+         watching for the thing yourself.
+
+         Also a rule with no "catches" line, which is a rule asking to be
+         obeyed without saying what for. Those get deleted in week two, and
+         they should be.
+
+Exit status:
+    0   every rule is labelled, explained, and honest
+    1   at least one is not, and it is named
+    2   the check could not run
+"""
+import os
+import re
+import sys
+
+RULES_SUBDIR = os.path.join("formwork", "rules")
+CHECKS_SUBDIR = os.path.join("formwork", "check", "checks")
+GUARD_SUBDIR = os.path.join("formwork", "guard")
+
+LABEL = re.compile(r"^\*\*(Enforced|Advice)\b", re.M)
+ENFORCER = re.compile(r"^\*\*Enforced\*\*\s+by\s+`([^`]+)`", re.M)
+CATCHES = re.compile(r"^\*\*Catches:\*\*", re.M)
+
+
+def rules_in(text):
+    """Split a rules file into (heading, body) at level-three headings."""
+    parts = re.split(r"^### (.+)$", text, flags=re.M)
+    out = []
+    for i in range(1, len(parts), 2):
+        out.append((parts[i].strip(), parts[i + 1]))
+    return out
+
+
+def enforcer_exists(root, named):
+    """A rule may name a check or a guard. Either must be a real file."""
+    base = os.path.basename(named)
+    for sub in (CHECKS_SUBDIR, GUARD_SUBDIR):
+        if os.path.exists(os.path.join(root, sub, base)):
+            return True
+    return os.path.exists(os.path.join(root, named))
+
+
+def main(argv):
+    if len(argv) < 2:
+        print("usage: rule-labels <directory>", file=sys.stderr)
+        return 2
+    root = argv[1]
+    if not os.path.isdir(root):
+        print("ERROR: not a directory: %s" % root, file=sys.stderr)
+        return 2
+
+    rules_dir = os.path.join(root, RULES_SUBDIR)
+    if not os.path.isdir(rules_dir):
+        print("no rules directory, nothing claimed")
+        return 0
+
+    problems = []
+    counted = 0
+    for fn in sorted(os.listdir(rules_dir)):
+        if not fn.endswith(".md"):
+            continue
+        path = os.path.join(rules_dir, fn)
+        try:
+            text = open(path, encoding="utf-8", errors="strict").read()
+        except (UnicodeDecodeError, OSError) as e:
+            print("ERROR: cannot read %s: %s" % (path, e), file=sys.stderr)
+            return 2
+
+        for heading, body in rules_in(text):
+            counted += 1
+            where = "%s: %s" % (fn, heading)
+            label = LABEL.search(body)
+            if not label:
+                problems.append("%s — neither Enforced nor Advice" % where)
+            elif label.group(1) == "Enforced":
+                named = ENFORCER.search(body)
+                if not named:
+                    problems.append("%s — says Enforced, names no check" % where)
+                elif not enforcer_exists(root, named.group(1)):
+                    problems.append("%s — says Enforced by `%s`, which does not "
+                                    "exist" % (where, named.group(1)))
+            if not CATCHES.search(body):
+                problems.append("%s — no 'Catches:' line" % where)
+
+    if not counted:
+        print("ERROR: a rules directory with no rules in it", file=sys.stderr)
+        return 2
+
+    if problems:
+        print("%d problem(s) across %d rule(s)" % (len(problems), counted))
+        for p in problems:
+            print("  %s" % p)
+        return 1
+
+    print("%d rule(s), each labelled, explained, and honest about enforcement"
+          % counted)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

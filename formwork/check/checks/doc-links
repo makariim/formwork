@@ -1,0 +1,127 @@
+#!/usr/bin/env python3
+"""Check: every link between documents points at something that exists.
+
+    doc-links <directory>
+
+CATCHES  A document that refers to a file which was renamed, moved or never
+         written. The reference still reads correctly, so nothing announces it,
+         and the reader follows it into nothing.
+
+         Both forms count: a markdown link, and a path in backticks. The
+         second is how a broken reference sat on the front page unnoticed.
+
+Exit status:
+    0   every link resolves
+    1   at least one does not, and it is named with its line
+    2   the check could not run
+
+Only links between files are checked. Web addresses are somebody else's
+problem, and an anchor without a path points inside the same document.
+
+Python 3, standard library only, no dependencies.
+"""
+import os
+import re
+import sys
+
+LINK = re.compile(r"\[[^\]]*\]\(([^)]+)\)")
+# A path inside backticks is a reference too. The front page pointed at a file
+# that did not exist for a day, and the markdown-only version never saw it.
+TICKED = re.compile(r"`([A-Za-z0-9_.\-]+(?:/[A-Za-z0-9_.\-]+)+/?)`")
+# Only paths into the kit's own tree, and they resolve from the project root
+# rather than from the file they appear in. Anything else in backticks is
+# somebody else's repository, a command, or an example, and guessing which
+# would produce noise rather than findings.
+OURS = ("formwork/",)
+SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv"}
+
+# Paths the runner has told this check to stay out of. Part of the check
+# contract: the runner decides, the check obeys.
+EXCLUDED = [os.path.abspath(p) for p in
+            os.environ.get("FORMWORK_EXCLUDE", "").split(os.pathsep) if p]
+# .txt was included and produced findings in data files that merely happened
+# to contain bracket-parenthesis text. Markdown and reStructuredText only.
+TEXT_EXT = {".md", ".rst"}
+
+
+def links_in(text):
+    # A fenced code block holds examples. Showing a link in one is legitimate
+    # work, and failing the gate for it is a false positive in a kit that is
+    # mostly documentation.
+    fenced = False
+    for line_no, line in enumerate(text.split("\n"), 1):
+        if line.lstrip().startswith("```"):
+            fenced = not fenced
+            continue
+        if fenced:
+            continue
+        for m in TICKED.finditer(line):
+            target = m.group(1).strip().rstrip("/")
+            if target.startswith(OURS):
+                yield line_no, target, True      # resolves from the root
+        for m in LINK.finditer(line):
+            target = m.group(1).strip()
+            if not target:
+                continue
+            # Somebody else's server, or a spot inside this same document.
+            if target.startswith(("http://", "https://", "mailto:", "#")):
+                continue
+            # A trailing anchor names a heading; the file is what we resolve.
+            path = target.split("#", 1)[0]
+            if path:
+                yield line_no, path, False       # resolves from this file
+
+
+def main(argv):
+    if len(argv) < 2:
+        print("usage: doc-links <directory>", file=sys.stderr)
+        return 2
+    root = argv[1]
+    if not os.path.isdir(root):
+        print("ERROR: not a directory: %s" % root, file=sys.stderr)
+        return 2
+
+    broken = []
+    unreadable = []
+    scanned = 0
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
+        here = os.path.abspath(dirpath)
+        if any(here == e or here.startswith(e + os.sep) for e in EXCLUDED):
+            dirnames[:] = []
+            continue
+        for fn in filenames:
+            if os.path.splitext(fn)[1].lower() not in TEXT_EXT:
+                continue
+            full = os.path.join(dirpath, fn)
+            try:
+                text = open(full, encoding="utf-8", errors="strict").read()
+            except (UnicodeDecodeError, OSError) as e:
+                # Silently skipping meant one stray byte hid a document from
+                # this check entirely, and the summary still said every link
+                # resolved. Say so instead.
+                unreadable.append("%s — cannot be read (%s)"
+                                  % (os.path.relpath(full, root), e))
+                continue
+            scanned += 1
+            for line_no, path, from_root in links_in(text):
+                base = root if from_root else dirpath
+                resolved = os.path.normpath(os.path.join(base, path))
+                if not os.path.exists(resolved):
+                    broken.append((os.path.relpath(full, root), line_no, path))
+
+    if broken or unreadable:
+        print("%d link(s) point at nothing, in %d file(s) scanned"
+              % (len(broken), scanned))
+        for rel, line_no, path in broken:
+            print("  %s:%d  ->  %s" % (rel, line_no, path))
+        for u in unreadable:
+            print("  %s" % u)
+        return 1
+
+    print("%d file(s) scanned, every link resolves" % scanned)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))
