@@ -23,3 +23,8 @@ docs/inventory.md
 # they describe the private material they compare against, and that
 # description is itself a disclosure. Guard, not first line of defence.
 tools/
+
+# Build artefacts. Made by `python3 -m build`, never committed.
+dist/
+build/
+*.egg-info/
