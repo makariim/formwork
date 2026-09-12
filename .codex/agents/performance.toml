@@ -1,5 +1,5 @@
 # GENERATED FROM formwork/roles/packs/performance.md — DO NOT EDIT.
-# Change the source and run formwork/build. A hand-edit here fails the gate.
+# Change the source and run formwork roles. A hand-edit here fails the gate.
 
 name = "performance"
 description = "How fast it is, how it behaves under load, and what one request costs."

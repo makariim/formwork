@@ -5,7 +5,7 @@ kind: local
 ---
 
 <!-- GENERATED FROM formwork/roles/packs/user-researcher.md — DO NOT EDIT. -->
-<!-- Change the source and run formwork/build. A hand-edit here fails the gate. -->
+<!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
 > **This role's tool grant is not expressed here.** It asks for `read`, `write`, `web`, and gemini-cli does not have a documented name for `write` and `web`. An incomplete allowlist would quietly remove a tool the role needs, so none is written. The grant is advice on this runtime.
 
@@ -187,7 +187,7 @@ CHANGE MY MIND   it without hesitating.
 | The situation | Whose it is |
 |---|---|
 | The finding is clear, the response is not | `product` |
-| It is a labelling or flow problem | `experience` |
+| It is a labelling or flow problem | `ux` |
 | Somebody wants a number from this | `researcher`, and say the sample was small |
 | You recorded anything personal | `legal`. Before anything else |
 | The finding contradicts a decision already made | report both. Do not resolve it |

@@ -31,7 +31,9 @@ SECTIONS = ("Owns", "Does not own", "Tools", "Stops when", "Would be wrong if")
 FIELDS = ("name", "pack", "owns", "tools")
 MAY_SPAWN = {"lead"}
 
-SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv"}
+SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv",
+             "venv", "build", "dist", "target", "vendor",
+             "site-packages", ".tox"}
 # Paths the runner has told this check to stay out of.
 EXCLUDED = [os.path.abspath(p) for p in
             os.environ.get("FORMWORK_EXCLUDE", "").split(os.pathsep) if p]

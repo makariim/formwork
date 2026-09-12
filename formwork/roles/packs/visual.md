@@ -10,7 +10,7 @@ tools: ["read", "write"]
 **Owns.** Look, type, colour, spacing, and whether the whole thing appears to
 come from one place.
 
-**Does not own.** Whether a person can use it. That is `experience`, and it wins
+**Does not own.** Whether a person can use it. That is `ux`, and it wins
 wherever the two conflict.
 
 **Tools.** Reads and writes.
@@ -161,7 +161,7 @@ Three cheap tests that catch most problems:
 
 | The situation | Whose it is |
 |---|---|
-| It looks right and people still cannot finish | `experience` |
+| It looks right and people still cannot finish | `ux` |
 | The contrast fails and the brand colour is the reason | `product`. That is a trade, not a detail |
 | It is slow because of images or fonts | `performance` |
 | Assistive technology cannot read it | `accessibility` |

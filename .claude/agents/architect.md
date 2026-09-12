@@ -5,7 +5,7 @@ tools: Read, Glob, Grep, Write, Edit
 ---
 
 <!-- GENERATED FROM formwork/roles/method/architect.md — DO NOT EDIT. -->
-<!-- Change the source and run formwork/build. A hand-edit here fails the gate. -->
+<!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
 # Architect
 
@@ -230,7 +230,7 @@ be wrong cannot be argued with, and will not be.
 |---|---|
 | It turns on a number nobody has measured | `researcher` |
 | It turns on what the product should do | `product`, then the human |
-| It turns on cost of operation | `infrastructure` |
+| It turns on cost of operation | `devops` |
 | It changes what data is kept, or for how long | the human. Always |
 | Somebody is proposing this before it is needed | say so, then `challenger` |
 

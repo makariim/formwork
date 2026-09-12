@@ -1,0 +1,121 @@
+#!/usr/bin/env python3
+"""One command for everything in this kit.
+
+    formwork/fw                 what you can do
+    formwork/fw install         set this project up
+    formwork/fw check           run every check
+    formwork/fw demo            watch every check refuse a broken input
+    formwork/fw roles           rebuild the role files after editing one
+    formwork/fw record          write down what the kit looks like now
+    formwork/fw test            run every test
+
+WHY THIS EXISTS
+---------------
+Before this, you had to remember `formwork/install --runtime claude-code` and
+`formwork/check/run` and `formwork/build`. Three paths and a flag, for five
+things you do every day.
+
+A Makefile at your project root would have been the obvious answer. It is also
+a file name your project may already be using, and overwriting somebody's build
+to save them typing is exactly what this kit exists to prevent.
+
+So: one file, inside the kit's own folder, where nothing can collide.
+
+Exit status is whatever the program underneath returned, so this can be used in
+a script the same way as the programs it calls.
+"""
+import os
+import subprocess
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+
+COMMANDS = [
+    ("install", "set this project up. Add --runtime <name> to pick your agent"),
+    ("check",   "run every check on this project"),
+    ("demo",    "watch every check refuse a broken input"),
+    ("roles",   "rebuild the role files after editing one"),
+    ("record",  "write down what the kit looks like now, after you changed it"),
+    ("test",    "run every test in the kit"),
+]
+
+TESTS = [
+    os.path.join("guard", "test_boundary.py"),
+    os.path.join("guard", "test_protection.py"),
+    os.path.join("guard", "test_quality_gate.py"),
+    os.path.join("check", "test_gate.py"),
+    "test_install.py",
+]
+
+
+PROJECT = os.path.dirname(HERE)
+
+
+def run(path, args):
+    full = os.path.join(HERE, path)
+    if not os.path.isfile(full):
+        print("ERROR: %s is missing from this kit" % path, file=sys.stderr)
+        return 2
+    try:
+        # From the project, always. Run from a subfolder without this and
+        # `install` wrote a second configuration into that subfolder and
+        # called it a success.
+        return subprocess.run([full] + args, cwd=PROJECT).returncode
+    except OSError as e:
+        print("ERROR: could not run %s: %s" % (path, e), file=sys.stderr)
+        return 2
+
+
+def run_tests():
+    failed = []
+    for t in TESTS:
+        full = os.path.join(HERE, t)
+        if not os.path.isfile(full):
+            continue
+        print("\n%s" % t, flush=True)
+        if subprocess.run([sys.executable, full], cwd=PROJECT).returncode != 0:
+            failed.append(t)
+    print("")
+    if failed:
+        print("FAILED: %s" % ", ".join(failed), file=sys.stderr)
+        return 1
+    print("every test passed")
+    return 0
+
+
+def usage():
+    print("formwork/fw <command>")
+    print("")
+    for name, what in COMMANDS:
+        print("  %-9s %s" % (name, what))
+    print("")
+    print("Nothing here is hidden. Each one runs a program in this folder that")
+    print("you can also run directly.")
+    return 0
+
+
+def main(argv):
+    if len(argv) < 2 or argv[1] in ("help", "-h", "--help"):
+        return usage()
+    cmd, rest = argv[1], argv[2:]
+    if cmd == "install":
+        return run("install", rest)
+    if cmd == "check":
+        return run(os.path.join("check", "run"), rest)
+    if cmd == "demo":
+        return run(os.path.join("check", "run"), ["--demo-fail"] + rest)
+    if cmd == "roles":
+        return run("build", rest)
+    if cmd == "test":
+        return run_tests()
+    if cmd == "record":
+        return run(os.path.join("check", "checks", "kit-integrity"),
+                   ["--record", os.path.dirname(HERE)] + rest)
+    print("ERROR: no such command: %s" % cmd, file=sys.stderr)
+    print("", file=sys.stderr)
+    usage()
+    return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

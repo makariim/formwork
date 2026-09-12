@@ -5,7 +5,7 @@ kind: local
 ---
 
 <!-- GENERATED FROM formwork/roles/packs/security.md — DO NOT EDIT. -->
-<!-- Change the source and run formwork/build. A hand-edit here fails the gate. -->
+<!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
 > **This role's tool grant is not expressed here.** It asks for `read`, `write`, `run`, `web`, and gemini-cli does not have a documented name for `write` and `web`. An incomplete allowlist would quietly remove a tool the role needs, so none is written. The grant is advice on this runtime.
 
@@ -233,7 +233,7 @@ nobody acted on.
 | The fix requires changing the data model | `data`, then `architect` |
 | The fix makes the product materially harder to use | `product`. A real trade |
 | The untrusted input is reaching a model | `ai` |
-| It is about what gets logged, not what gets in | `observability` |
+| It is about what gets logged, not what gets in | `sre` |
 | Personal data is being kept, and maybe should not be | `legal` |
 | It only fails under load | `performance` |
 

@@ -33,7 +33,13 @@ TICKED = re.compile(r"`([A-Za-z0-9_.\-]+(?:/[A-Za-z0-9_.\-]+)+/?)`")
 # somebody else's repository, a command, or an example, and guessing which
 # would produce noise rather than findings.
 OURS = ("formwork/",)
-SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv"}
+# Third-party and generated trees. Without these, a single install of
+# somebody's dependencies produced dozens of findings about other people's
+# READMEs, and the file count in the summary was meaningless.
+SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv", "venv", "env",
+             ".tox", ".nox", "build", "dist", "target", "vendor",
+             "site-packages", ".next", ".nuxt", "coverage", ".mypy_cache",
+             ".pytest_cache", ".ruff_cache", ".gradle", "Pods"}
 
 # Paths the runner has told this check to stay out of. Part of the check
 # contract: the runner decides, the check obeys.

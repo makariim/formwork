@@ -473,8 +473,9 @@ is the most load-bearing part of the arrangement and the least inspectable.
 The layer above and the working session cannot see each other. A person moves
 text between them.
 
-**Catches:** nothing. This is not a design — it is what is left when two systems
-that must cooperate have no channel.
+**Catches:** work done twice, and work done against a decision that was already
+made upstairs. When nothing carries the messages, the two halves drift apart and
+neither knows it.
 
 **Warning:** known not to work beyond one person. Two people would need two
 relays and nothing joins them up.

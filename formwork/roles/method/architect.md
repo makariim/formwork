@@ -228,7 +228,7 @@ be wrong cannot be argued with, and will not be.
 |---|---|
 | It turns on a number nobody has measured | `researcher` |
 | It turns on what the product should do | `product`, then the human |
-| It turns on cost of operation | `infrastructure` |
+| It turns on cost of operation | `devops` |
 | It changes what data is kept, or for how long | the human. Always |
 | Somebody is proposing this before it is needed | say so, then `challenger` |
 

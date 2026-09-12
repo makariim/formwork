@@ -67,6 +67,19 @@ fingerprints, hiding a path inside a here-document.
 Beyond that it only warns: modification times are weak evidence and it says so.
 **It cannot tell you the predictions were any good.**
 
+**The fixture shuffle hides the case name and nothing else.** Before a check
+runs, its test folder is copied somewhere with a meaningless name, so a check
+cannot pass by spotting the word "must-fail". **Names inside the folder are
+left alone**, because several checks read them for real reasons: a decision
+record is identified by its numbered filename, a role by its `.md` ending.
+
+So a check that looks for one particular file inside a fixture can still pass
+while examining nothing. An audit wrote one and it worked. Scrambling the
+contents was tried and broke the checks that read names legitimately.
+
+**What this means in practice:** the pair of fixtures proves a check can tell
+two inputs apart. It does not prove the check looked at what is in them.
+
 **`rule-labels`** checks that a rule naming a check names one that exists. It
 matches on the name only.
 

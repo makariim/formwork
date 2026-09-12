@@ -58,7 +58,7 @@ STRENGTHS = ("block", "warn", "off")
 # Subcommands that change history, the index, or a remote.
 WRITES = {
     "commit", "push", "merge", "rebase", "revert", "cherry-pick", "am",
-    "reset", "add", "rm", "mv", "clean", "restore",
+    "reset", "add", "rm", "mv", "clean",
     "update-ref", "update-index", "filter-branch",
     "filter-repo", "replace", "gc", "prune",
     "send-email", "request-pull", "subtree",
@@ -70,6 +70,10 @@ READS = {
     "rev-parse", "rev-list", "cat-file", "blame", "describe", "shortlog",
     "grep", "whatchanged", "reflog", "bisect", "annotate", "count-objects",
     "check-ignore", "check-attr", "verify-commit", "merge-base", "diff-tree",
+    # `git init` makes a new repository. There is no history to damage, and
+    # refusing it stopped somebody starting an unrelated project.
+    "init", "archive", "fsck", "range-diff", "verify-pack", "bundle",
+    "difftool", "mergetool", "column", "sparse-checkout", "count-objects",
     "diff-index", "name-rev", "for-each-ref", "var", "help", "version",
 }
 
@@ -95,19 +99,34 @@ CONDITIONAL = {
     "checkout": ("-b", "-B", "--orphan", "--"),
     "switch":   ("-c", "-C", "--create", "--orphan"),
     "submodule": ("add", "update", "deinit", "sync", "set-url", "foreach"),
+    # `-p` is NOT here: `git stash show -p` is the standard way to read a
+    # stash, and refusing it said "changes the repository", which is untrue.
     "stash":    ("push", "pop", "apply", "drop", "clear", "save", "store",
-                 "create", "branch", "-u", "-p", "--include-untracked"),
+                 "create", "branch", "-u", "--include-untracked"),
     "notes":    ("add", "append", "copy", "edit", "remove", "prune", "merge"),
     "cherry":   (),
+    # `git restore --staged` unstages. `git restore <path>` throws away the
+    # edits in your working tree, which is the one to stop.
+    "restore":  ("--worktree", "-W", "--source", "-s"),
     # `git apply --check` is explicitly a dry run; `git symbolic-ref --short
     # HEAD` is the standard way to read the branch name. Both were refused.
     "apply":    (),   # handled below: bare apply writes, --check does not
-    "symbolic-ref": ("-d", "--delete", "-m"),
+    "symbolic-ref": ("-d", "--delete", "-m"),   # plus: two operands writes
     "fetch":    ("--prune", "-p", "--force", "-f", "--tags", "--unshallow"),
     "format-patch": ("-o", "--output-directory"),
 }
 
 # Global options these tools take before the subcommand, with a value.
+# Endings that mean a file rather than a branch. `feature/new-thing` and
+# `release-1.2` are branch names people really use, and refusing them sent
+# them to `git switch` or to turning the guard off.
+FILE_SUFFIXES = {
+    ".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".rs", ".rb", ".java", ".c",
+    ".h", ".cpp", ".cs", ".php", ".swift", ".kt", ".scala", ".sh", ".bash",
+    ".md", ".rst", ".txt", ".json", ".yaml", ".yml", ".toml", ".ini", ".cfg",
+    ".html", ".css", ".scss", ".sql", ".xml", ".csv", ".lock", ".gradle",
+}
+
 GH_FLAGS_WITH_VALUE = {"-R", "--repo", "--hostname", "-X", "--method",
                        "-F", "-f", "--jq", "--template"}
 
@@ -133,7 +152,21 @@ GROUPING = {"(", "{", "}", ")", "then", "else", "do", "done", "fi", "!",
             "for", "while", "until", "if", "in", "case", "esac", "elif"}
 
 # Wrapper flags that consume the next token, so it is not the command either.
-WRAPPER_FLAGS_WITH_VALUE = {"-n", "-u", "-s", "-k", "-i", "-C", "-o", "-g"}
+# Which flags each wrapper takes a VALUE for. One shared set was wrong: `sudo
+# -n` and `env -i` take no value, so the program name after them was eaten and
+# `sudo -n rm <a guard>` was allowed.
+WRAPPER_VALUE_FLAGS = {
+    "nice":    {"-n", "--adjustment"},
+    "timeout": {"-k", "-s", "--kill-after", "--signal"},
+    "env":     {"-u", "-C", "--unset", "--chdir"},
+    "sudo":    {"-u", "-g", "-p", "-C", "-r", "-t", "--user", "--group"},
+    "doas":    {"-u", "-C"},
+    "stdbuf":  {"-i", "-o", "-e"},
+    "command": set(),
+    "exec":    set(),
+    "time":    set(),
+    "nohup":   set(),
+}
 
 # Shells and runners that take a command as an ARGUMENT. Whatever follows is
 # inspected in its own right; otherwise `bash -c "git commit"` walked through.
@@ -208,8 +241,9 @@ def strip_prefixes(words):
         if ASSIGNMENT.match(w) or w in PREFIXES:
             i += 1
             # Skip the wrapper's own flags, and a value where one is taken.
+            takes = WRAPPER_VALUE_FLAGS.get(w, set())
             while i < len(words) and words[i].startswith("-"):
-                takes_value = words[i] in WRAPPER_FLAGS_WITH_VALUE
+                takes_value = words[i] in takes
                 i += 1
                 if takes_value and i < len(words):
                     i += 1
@@ -263,7 +297,12 @@ def verdict_for(segment):
             # Some subcommands write with no flag at all, purely by having
             # arguments. `git config a.b c` sets a value. `git checkout FILE`
             # discards uncommitted work. Both were allowed.
-            plain = [r for r in rest if not r.startswith("-")]
+            # A redirection is not an argument. `git config --local user.email
+            # 2>/dev/null` is a read, and counting `2>/dev/null` as a value
+            # made it look like a write.
+            plain = [r for r in rest
+                     if not r.startswith("-")
+                     and ">" not in r and "<" not in r and r != "|"]
             # Bare `git stash` is `git stash push`. It moves your changes.
             if sub == "stash" and not plain:
                 return "git stash with no subcommand stashes your changes"
@@ -278,13 +317,45 @@ def verdict_for(segment):
             if sub == "config" and any(
                     r.startswith(("--get", "--list", "-l")) for r in rest):
                 return None
+            # Setting your name, your email or your editor is routine. What
+            # this is guarding against is a write that switches off the hooks.
+            DANGEROUS_CONFIG = ("hookspath", "core.hookspath", "alias.",
+                                "core.editor" "", "include.path",
+                                "core.fsmonitor", "core.sshcommand",
+                                "credential.helper", "filter.", "diff.external",
+                                "pager.", "core.pager", "uploadpack.",
+                                "receive.")
             if sub == "config" and len(plain) >= 2:
-                return ("git config with a value writes to the repository's "
-                        "configuration, and one such write can switch off "
-                        "every hook in it")
+                key = plain[0].lower()
+                if any(key.startswith(d) or d in key
+                       for d in ("hookspath", "alias.", "include.path",
+                                 "fsmonitor", "sshcommand", "credential.helper",
+                                 "filter.", "external", "uploadpack.",
+                                 "receive.")):
+                    return ("git config %s can change what runs on your "
+                            "machine, including switching off these hooks"
+                            % plain[0])
+                return None
+            # `git checkout main` moves to a branch and discards nothing.
+            # `git checkout somefile.py` throws your work away. Tell them
+            # apart by asking the filesystem.
+            # `git checkout main` moves to a branch and discards nothing.
+            # `git checkout somefile.py` throws your work away. A branch name
+            # has no slash and no file extension, so ask that as well as the
+            # filesystem: the file may not exist yet and still be meant.
             if sub == "checkout" and plain:
-                return ("git checkout with a path discards uncommitted work "
-                        "in it")
+                # A slash does not mean a path: `feature/new-thing` is an
+                # ordinary branch name, and refusing it sent people to
+                # `git switch` or to turning the guard off.
+                looks_like_path = [
+                    q for q in plain
+                    if os.path.exists(q)
+                    or os.path.splitext(q)[1].lower() in FILE_SUFFIXES]
+                if looks_like_path or "--" in rest:
+                    return ("git checkout with a path discards uncommitted "
+                            "work in it")
+            if sub == "symbolic-ref" and len(plain) >= 2:
+                return "git symbolic-ref with a value repoints a reference"
             return None
         # An unknown subcommand is not waved through. Say so rather than
         # guessing, and let a human decide.
@@ -323,10 +394,25 @@ def verdict_for(segment):
 # shell or an interpreter it is code, and stripping it hid the command
 # completely. This was introduced by the fix for the opposite false positive,
 # which is a good reminder that a guard change needs its own test.
-SHELL_SINK = re.compile(
-    r"(?:^|[;&|]|\$\(|`)\s*(?:[A-Za-z_][A-Za-z0-9_]*=\S*\s+)*"
-    r"(?:sudo|env|nice|timeout|command|exec)?\s*"
-    r"(?:/\S*/)?(?:ba|z|k|da)?sh|python[0-9.]*|perl|ruby|node|eval\b")
+# Does this line hand the heredoc to something that will RUN it?
+#
+# The first version was a regular expression with an unparenthesised
+# alternation. Only the shell branch was anchored, so `cat > retrieval.md` was
+# read as `eval` and refused, while `sudo -n bash` was not read as a shell at
+# all and walked through. Tokenising is slower and correct.
+EXECUTES_STDIN = {"sh", "bash", "zsh", "ksh", "dash", "eval", "python",
+                  "python3", "perl", "ruby", "node", "uv", "xargs"}
+
+
+def _sink_runs_it(line):
+    try:
+        words = shlex.split(line)
+    except ValueError:
+        words = tokens(line)
+    words = strip_prefixes(words)
+    if not words:
+        return False
+    return os.path.basename(words[0].strip("'\"")) in EXECUTES_STDIN
 
 
 def strip_heredocs(command):
@@ -334,7 +420,11 @@ def strip_heredocs(command):
     def keep_or_drop(m):
         before = command[:m.start()]
         line = before.rsplit("\n", 1)[-1]
-        if SHELL_SINK.search(line):
+        # Split on the last separator: `x && bash <<EOF` is a shell sink.
+        for sep in ("&&", "||", ";", "|"):
+            if sep in line:
+                line = line.rsplit(sep, 1)[-1]
+        if _sink_runs_it(line):
             return m.group(0)        # it is code. Leave it to be inspected.
         return "<<REDACTED"
     return HEREDOC.sub(keep_or_drop, command)
@@ -392,13 +482,42 @@ def split_all(command, depth=0):
         except ValueError:
             quoted = tokens(segment)
         words = strip_prefixes(quoted)
-        if words and os.path.basename(words[0]) in INDIRECT:
-            for w in words[1:]:
-                if w.startswith("-"):
-                    continue
-                for seg in split_all(w, depth + 1):
+        if not words:
+            continue
+        head = os.path.basename(words[0])
+
+        # `find . -exec <command> ;` runs whatever follows -exec. It was not
+        # inspected at all.
+        if head == "find":
+            for k, w in enumerate(words):
+                if w in ("-exec", "-execdir", "-ok", "-okdir"):
+                    rest = []
+                    for t in words[k + 1:]:
+                        if t in (";", "\\\\;", "+"):
+                            break
+                        rest.append(t)
+                    if rest:
+                        for seg in split_all(" ".join(rest), depth + 1):
+                            yield seg
+            continue
+
+        if head in INDIRECT:
+            rest = [w for w in words[1:]]
+            # A quoted single argument, as in `sh -c "git push"`.
+            first = None
+            for w in rest:
+                if not w.startswith("-"):
+                    first = w
+                    break
+            if first is not None:
+                for seg in split_all(first, depth + 1):
                     yield seg
-                break
+            # And the same command spread across argv, as in `xargs git push`
+            # or `watch -n1 git push`, which was only half read.
+            spread = [w for w in rest if not w.startswith("-")]
+            if len(spread) > 1:
+                for seg in split_all(" ".join(spread), depth + 1):
+                    yield seg
 
 
 FORMATS = {

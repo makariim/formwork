@@ -11,7 +11,7 @@ CATCHES  A hand-edit to a generated file. It works, for exactly as long as
          the drift that copying was supposed to remove and quietly reintroduces
          it.
 
-The real work is done by `formwork/build --check`, which regenerates in memory
+The real work is done by `formwork roles --check`, which regenerates in memory
 and compares bytes. This check exists so that comparison happens on every turn
 rather than when somebody remembers.
 

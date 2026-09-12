@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="Formwork">
+  <g fill="#16181a">
+    <rect x="2"  y="0"  width="36" height="100"/>
+    <rect x="38" y="10" width="21" height="22"/>
+    <rect x="38" y="68" width="21" height="22"/>
+    <rect x="62" y="0"  width="36" height="100"/>
+    <rect x="40" y="36" width="22" height="28"/>
+  </g>
+</svg>

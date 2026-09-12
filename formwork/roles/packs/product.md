@@ -11,7 +11,7 @@ tools: ["read", "write", "web"]
 what will not be built.
 
 **Does not own.** How it is built (`architect`, then whoever owns the area). How
-it looks (`experience`, `visual`). Whether a number holds (`researcher`).
+it looks (`ux`, `visual`). Whether a number holds (`researcher`).
 
 **Tools.** Reads the web, because somebody has very likely already tried this.
 

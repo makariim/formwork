@@ -28,8 +28,8 @@ These do not ask you. They refuse.
 | Rule | Enforced by |
 |---|---|
 | The agent never writes to version control | `formwork/guard/git-boundary` |
-| One command runs every check | `formwork/check/run` |
-| Every check ships with an input that breaks it | `formwork/check/run` |
+| One command runs every check | `formwork check` |
+| Every check ships with an input that breaks it | `formwork check` |
 | Every rule is labelled, and names a real check | `formwork/check/checks/rule-labels` |
 | Documents link only to files that exist | `formwork/check/checks/doc-links` |
 | A declared runtime is actually wired up | `formwork/check/checks/guard-wired` |
@@ -43,10 +43,14 @@ Three refusals is loud. Set `gate_budget` in `.formwork.toml` to change it.
 Run them:
 
 ```
-formwork/check/run              everything, on your project
-formwork/check/run --demo-fail  watch each check refuse a broken input
-formwork/check/run --list       what exists
+formwork check              everything, on your project
+formwork demo  watch each check refuse a broken input
+formwork check --list       what exists
 ```
+
+**If you did not install the command**, every one of these works by path
+instead: `formwork/fw check`, `formwork/fw demo`, `formwork/fw roles`. Run
+`formwork/fw` on its own to see the list.
 
 ## What is advice
 
@@ -88,6 +92,13 @@ protect_files = "block"          # block | warn | off
 `[strength]` tunes how hard the enforced guards bite. `[bindings]` is your
 setup. There is no third section: see above.
 
+**Two more keys exist and both live in `[strength]`:**
+
+```toml
+aggregate_gate = "block"   # block | warn | off. The turn-end gate
+gate_budget = 3            # how many times it refuses before standing aside
+```
+
 For one session only:
 
 ```
@@ -110,7 +121,7 @@ frontmatter fields. A role missing any of them does not load.
 The installer generates them for your runtime. To regenerate after an edit:
 
 ```
-formwork/build
+formwork roles
 ```
 
 ## What it cannot do
@@ -122,13 +133,17 @@ path and not a determined one.
 was closed afterwards, and what cannot be closed this way. Read it before
 trusting any of this further than it deserves.
 
-## What this is not
+## Two things here you will not find elsewhere
 
-It has been used by one person, on two projects, and that person wrote it.
+**A check that refuses rather than advises.** Most tooling tells you something
+is wrong and lets the work continue. This stops the turn.
 
-There is no evidence it helps anybody else. Two things in it were not found
-anywhere else — a check that refuses rather than advises, and a set of rules
-about what counts as evidence — and both are unproven.
+**Rules about what counts as evidence.** A figure is reported together with the
+command behind it. Anything unmeasured says so in capitals. A check that nobody has
+watched fail is not treated as proof of anything.
+
+Both came out of real use. Neither has been tried by anybody else yet, and the
+kit would rather say that than imply a crowd that does not exist.
 
 ## What it costs
 

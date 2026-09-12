@@ -195,7 +195,7 @@ this one's.
 | The situation | Whose it is |
 |---|---|
 | The data cannot answer this question | say so. Do not approximate |
-| The instrumentation is missing or wrong | `observability` |
+| The instrumentation is missing or wrong | `sre` |
 | It needs to know why people behaved this way | `user-researcher`. Numbers show what, never why |
 | The number implies a product change | `product`. You do not decide |
 | It involves personal data or profiling | `legal` |

@@ -35,6 +35,12 @@ LABEL = re.compile(r"^\*\*(Enforced|Advice)\b", re.M)
 ENFORCER = re.compile(r"^\*\*Enforced\*\*\s+by\s+`([^`]+)`", re.M)
 CATCHES = re.compile(r"^\*\*Catches:\*\*", re.M)
 
+# A Catches line has to name a failure. "nothing" is the word a rule uses when
+# it cannot, and one shipped saying exactly that while this check passed it.
+EMPTY_CATCH = re.compile(
+    r"^\*\*Catches:\*\*\s*(nothing|none|n/a|-|tbd|todo)\s*\.?\s*$",
+    re.M | re.I)
+
 
 def rules_in(text):
     """Split a rules file into (heading, body) at level-three headings."""
@@ -46,12 +52,22 @@ def rules_in(text):
 
 
 def enforcer_exists(root, named):
-    """A rule may name a check or a guard. Either must be a real file."""
+    """A rule may name a check or a guard. It must be one that really runs.
+
+    This used to accept any file of that name anywhere, so `nonexistent/dir/
+    doc-links` passed because a file called doc-links exists somewhere. It now
+    requires the named thing to sit where the gate and the hooks look for it,
+    and to be runnable.
+    """
     base = os.path.basename(named)
+    if named not in (base, os.path.join(CHECKS_SUBDIR, base),
+                     os.path.join(GUARD_SUBDIR, base)):
+        return False
     for sub in (CHECKS_SUBDIR, GUARD_SUBDIR):
-        if os.path.exists(os.path.join(root, sub, base)):
+        full = os.path.join(root, sub, base)
+        if os.path.isfile(full) and os.access(full, os.X_OK):
             return True
-    return os.path.exists(os.path.join(root, named))
+    return False
 
 
 def main(argv):
@@ -95,6 +111,10 @@ def main(argv):
                                     "exist" % (where, named.group(1)))
             if not CATCHES.search(body):
                 problems.append("%s — no 'Catches:' line" % where)
+            elif EMPTY_CATCH.search(body):
+                problems.append("%s — its 'Catches:' line says nothing is "
+                                "caught. A rule that cannot name a failure is "
+                                "an opinion" % where)
 
     if not counted:
         print("ERROR: a rules directory with no rules in it", file=sys.stderr)

@@ -28,6 +28,7 @@ one report.
 docs/rounds/<name>/
     brief.md          what is being asked. You write this
     predictions.md    the challenger, written FIRST
+                      template: formwork/templates/predictions.md
     <role>.md         one file per participant
     round.md          what came out of it. The lead writes this
 ```
@@ -99,8 +100,13 @@ work. See [`adapters/`](adapters/).
 ## The check that watches this
 
 ```
-formwork/check/checks/predictions-first .
+formwork check
 ```
+
+**Run the gate, not the check on its own.** A check run directly will also scan
+the kit's own test fixtures, which contain deliberately broken examples, and
+report them as if they were yours. The gate tells each check what to leave
+alone; nothing else does.
 
 **What it fails on:** a round folder that has participant reports in it and no
 `predictions.md` at all. That is a real finding and it exits 1.

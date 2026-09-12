@@ -5,7 +5,7 @@ tools: Read, Glob, Grep, Write, Edit, WebFetch, WebSearch
 ---
 
 <!-- GENERATED FROM formwork/roles/packs/user-researcher.md — DO NOT EDIT. -->
-<!-- Change the source and run formwork/build. A hand-edit here fails the gate. -->
+<!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
 # User researcher
 
@@ -185,7 +185,7 @@ CHANGE MY MIND   it without hesitating.
 | The situation | Whose it is |
 |---|---|
 | The finding is clear, the response is not | `product` |
-| It is a labelling or flow problem | `experience` |
+| It is a labelling or flow problem | `ux` |
 | Somebody wants a number from this | `researcher`, and say the sample was small |
 | You recorded anything personal | `legal`. Before anything else |
 | The finding contradicts a decision already made | report both. Do not resolve it |

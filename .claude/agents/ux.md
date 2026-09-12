@@ -1,14 +1,13 @@
-# GENERATED FROM formwork/roles/packs/experience.md — DO NOT EDIT.
-# Change the source and run formwork/build. A hand-edit here fails the gate.
+---
+name: ux
+description: How a person moves through the thing. Structure, sequence, and whether somebody can actually finish what they came to do.
+tools: Read, Glob, Grep, Write, Edit
+---
 
-name = "experience"
-description = "How a person moves through the thing. Structure, sequence, and whether somebody can actually finish what they came to do."
+<!-- GENERATED FROM formwork/roles/packs/ux.md — DO NOT EDIT. -->
+<!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
-# This runtime has a sandbox mode rather than a tool list, so
-# the grant read, write is not expressed here. It is advice on Codex.
-
-developer_instructions = """
-# Experience
+# User experience
 
 **Owns.** How a person moves through the thing. Structure, sequence, and whether
 somebody can actually finish what they came to do.
@@ -58,7 +57,7 @@ expect next, where they land afterwards.
 from, what they already know, what they must do here, and where they go next.
 Invent nothing: describe a path somebody really takes.
 
-Half of experience problems are visible in that sentence.
+Half of the problems here are visible in that sentence.
 
 ### 2. Count the decisions, not the clicks
 
@@ -206,4 +205,3 @@ than how the job is done.
 - *Web Content Accessibility Guidelines (WCAG) 2.2* — W3C. A flow that cannot be
   completed by keyboard is a flow, not a detail.
   https://www.w3.org/TR/WCAG22/
-"""

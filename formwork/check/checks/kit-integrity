@@ -22,6 +22,8 @@ Exit status:
 """
 import hashlib
 import os
+import re
+import shutil
 import sys
 
 PROTECTED = (
@@ -35,7 +37,49 @@ PROTECTED = (
 
 STATE = os.environ.get("FORMWORK_STATE_DIR") or os.environ.get(
     "FORMWORK_DENYLIST_DIR", os.path.expanduser("~/.formwork"))
-RECORD = os.path.join(STATE, "fingerprints.txt")
+
+
+def record_path(root):
+    """Where this project's fingerprints live.
+
+    One file per project, named after the project's own path.
+
+    It used to be a single file for the whole machine. Two projects on one
+    machine then shared one record, so the second one to be set up inherited
+    the first one's fingerprints and reported that its untouched guards had
+    been tampered with. Recording to fix it moved the accusation to the other
+    project. An audit hit this on its first run.
+    """
+    # realpath, not abspath. On macOS /tmp is a symlink to /private/tmp, so
+    # the same project reached two ways hashed to two different records and
+    # the second one reported "nothing recorded yet".
+    # An explicit file wins. Fixtures carry their own state directory and
+    # cannot know the name below, which depends on where they were copied to.
+    explicit = os.environ.get("FORMWORK_FINGERPRINTS")
+    if explicit:
+        return explicit
+    full = os.path.realpath(root)
+    digest = hashlib.sha256(full.encode("utf-8")).hexdigest()[:16]
+    name = re.sub(r"[^A-Za-z0-9_.-]", "-", os.path.basename(full.rstrip(os.sep)))
+    mine = os.path.join(STATE, "fingerprints", "%s-%s.txt" % (name, digest))
+
+    # One migration, once. An older version kept a single record for the whole
+    # machine. Reading it as a fallback brought the shared-record bug straight
+    # back, so instead it is moved here the first time this project is
+    # checked, and the flat file is left behind renamed so nothing is lost.
+    legacy = os.path.join(STATE, "fingerprints.txt")
+    if os.path.isfile(legacy) and not os.path.exists(mine):
+        try:
+            os.makedirs(os.path.dirname(mine), exist_ok=True)
+            shutil.copyfile(legacy, mine)
+            os.rename(legacy, legacy + ".migrated")
+            print("moved the old machine-wide record to %s" % mine,
+                  file=sys.stderr)
+            print("  It used to be shared by every project on this machine.",
+                  file=sys.stderr)
+        except OSError:
+            pass
+    return mine
 
 
 def digest(path):
@@ -59,15 +103,20 @@ def protected_files(root):
                     if fn.endswith(".pyc"):
                         continue
                     p = os.path.join(dp, fn)
-                    found[os.path.relpath(p, root)] = digest(p)
+                    try:
+                        found[os.path.relpath(p, root)] = digest(p)
+                    except OSError:
+                        # A dangling symlink used to become a traceback and
+                        # exit 1, which the contract reserves for findings.
+                        found[os.path.relpath(p, root)] = "UNREADABLE"
     return found
 
 
-def load_record():
-    if not os.path.exists(RECORD):
+def load_record(root):
+    if not os.path.exists(record_path(root)):
         return None
     out = {}
-    for line in open(RECORD, encoding="utf-8"):
+    for line in open(record_path(root), encoding="utf-8"):
         line = line.split("#", 1)[0].strip()
         if not line or " " not in line:
             continue
@@ -90,15 +139,21 @@ def main(argv):
     now = protected_files(root)
 
     if record_mode:
-        os.makedirs(os.path.dirname(RECORD), exist_ok=True)
-        with open(RECORD, "w", encoding="utf-8") as f:
+        try:
+            os.makedirs(os.path.dirname(record_path(root)), exist_ok=True)
+        except OSError as e:
+            print("ERROR: cannot write the record: %s" % e, file=sys.stderr)
+            print("       Check FORMWORK_STATE_DIR points at a directory you "
+                  "can write to.", file=sys.stderr)
+            return 2
+        with open(record_path(root), "w", encoding="utf-8") as f:
             f.write("# Fingerprints of everything that enforces a rule.\n")
             f.write("# Kept outside the repository on purpose: a record beside\n")
             f.write("# the thing it describes protects nothing.\n")
             f.write("# Re-record deliberately, after reviewing what changed.\n")
             for rel in sorted(now):
                 f.write("%s  %s\n" % (now[rel], rel))
-        print("recorded %d file(s) to %s" % (len(now), RECORD))
+        print("recorded %d file(s) to %s" % (len(now), record_path(root)))
         return 0
 
     if not now:
@@ -109,9 +164,9 @@ def main(argv):
               file=sys.stderr)
         return 2
 
-    was = load_record()
+    was = load_record(root)
     if was is None:
-        print("ERROR: no fingerprints recorded at %s" % RECORD, file=sys.stderr)
+        print("ERROR: no fingerprints recorded at %s" % record_path(root), file=sys.stderr)
         print("       Run: formwork/check/checks/kit-integrity --record .",
               file=sys.stderr)
         print("       Until then nothing is watching the guards, and that is "

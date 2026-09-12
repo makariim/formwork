@@ -5,7 +5,7 @@ kind: local
 ---
 
 <!-- GENERATED FROM formwork/roles/packs/tester.md — DO NOT EDIT. -->
-<!-- Change the source and run formwork/build. A hand-edit here fails the gate. -->
+<!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
 > **This role's tool grant is not expressed here.** It asks for `read`, `write`, `run`, and gemini-cli does not have a documented name for `write`. An incomplete allowlist would quietly remove a tool the role needs, so none is written. The grant is advice on this runtime.
 
@@ -215,7 +215,7 @@ Say it out loud rather than approximating:
 | The logic cannot be reached by a test | `backend` or `architect`. It has to move |
 | It fails only under load | `performance` |
 | A test exposes a permission hole | stop. `security`, now |
-| The suite is slow enough that people skip it | `infrastructure`, and say how slow |
+| The suite is slow enough that people skip it | `devops`, and say how slow |
 
 ---
 

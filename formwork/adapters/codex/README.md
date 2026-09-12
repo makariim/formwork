@@ -19,7 +19,7 @@ though this wiring has not been exercised.
 
 ## Roles
 
-`formwork/build --runtime codex` writes `.codex/agents/<name>.toml`.
+`formwork roles --runtime codex` writes `.codex/agents/<name>.toml`.
 
 **Of the four runtimes, this is the one that does not take markdown.** It takes TOML, with
 `name`, `description` and `developer_instructions`.

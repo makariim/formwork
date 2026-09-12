@@ -21,8 +21,6 @@ rule the kit applies to its own decision records.
 | [`build-plan.md`](build-plan.md) | the order the work was done in |
 | [`dogfood.md`](dogfood.md) | **what broke while using the kit on itself. The most useful page here** |
 
-The kit's own page on what it cannot do lives with the kit, not here:
-[`../formwork/limits.md`](../formwork/limits.md).
 | [`first-run.md`](first-run.md) | the design of the fifteen-minute first run |
 | [`runtime-capabilities.md`](runtime-capabilities.md) | what each of the four runtimes can actually enforce |
 | [`role-formats.md`](role-formats.md) | how a role is expressed in each runtime, and where the grant does not survive |
@@ -40,3 +38,6 @@ in the repository.
 **You can check the reasoning.** Every rule in the kit came from somewhere. If
 you think one is wrong, the argument that produced it is here and you can
 disagree with the argument rather than with the rule.
+
+The kit's own page on what it cannot do lives with the kit, not here:
+[`../formwork/limits.md`](../formwork/limits.md).

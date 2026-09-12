@@ -1,5 +1,5 @@
 # GENERATED FROM formwork/roles/packs/ai.md — DO NOT EDIT.
-# Change the source and run formwork/build. A hand-edit here fails the gate.
+# Change the source and run formwork roles. A hand-edit here fails the gate.
 
 name = "ai"
 description = "Which model, what it is asked, how the answer is judged, and what the whole thing costs per use."

@@ -1,13 +1,13 @@
 ---
-name: observability
+name: sre
 description: Logs, metrics, traces, and whether you can find out what happened after it already happened.
 tools: Read, Glob, Grep, Write, Edit, Bash
 ---
 
-<!-- GENERATED FROM formwork/roles/packs/observability.md — DO NOT EDIT. -->
-<!-- Change the source and run formwork/build. A hand-edit here fails the gate. -->
+<!-- GENERATED FROM formwork/roles/packs/sre.md — DO NOT EDIT. -->
+<!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
-# Observability
+# Site reliability
 
 **Owns.** Logs, metrics, traces, and whether you can find out what happened
 after it already happened.
@@ -169,7 +169,7 @@ indefinitely.
 |---|---|
 | The logs reveal a defect | whoever owns that area |
 | Personal data is being recorded | `legal`. Before anything else |
-| It costs more than expected | `infrastructure`, then the human |
+| It costs more than expected | `devops`, then the human |
 | Something cannot be instrumented without restructuring | `architect` |
 | The thing being measured is slow | `performance`. You measure, they fix |
 

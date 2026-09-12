@@ -67,7 +67,11 @@ def _seconds(name, default):
         v = int(raw)
     except (TypeError, ValueError):
         return None
-    return v if v > 0 else None
+    if v <= 0:
+        return None
+    # A number too large to be a timeout raised OverflowError deep inside
+    # subprocess, which surfaced as exit 1. A day is already absurd.
+    return min(v, 86400)
 
 
 DEADLINE = _seconds("FORMWORK_CHECK_TIMEOUT", 60)
@@ -109,6 +113,17 @@ def anonymised(fixture):
     Without this, a check can pass the gate by recognising the word
     "must-fail" or the case name, while examining nothing. An audit did
     exactly that in about a minute.
+
+    **It hides the case name and nothing else.** Names inside the fixture are
+    left alone, because several checks legitimately read them: a decision
+    record is identified by its numbered filename, a role by its `.md`
+    ending. So a check that looked for a particular file INSIDE a fixture
+    could still pass without examining anything. A later audit wrote one and
+    it worked.
+
+    Scrambling the contents was tried and broke the checks that read names
+    for real reasons. The limit is recorded in formwork/limits.md instead of
+    being papered over.
     """
     tmp = tempfile.mkdtemp(prefix="fw-")
     dest = os.path.join(tmp, "subject")

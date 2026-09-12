@@ -1,4 +1,22 @@
-# First run
+# The first run, as designed
+
+> ## Read this first: it is a record, not a description
+>
+> **This page says what was planned. It has not been kept in step with what
+> was built, and parts of it are wrong.**
+>
+> An audit found three. It quotes `FORMWORK.md` "in these words" using words
+> that page does not contain, and the invented quote tells the reader to do
+> the one thing a check refuses. It documents a flag, `--explain`, that does
+> not exist. And it says nine rules carry a `SEE IT` line; none do.
+>
+> **It is kept as written on purpose.** Rewriting a design record to match the
+> outcome destroys the evidence of what changed, which is the rule this kit
+> applies to decision records.
+>
+> **For the real first run**, read
+> [`../formwork/first-run.md`](../formwork/first-run.md).
+
 
 **Phase:** K6. **Date:** 2026-09-12.
 

@@ -45,7 +45,7 @@ requires a clean working tree and yours will be dirty, record that here.
 
 ## 5. Checked by
 
-`formwork/check/run`, named as the whole thing.
+`formwork check`, named as the whole thing.
 
 You may add commands on top. You may never swap in a hand-picked few instead.
 

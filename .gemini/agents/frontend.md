@@ -5,7 +5,7 @@ kind: local
 ---
 
 <!-- GENERATED FROM formwork/roles/packs/frontend.md — DO NOT EDIT. -->
-<!-- Change the source and run formwork/build. A hand-edit here fails the gate. -->
+<!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
 > **This role's tool grant is not expressed here.** It asks for `read`, `write`, `run`, and gemini-cli does not have a documented name for `write`. An incomplete allowlist would quietly remove a tool the role needs, so none is written. The grant is advice on this runtime.
 
@@ -15,7 +15,7 @@ kind: local
 the user's own machine does.
 
 **Does not own.** What the server does (`backend`). What the data looks like at
-rest (`data`). How it should look (`visual`) or flow (`experience`).
+rest (`data`). How it should look (`visual`) or flow (`ux`).
 
 **Tools.** Runs the build and the tests.
 
@@ -194,7 +194,7 @@ A test coupled to structure breaks on every refactor and catches nothing.
 | The situation | Whose it is |
 |---|---|
 | The response shape does not exist yet | `backend`. Do not invent it |
-| The flow itself is confusing | `experience` |
+| The flow itself is confusing | `ux` |
 | It is slow because of what is being sent | `performance`, with a measurement |
 | A control cannot be made accessible | `accessibility` |
 | A rule is duplicated and the two disagree | `backend`. The server wins |

@@ -14,7 +14,7 @@ formwork/guard/protected-files --format gemini-cli
 
 ## Roles
 
-`formwork/build --runtime gemini-cli` writes `.gemini/agents/<name>.md` —
+`formwork roles --runtime gemini-cli` writes `.gemini/agents/<name>.md` —
 markdown with YAML frontmatter, `kind: local`, and a `tools:` list.
 
 ## Where the tool grant goes — and the gap

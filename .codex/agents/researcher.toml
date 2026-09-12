@@ -1,5 +1,5 @@
 # GENERATED FROM formwork/roles/method/researcher.md — DO NOT EDIT.
-# Change the source and run formwork/build. A hand-edit here fails the gate.
+# Change the source and run formwork roles. A hand-edit here fails the gate.
 
 name = "researcher"
 description = "What gets measured, what the unit is, and where the bar sits — committed to writing first, never afterwards — plus whatever would invalidate the result."
