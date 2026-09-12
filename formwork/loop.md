@@ -8,6 +8,8 @@ BRIEF → WORK → CHECK → REPORT → STOP → you say go → BRIEF …
 
 **Nothing continues past STOP without you.** That is the whole shape.
 
+---
+
 ## Five sizes
 
 | Size | How long | Brief | Report |
@@ -21,6 +23,8 @@ BRIEF → WORK → CHECK → REPORT → STOP → you say go → BRIEF …
 **These are names for how big a turn was.** They are not five different
 processes. A task and a phase run the same loop.
 
+---
+
 ## Four questions, every size
 
 Before starting anything, answer these. A phase and a five-minute task both
@@ -33,6 +37,8 @@ deserve them, in proportion.
 
 Question four is the one people skip. A piece of work that cannot fail is a
 piece of work nobody can check.
+
+---
 
 ## Picking a size
 
@@ -51,6 +57,8 @@ real money and nobody has measured how much. Do not run one out of habit.
 
 **Milestone** — a direction, not a piece of work. It contains phases.
 
+---
+
 ## Where the size comes from
 
 Not from counting files. From this question:
@@ -61,6 +69,8 @@ If yes, it is two pieces of work. Split it there.
 
 *That test comes from a published engineering-process kit, not from this
 method. A file count is arbitrary and this is not.*
+
+---
 
 ## What STOP means
 

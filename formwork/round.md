@@ -45,9 +45,12 @@ is six headings and it is the whole input, so it is worth the twenty minutes.
 
 **2. The challenger writes `predictions.md` first**, before anybody has
 proposed anything. It names the failures it expects and what result would show
-each one was mistaken. **A prediction written after the answer is not a
-prediction, it is agreement.** This is the rule people skip, and it is the
-reason a round is worth anything.
+each one was mistaken.
+
+> [!IMPORTANT]
+> **A prediction written after the answer is not a prediction, it is
+> agreement.** This is the rule people skip, and it is the reason a round is
+> worth anything.
 
 **3. Everybody else works, at the same time.** Each writes their own file, named
 for their role. They do not read each other's yet.

@@ -2,6 +2,8 @@
 
 A way of running a project with coding agents.
 
+---
+
 ## The loop
 
 Everything is one loop. Only the size changes.
@@ -21,6 +23,8 @@ BRIEF → WORK → CHECK → REPORT → STOP → you say go → BRIEF …
 Each one answers four questions: what it produces, what must be true before it
 starts, who says go, and **what would tell us it failed.**
 
+---
+
 ## What is blocked
 
 These do not ask you. They refuse.
@@ -36,8 +40,9 @@ These do not ask you. They refuse.
 | The agent does not quietly alter the kit's own files | `formwork/guard/protected-files` |
 | A turn does not end while the aggregate is red | `formwork/guard/quality-gate` |
 
-**The last one refuses three times in a session, then stands aside**, so a
-genuinely stuck turn is not trapped for ever. Change it with `gate_budget`.
+> [!NOTE]
+> **The last one refuses three times in a session, then stands aside**, so a
+> genuinely stuck turn is not trapped for ever. Change it with `gate_budget`.
 
 Run them:
 
@@ -51,6 +56,8 @@ formwork check --list       what exists
 instead: `formwork/fw check`, `formwork/fw demo`, `formwork/fw roles`. Run
 `formwork/fw` on its own to see the list.
 
+---
+
 ## What is advice
 
 Everything else. **46 rules**, in two files.
@@ -58,8 +65,11 @@ Everything else. **46 rules**, in two files.
 - `formwork/rules/core.md` — 13. You meet these every day.
 - `formwork/rules/full.md` — 33. Read one when you hit the situation it covers.
 
-Every rule says what it catches. None of them tells you a story, because the
-stories belong to somebody else's project.
+> [!TIP]
+> Every rule says what it catches. None of them tells you a story, because the
+> stories belong to somebody else's project.
+
+---
 
 ## Some of this will look like fussiness
 
@@ -74,6 +84,8 @@ add it. A rule switched off in a settings file disappears quietly. A rule
 deleted from the rules file does not.
 
 A rule you follow without understanding gets dropped quietly later anyway.
+
+---
 
 ## Settings
 
@@ -106,6 +118,8 @@ FORMWORK_PROTECT_FILES=warn
 FORMWORK_GATE=off
 ```
 
+---
+
 ## Your team
 
 `formwork/roles/` holds 27 roles. Six run the method. Twenty-one do the work,
@@ -123,6 +137,8 @@ The installer generates them for your runtime. To regenerate after an edit:
 formwork roles
 ```
 
+---
+
 ## What it cannot do
 
 The guards are pattern matching over a command line. They stop the ordinary
@@ -131,6 +147,8 @@ path and not a determined one.
 [`formwork/limits.md`](formwork/limits.md) lists exactly what got past an audit, what
 was closed afterwards, and what cannot be closed this way. Read it before
 trusting any of this further than it deserves.
+
+---
 
 ## Two things here you will not find elsewhere
 
@@ -144,11 +162,15 @@ watched fail is not treated as proof of anything.
 Both came out of real use. Neither has been tried by anybody else yet, and the
 kit would rather say that than imply a crowd that does not exist.
 
+---
+
 ## What it costs
 
 Nobody has measured what one round costs in money. Not once. `formwork/COSTS.md`
 says so plainly, gives the part that can be measured for free, and says what
 would establish the rest.
+
+---
 
 ## Where to start
 

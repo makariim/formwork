@@ -1,5 +1,7 @@
 # Adding a role
 
+---
+
 ## Your own
 
 1. `mkdir -p formwork/roles/project` if it is not there. Version control does
@@ -16,6 +18,8 @@ check refuses a `[roles]` section if you add one.
 
 If a section is missing, or another role already claims your `owns` slug, the
 gate refuses and tells you which.
+
+---
 
 ## From somewhere else
 
@@ -35,6 +39,8 @@ Converting one takes about five minutes:
 An unconverted role does not load. That is on purpose: a role with no stated
 boundary is a role that will wander into somebody else's work.
 
+---
+
 ## Turning roles on
 
 **Not built yet, and this section says so rather than pretending.**
@@ -45,6 +51,8 @@ The intention is a `[roles]` block in `.formwork.toml` naming which packs are
 on. Until something actually reads it, writing one would be configuration that
 does nothing — and a setting that appears to work and does not is worse than an
 honest absence.
+
+---
 
 ## Where a tool grant actually binds
 
@@ -84,6 +92,8 @@ qualifier above is held in place by nothing but this page.
 
 Established by reading each publisher's own documentation. Recorded in
 `docs/role-formats.md`.
+
+---
 
 ## What makes a bad role
 

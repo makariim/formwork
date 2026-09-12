@@ -12,6 +12,8 @@
 >
 > To get the short command: `pipx install formwork-kit`.
 
+---
+
 ## The basics
 
 ### Do I need to be a programmer?
@@ -113,8 +115,9 @@ here can do that for you.
 
 ### Can I trust this to stop my agent doing damage?
 
-**Partly.** The guards stop the normal path; somebody who wants around them
-can get around them. [`formwork/limits.md`](formwork/limits.md) lists every
+> [!WARNING]
+> **Partly.** The guards stop the normal path. Somebody who wants around them
+> can get around them. [`formwork/limits.md`](formwork/limits.md) lists every
 route anybody has found. If you need real containment, use a sandbox.
 
 ### Does it send my code anywhere?

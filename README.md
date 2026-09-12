@@ -18,6 +18,23 @@ own. Projects never had that. Now they do.*
 
 ---
 
+<div align="center">
+
+| A team | A way of working | Rules that refuse |
+|:--:|:--:|:--:|
+| everyone a project needs | brief, work, check, report, stop | some mistakes cannot happen |
+
+</div>
+
+```console
+$ pipx install formwork-kit
+$ formwork init && formwork install --runtime claude-code
+$ formwork check
+GATE: green. 9 check(s), each shown to reject the wrong and accept the right.
+```
+
+---
+
 ## Ideas do not die at the idea
 
 They die at what comes next.
@@ -38,6 +55,8 @@ Someone who tells you when to call a real lawyer.
 
 Nobody to hire. Nobody to wait for. They are in the folder.
 
+---
+
 ## Who it is for
 
 **Anyone building something with an AI agent.**
@@ -52,6 +71,8 @@ know better.
 **Expert in one thing?** Your role file will be thinner than you are. Replace
 it. Everything else keeps working around it.
 
+---
+
 ## What you get
 
 **A way of working.** You say what you want. The agent works. The checks run.
@@ -62,13 +83,19 @@ living in a chat you will close and lose.
 
 **Rules your agent cannot ignore.** Not tips. Real refusals.
 
-```
+```console
 you:    commit this for me
 agent:  REFUSED by the version-control boundary: git commit changes
         the repository.
 ```
 
 Nobody read you a rule. You watched it work.
+
+> [!IMPORTANT]
+> That is the whole idea. You think about what you are building. The kit holds
+> everything else.
+
+---
 
 ## Install
 
@@ -95,8 +122,9 @@ That last line should say green.
 guards into your agent and writes your role files. Type `formwork` on its own
 to see the rest.
 
-**Use pipx, not pip.** Plain pip works, but often puts the command somewhere
-your shell does not look, and you get `command not found` with no clue why.
+> [!TIP]
+> **Use pipx, not pip.** Plain pip works, but often puts the command somewhere
+> your shell does not look, and you get `command not found` with no clue why.
 
 **Or install nothing.** The kit is just files:
 
@@ -119,6 +147,8 @@ settings file keeping anything already there, and puts one file in
 | **Linux** | Should do. Nobody has tried. **Try it and tell us** |
 | **Windows** | The command installs. The guards assume a unix shell and nobody has run them there |
 
+---
+
 ## What is inside
 
 | | | count it yourself |
@@ -132,6 +162,8 @@ settings file keeping anything already there, and puts one file in
 It is all text files and small programs. You can read every line. Nothing is
 hidden. Nothing is sent anywhere.
 
+---
+
 ## Every check has been watched failing
 
 A check nobody has seen fail proves nothing.
@@ -139,6 +171,8 @@ A check nobody has seen fail proves nothing.
 So each check ships test cases of both kinds: at least one it must reject, at
 least one it must accept. It has to tell them apart. Watch it yourself with
 `formwork demo`.
+
+---
 
 ## Which agents work
 
@@ -149,31 +183,36 @@ least one it must accept. It has to tell them apart. Watch it yourself with
 | **Cursor** | It should. Nobody has tried |
 | **Gemini CLI** | It should. Nobody has tried |
 
-For the three nobody has tried, `formwork check` stays red until you write the
-hook file yourself. Your agent's page in `formwork/adapters/` says what goes in
-it. Red is the right answer there: nothing is guarding you yet.
+> [!NOTE]
+> For the three nobody has tried, `formwork check` stays red until you write
+> the hook file yourself. Your agent's page in `formwork/adapters/` says what
+> goes in it. **Red is the right answer there: nothing is guarding you yet.**
 
 **Those three are the easiest way to help.** Set one up, ask your agent to
 commit something, and tell us what happened. Either answer is useful.
+
+---
 
 ## What this will not pretend
 
 Every number here comes with the command that made it. Anything unmeasured says
 so in capitals rather than guessing. There are three:
 
-**Nobody knows what a round costs in money.**
-[`formwork/COSTS.md`](formwork/COSTS.md) says NOT ESTABLISHED instead of a made
-up number.
+| | |
+|---|---|
+| **What a round costs in money** | never measured. [`COSTS.md`](formwork/COSTS.md) says NOT ESTABLISHED instead of guessing |
+| **Whether the guards stop a determined agent** | they do not. [`limits.md`](formwork/limits.md) lists every way around them |
+| **Whether three of the four agents work** | nobody has tried them |
 
-**The guards stop the normal way, not a clever one.**
-[`formwork/limits.md`](formwork/limits.md) lists every way around them anybody
-has found. If you need real safety, use a sandbox.
-
-**Three of the four agents are untried.**
+> [!WARNING]
+> The guards stop the ordinary path, not a clever one. If you need real safety,
+> use a sandbox.
 
 Every time this kit failed on the person who wrote it, the failure went into
 [`docs/dogfood.md`](docs/dogfood.md) instead of being quietly patched. That page
 is the best reason to trust the rest.
+
+---
 
 ## Where to start
 
@@ -183,48 +222,57 @@ own project. No tutorial. No pretend example.
 It should take about fifteen minutes. Nobody has timed the part you do, and the
 page says so.
 
+---
+
 ## The rest
+
+**Start here**
 
 | | |
 |---|---|
+| [`formwork/first-run.md`](formwork/first-run.md) | seven short steps, on your own project |
 | [`FORMWORK.md`](FORMWORK.md) | the whole method on one page. Read it after your first run |
-| [`formwork/loop.md`](formwork/loop.md) | how one job goes, start to finish |
-| [`formwork/round.md`](formwork/round.md) | how to run a round, and when it is worth it |
-| [`formwork/rules/`](formwork/rules/) | the rules, each saying what it catches |
-| [`formwork/roles/`](formwork/roles/) | the roles, and how to write your own |
-| [`formwork/templates/`](formwork/templates/) | brief, predictions, report, decision, round |
-| [`formwork/glossary.md`](formwork/glossary.md) | every word we use, in plain language |
-| [`formwork/troubleshooting.md`](formwork/troubleshooting.md) | every error message and what to do |
-| [`formwork/limits.md`](formwork/limits.md) | what this kit cannot do |
+
+**While you work**
+
+| | |
+|---|---|
+| [`loop.md`](formwork/loop.md) | how one job goes, start to finish |
+| [`round.md`](formwork/round.md) | how to run a round, and when it is worth it |
+| [`templates/`](formwork/templates/) | brief, predictions, report, decision, round |
+| [`roles/`](formwork/roles/) | the roles, and how to write your own |
+| [`rules/`](formwork/rules/) | the rules, each saying what it catches |
+
+**When you need it**
+
+| | |
+|---|---|
+| [`troubleshooting.md`](formwork/troubleshooting.md) | every error message and what to do |
+| [`glossary.md`](formwork/glossary.md) | every word we use, in plain language |
+| [`limits.md`](formwork/limits.md) | what this kit cannot do |
+| [`COSTS.md`](formwork/COSTS.md) | what it costs, and the number nobody has |
 | [`FAQ.md`](FAQ.md) | questions people ask |
-| [`docs/`](docs/) | how it was built, and what broke |
-| [`RELEASING.md`](RELEASING.md) | for the maintainer, how a version gets published |
+
+**How it was built**
+
+| | |
+|---|---|
+| [`docs/`](docs/) | the survey, the design, and what broke |
+| [`docs/dogfood.md`](docs/dogfood.md) | the kit failing on its own author, written down |
+| [`RELEASING.md`](RELEASING.md) | for the maintainer |
 
 ## Contributing
 
-Forks are the point. Take it, change it, keep what you like.
+Forks are the point. What helps most, in order:
 
-What helps most, in order:
+- **A command that got past a guard.** One line, no fix needed
+- **A normal command that was wrongly stopped.** Just as useful
+- **A report from an untried agent**, whether it worked or not
+- **A new role** the twenty seven do not cover
 
-- **A command that got past a guard.** One line is enough, no fix needed.
-- **A normal command that was wrongly stopped.** Just as useful. A guard that
-  blocks real work is a guard people switch off.
-- **A report from an untried agent.** Codex, Cursor or Gemini CLI. Worked or
-  not, both answers help.
-- **A new role.** Copy `formwork/roles/TEMPLATE.md` and read
-  [`HOW-TO-ADD-A-ROLE.md`](formwork/roles/HOW-TO-ADD-A-ROLE.md) first.
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md).
 
-Before you open a pull request:
-
-```
-formwork check    must say green
-formwork demo     must reject every broken test case
-formwork test     all 295 must pass
-```
-
-Two house rules, taken from the kit itself. **Change a guard or a check, and
-add the test that would have caught the bug**, shown failing without your fix.
-**Write down a number, and write down the command that made it.**
+---
 
 ## Licence
 
