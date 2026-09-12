@@ -9,6 +9,7 @@ nothing else. It does not need a clean working tree.
 about a second. Your share is step 4, which is real work on your own project,
 and nobody can time that for you.
 
+> [!TIP]
 > **`command not found: formwork`?** Everything here also works as
 > `formwork/fw check`, `formwork/fw record` and so on, from the top of your
 > project. To get the short command: `pipx install formwork-kit`.
@@ -124,8 +125,9 @@ Nothing unasked, nothing skipped, brief was accurate.
 Four lines, answering the three questions that matter: what was done beyond the
 request, what was skipped, and whether the brief was right.
 
-**Then it stops.** It does not start the next thing. That is the loop, and
-`STOP` is the part worth keeping if you keep nothing else.
+> [!IMPORTANT]
+> **Then it stops.** It does not start the next thing. That is the loop, and
+> `STOP` is the part worth keeping if you keep nothing else.
 
 ---
 
@@ -194,8 +196,9 @@ bad day.
 yourself. The loop, the brief and the stop are things the agent does because
 the rules say so.
 
-**The honest division: the checks are yours whatever you run. None of the three
-guards is, until the hooks are wired.**
+> [!WARNING]
+> **The checks are yours whatever you run. None of the three guards is, until
+> the hooks are wired.**
 
 A rule an agent follows most of the time is worth having. It is not the same as
 one it cannot break, and this kit will not blur the two.

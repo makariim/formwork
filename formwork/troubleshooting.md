@@ -2,6 +2,7 @@
 
 Find the message you saw. Every entry says what happened, why, and what to do.
 
+> [!TIP]
 > **`command not found: formwork`?**
 >
 > Everything on this page also works with `formwork/fw` from the top of your

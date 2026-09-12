@@ -3,6 +3,8 @@
 **Everything below was confirmed by running it, not guessed.** A guard you
 trust further than it deserves is worse than no guard at all.
 
+---
+
 ## The short version
 
 **The guards stop the ordinary path, not a determined one.** They are pattern
@@ -10,7 +12,8 @@ matching over a command line. An agent that wants past them can get past them.
 The value is that an agent not trying to, which is nearly always, is stopped
 from doing the everyday thing that should have been your decision.
 
-**If you need containment, this is not it.** Use a sandbox.
+> [!WARNING]
+> **If you need containment, this is not it.** Use a sandbox.
 
 ---
 
