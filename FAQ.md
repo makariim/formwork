@@ -59,6 +59,20 @@ agent to do it.
 The rest of the loop is in
 [`formwork/loop.md`](formwork/loop.md).
 
+### How many conversations do I need to keep open?
+
+Two kinds. One director thread, which decides what happens next and reads the
+reports. One working session per piece of work, in the repository, which does
+that one thing and stops.
+
+The director is a role, `formwork/roles/method/director.md`. Inside your coding
+tool, ask for it by name. Anywhere else, paste the file.
+
+You carry the text between them. The plan does not live in the chat window: it
+lives in `docs/standing.md`, so closing the window costs you nothing.
+
+[`formwork/threads.md`](formwork/threads.md) has the whole shape.
+
 ### How do I use one of the roles?
 
 On Claude Code, ask for it by name in plain words:
@@ -70,7 +84,7 @@ Use the challenger on this plan. Tell me what is wrong with it.
 The roles are installed where your tool looks for them. On the other three
 tools this is documented but untested.
 
-### Do I have to use all twenty seven roles?
+### Do I have to use all twenty eight roles?
 
 No. Most people will use four or five. The rest sit there until you hit a
 situation that needs one.

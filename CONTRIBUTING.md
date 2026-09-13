@@ -48,7 +48,7 @@ These are taken from the kit itself.
 
 - Set up the hooks for Codex, Cursor or Gemini CLI and tell us if they work
 - Translate [the first run page](formwork/first-run.md)
-- Add a role for something the twenty seven do not cover
+- Add a role for something the twenty eight do not cover
 - Find a command that gets past a guard
 
 ---

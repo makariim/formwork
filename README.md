@@ -30,7 +30,7 @@ own. Projects never had that. Now they do.*
 $ pipx install formwork-kit
 $ formwork init && formwork install --runtime claude-code
 $ formwork check
-GATE: green. 9 check(s), each shown to reject the wrong and accept the right.
+GATE: green. 11 check(s), each shown to reject the wrong and accept the right.
 ```
 
 ---
@@ -48,7 +48,7 @@ That used to mean hiring people. People cost money. Hiring takes time.
 
 **Now it is a folder you copy into your project.**
 
-Twenty seven roles, already written. A lead, a challenger, an architect, a
+Twenty eight roles, already written. A director, a lead, a challenger, a
 researcher, a reviewer. Engineers for the back end, the front end, phones,
 data, servers and safety. A designer, a writer, a product person, a marketer.
 Someone who tells you when to call a real lawyer.
@@ -154,9 +154,9 @@ settings file keeping anything already there, and puts one file in
 | | | count it yourself |
 |---|---|---|
 | **3 guards** | small programs that refuse. Two stop a command, one stops a turn ending | `ls formwork/guard \| grep -v test_` |
-| **9 checks** | small programs that read your project and say green or red | `ls formwork/check/checks \| wc -l` |
-| **27 roles** | one file each, saying what that job does and where it stops | `ls formwork/roles/*/*.md \| wc -l` |
-| **46 rules** | 13 you meet daily, 33 for when you need them | `grep -c '^### ' formwork/rules/*.md` |
+| **11 checks** | small programs that read your project and say green or red | `ls formwork/check/checks \| wc -l` |
+| **28 roles** | one file each, saying what that job does and where it stops | `ls formwork/roles/*/*.md \| wc -l` |
+| **47 rules** | 13 you meet daily, 34 for when you need them | `grep -c '^### ' formwork/rules/*.md` |
 | **295 tests** | every guard and check, proved able to fail | `formwork test` |
 
 It is all text files and small programs. You can read every line. Nothing is
@@ -238,8 +238,9 @@ page says so.
 | | |
 |---|---|
 | [`loop.md`](formwork/loop.md) | how one job goes, start to finish |
+| [`threads.md`](formwork/threads.md) | how work starts, and where the plan lives between conversations |
 | [`round.md`](formwork/round.md) | how to run a round, and when it is worth it |
-| [`templates/`](formwork/templates/) | brief, predictions, report, decision, round |
+| [`templates/`](formwork/templates/) | brief, predictions, report, decision, round, standing brief |
 | [`roles/`](formwork/roles/) | the roles, and how to write your own |
 | [`rules/`](formwork/rules/) | the rules, each saying what it catches |
 
@@ -268,7 +269,7 @@ Forks are the point. What helps most, in order:
 - **A command that got past a guard.** One line, no fix needed
 - **A normal command that was wrongly stopped.** Just as useful
 - **A report from an untried agent**, whether it worked or not
-- **A new role** the twenty seven do not cover
+- **A new role** the twenty eight do not cover
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md).
 

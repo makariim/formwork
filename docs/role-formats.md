@@ -60,7 +60,7 @@ over.
 | Cursor | **read-only, or not.** Nothing finer |
 | Codex | **a sandbox mode.** Not a tool list at all |
 
-The kit's 27 roles each declare a list like `["read", "write", "run"]`. That
+The kit's 28 roles each declare a list like `["read", "write", "run"]`. That
 maps cleanly onto two runtimes, collapses to one bit on Cursor, and does not
 map onto Codex at all.
 
