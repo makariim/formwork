@@ -20,16 +20,16 @@ Nothing here is a decision. It is a list of writing owed.
 
 | What | Where it lands |
 |---|---|
-| Model, effort and colour per role, and which runtimes can express each | `docs/role-formats.md`, `docs/runtime-capabilities.md` |
-| Em dashes across the twenty eight role sources, then regenerate | `formwork/roles/` |
-| `formwork/install` run from a subfolder writes its configuration into that subfolder | fix first, then say so |
 | Numbers in `docs/` that are now stale | those pages are history and say so at the top. Decide whether that is enough, or mark the figures |
+| **Em dashes still in the programs**, in comments and in the findings they print: `0001-x.md — no date`. There it is a column separator, not a pause in a sentence. Left alone on purpose. Changing it means editing every guard and check, which means re-recording all of them | your call. The prose is done |
 | Not a file: the repository has no About text, no website and no topics on GitHub | the repository page. Only you can set it |
 
 ## Dropped, with the reason
 
-**Skills.** Not built, so nothing to write. The README says version one does
-not have them.
+**Skills**, and **a model per role**. Both dropped before starting, so there is
+nothing to document. The README lists them as not here, and says the model one
+is known to work on Claude Code only, because nobody has read the other three
+publishers' documentation.
 
 ## Done in the documentation pass
 
@@ -45,3 +45,9 @@ Kept for one release, so the next pass can tell what was deliberate.
   a version one statement
 - repeated wording between pages cut roughly in half, measured as shared runs
   of seven words or more across twenty one pages: 240 before, 89 after
+- 328 em dashes replaced across the kit's pages and role files. Two dashes in
+  one sentence became commas, one became a full stop, and six were repaired by
+  hand where the sentence had wrapped across two lines
+- `formwork/install` run from a subfolder wrote into that subfolder and called
+  it a success. It now installs into the project holding the kit, and says
+  which one it chose
