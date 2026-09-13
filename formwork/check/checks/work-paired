@@ -38,9 +38,37 @@ import sys
 BRIEFS = os.path.join("docs", "briefs")
 REPORTS = os.path.join("docs", "reports")
 NUMBERED = re.compile(r"^(\d{1,6})[-_]")
-STATUS = re.compile(r"^\s*status\s*:\s*[\"']?([a-z]+)", re.M | re.I)
+# No leading whitespace. An indented `status:` inside a nested mapping used to
+# win over the real one below it, so a brief could say done, have no report,
+# and pass.
+STATUS = re.compile(r"^status\s*:\s*[\"']?([a-z]+)", re.M | re.I)
+
+# A report has to say something. The file was never opened, so `touch
+# docs/reports/0007-x.md` satisfied the check whose whole purpose is catching
+# work that left nothing behind. Making `docs/reports` a symlink to
+# `docs/briefs` did the same for every brief at once.
+MEANINGFUL = 20
 
 OPEN, DONE, DROPPED = "open", "done", "dropped"
+
+# Paths the runner has told this check to stay out of. The kit's own fixtures
+# are wrong on purpose. Resolved against the directory being checked, not
+# against wherever the person happened to be standing: a relative exclude used
+# to mean two different places depending on the caller.
+def excluded_paths(root):
+    out = []
+    for p in os.environ.get("FORMWORK_EXCLUDE", "").split(os.pathsep):
+        if not p:
+            continue
+        out.append(os.path.realpath(p if os.path.isabs(p)
+                                    else os.path.join(root, p)))
+    return out
+
+
+def is_excluded(path, excludes):
+    a = os.path.realpath(path)
+    return any(a == e or a.startswith(e + os.sep) for e in excludes)
+
 ALLOWED = (OPEN, DONE, DROPPED)
 
 
@@ -48,7 +76,7 @@ def numbered(root, sub):
     """Every numbered markdown file in a folder, as {number: [filenames]}."""
     d = os.path.join(root, sub)
     out = {}
-    if not os.path.isdir(d):
+    if not os.path.isdir(d) or is_excluded(d, excluded_paths(root)):
         return None
     for fn in sorted(os.listdir(d)):
         if not fn.endswith(".md") or fn.upper().startswith("README"):
@@ -84,7 +112,13 @@ def main(argv):
 
     if want_next:
         taken = [n for n in briefs if n is not None]
-        print("%04d" % ((max(taken) + 1) if taken else 1))
+        nxt = (max(taken) + 1) if taken else 1
+        # The filename pattern accepts six digits. Handing out a seventh would
+        # give somebody a number this same program then refuses.
+        if nxt > 999999:
+            print("ERROR: every number up to 999999 is taken", file=sys.stderr)
+            return 2
+        print("%04d" % nxt)
         return 0
 
     problems = []
@@ -124,8 +158,29 @@ def main(argv):
         elif status == DONE and n not in reports:
             problems.append("%s/%s — says done, and there is no report for it "
                             "in %s" % (BRIEFS, fn, REPORTS))
+        elif status == DONE:
+            rn = reports[n][0]
+            rp = os.path.join(root, REPORTS, rn)
+            if os.path.realpath(rp) == os.path.realpath(
+                    os.path.join(root, BRIEFS, fn)):
+                problems.append("%s/%s — its report is the brief itself"
+                                % (REPORTS, rn))
+                continue
+            try:
+                body = open(rp, encoding="utf-8", errors="replace").read()
+            except OSError as e:
+                print("ERROR: cannot read %s/%s: %s" % (REPORTS, rn, e),
+                      file=sys.stderr)
+                return 2
+            if len(body.strip()) < MEANINGFUL:
+                problems.append("%s/%s — is empty, or close enough. A report "
+                                "that says nothing is the state this check "
+                                "exists to catch" % (REPORTS, rn))
 
     for n, names in sorted((k, v) for k, v in reports.items() if k is not None):
+        if len(names) > 1:
+            problems.append("number %04d is used by %d reports: %s"
+                            % (n, len(names), ", ".join(names)))
         if n not in briefs:
             problems.append("%s/%s — answers brief %04d, which does not exist"
                             % (REPORTS, names[0], n))

@@ -23,6 +23,13 @@ WHAT IT CANNOT DO
 Tell whether the page is read, or followed. Nothing can. It checks that the
 road exists, not that anybody drove down it.
 
+Notice roles that were **deleted** rather than fixed. Remove the generated
+files and this check goes green, because it has nothing left to look at. To
+catch that it would have to know which roles ought to exist, which means
+carrying a second copy of the generator, and a checker built out of the thing
+it checks is not a check. `generated-current` covers the opposite case, a
+generated file with no source behind it.
+
 Exit status:
     0   every generated role points at the page, or there is nothing to check
     1   at least one does not, and it is named
@@ -32,7 +39,14 @@ import os
 import sys
 
 PAGE = os.path.join("formwork", "style.md")
-NEEDLE = "style.md"
+# The whole path, not "style.md". A role whose only mention was the word
+# "lifestyle.md" in an unrelated description satisfied the old substring test.
+NEEDLE = "formwork/style.md"
+
+# What marks a file as one the generator wrote. Without this, a README sitting
+# in .claude/agents was treated as a role and failed, with a printed remedy
+# that could never fix it, because the generator does not own that file.
+GENERATED = "GENERATED FROM"
 
 # Where each runtime's generated roles live. The same list the generator
 # writes to, and guard-wired reads from.
@@ -43,26 +57,48 @@ TREES = [
 ]
 
 SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv"}
-EXCLUDED = [os.path.abspath(p) for p in
-            os.environ.get("FORMWORK_EXCLUDE", "").split(os.pathsep) if p]
 
 
-def excluded(path):
-    a = os.path.abspath(path)
-    return any(a == e or a.startswith(e + os.sep) for e in EXCLUDED)
+# Paths the runner has told this check to stay out of. The kit's own fixtures
+# are wrong on purpose. Resolved against the directory being checked, not
+# against wherever the person happened to be standing: a relative exclude used
+# to mean two different places depending on the caller.
+def excluded_paths(root):
+    out = []
+    for p in os.environ.get("FORMWORK_EXCLUDE", "").split(os.pathsep):
+        if not p:
+            continue
+        out.append(os.path.realpath(p if os.path.isabs(p)
+                                    else os.path.join(root, p)))
+    return out
+
+
+def is_excluded(path, excludes):
+    a = os.path.realpath(path)
+    return any(a == e or a.startswith(e + os.sep) for e in excludes)
 
 
 def generated(root):
-    """Every generated role file, with the runtime folder it came from."""
+    """Every generated role file, with the runtime folder it came from.
+
+    Walked, not listed. Claude Code loads agents from subdirectories, and a
+    flat listing reported "nothing generated here yet" with an un-pointed role
+    sitting one folder down. A leading dot was skipped for the same reason and
+    is now read like anything else.
+    """
     out = []
+    excludes = excluded_paths(root)
     for rel, ending in TREES:
         d = os.path.join(root, rel)
-        if not os.path.isdir(d) or excluded(d):
+        if not os.path.isdir(d) or is_excluded(d, excludes):
             continue
-        for fn in sorted(os.listdir(d)):
-            if not fn.endswith(ending) or fn.startswith("."):
-                continue
-            out.append((os.path.join(rel, fn), os.path.join(d, fn)))
+        for base, dirs, files in os.walk(d):
+            dirs.sort()
+            for fn in sorted(files):
+                full = os.path.join(base, fn)
+                if not fn.endswith(ending) or is_excluded(full, excludes):
+                    continue
+                out.append((os.path.relpath(full, root), full))
     return out
 
 
@@ -85,30 +121,41 @@ def main(argv):
         print("nothing generated here yet, nothing to check")
         return 0
 
-    missing = []
+    missing, looked = [], 0
     for rel, full in files:
         try:
             text = open(full, encoding="utf-8", errors="replace").read()
         except OSError as e:
             print("ERROR: cannot read %s: %s" % (rel, e), file=sys.stderr)
             return 2
+        # Only files this kit generated. Anything else in that folder is
+        # somebody's own, and running the generator would never change it.
+        if GENERATED not in text:
+            continue
+        looked += 1
         # A generated role is allowed to say it in any wording. What is not
         # allowed is never naming the page at all.
         if NEEDLE not in text:
             missing.append(rel)
 
+    if not looked:
+        print("no generated role files found, nothing to check")
+        return 0
+
     if missing:
         print("%d of %d generated role(s) do not name %s"
-              % (len(missing), len(files), PAGE))
+              % (len(missing), looked, PAGE))
         for rel in missing[:10]:
-            print("  %s" % rel)
+            # A newline in a filename used to break the list into more lines
+            # than there were findings.
+            print("  %s" % rel.replace("\n", "\\n"))
         if len(missing) > 10:
             print("  and %d more" % (len(missing) - 10))
         print("  Run formwork roles. If the generator stopped writing the "
               "pointer, that is the bug.")
         return 1
 
-    print("%d generated role(s), every one names %s" % (len(files), PAGE))
+    print("%d generated role(s), every one names %s" % (looked, PAGE))
     return 0
 
 
