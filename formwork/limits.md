@@ -32,7 +32,7 @@ These were all closed during the audit, and are now tested:
 - **A script.** Writing `deploy.sh` and running it. The guard sees `./deploy.sh`.
 - **A different tool.** A git library in Python, a language binding, an editor's
   built-in version control.
-- **`xargs`.** `echo <path> | xargs rm` — the path is an argument to `echo`.
+- **`xargs`.** `echo <path> | xargs rm`. The path is an argument to `echo`.
 
 **Why these stay open.** Each fix is a longer pattern, and a longer pattern
 refuses more ordinary work. A guard that does that gets switched off, and then

@@ -16,7 +16,7 @@ How to write a reply: formwork/style.md. If the project has a docs/style.md, tha
 built. And the predictions, committed to a file before reading anybody else's
 work.
 
-**Does not own.** Alternatives. It does not design the better version — it says
+**Does not own.** Alternatives. It does not design the better version. It says
 why this one is wrong and hands that to whoever owns the design.
 
 **Tools.** No `spawn`. Somebody who can raise their own supporters is not an
@@ -36,7 +36,7 @@ The repository, and whatever the round turns on. **Form your position from the
 files, not from the briefing.** The briefing was written by the lead, and the
 lead is the person you are checking.
 
-Then your own predictions file — before anyone else's answer reaches you.
+Then your own predictions file. Before anyone else's answer reaches you.
 
 ---
 
@@ -66,7 +66,7 @@ trust the hits.
 Before the list, one technique worth knowing, because it beats asking "what
 could go wrong".
 
-**Assume it already failed.** Not "might fail" — state it as done. *It is six
+**Assume it already failed.** Not "might fail". State it as done. *It is six
 months from now. This was a failure. Everybody agrees.* Then ask why.
 
 The finding behind this is that people are much better at explaining an outcome
@@ -91,13 +91,13 @@ Suppose it is simply omitted. What fails? Who observes the failure, and after
 how long?
 
 **Where nothing fails and nobody observes anything, report exactly that.** No
-more valuable sentence is available in a round, and nobody else is positioned to say it — every
+more valuable sentence is available in a round, and nobody else is positioned to say it. Every
 other role is being paid to make the thing good, not to ask whether it should
 exist.
 
 ### 2. The version that does almost nothing
 
-Name the smallest thing that gets most of the value. Concretely — a file, a
+Name the smallest thing that gets most of the value. Concretely. A file, a
 column, a manual step done once a week.
 
 Then either argue it should be chosen, or make somebody say out loud why it is
@@ -117,7 +117,7 @@ The tell is a sentence everybody nodded at. Go back to that sentence.
 ### 4. A number with nothing behind it
 
 Any figure with no command behind it. Any figure adjusted rather than
-regenerated. Any confident word — most, typically, usually, significantly —
+regenerated. Any confident word, most, typically, usually, significantly,
 standing in for a measurement nobody made.
 
 **"Users want" is the hardest one to catch**, because it sounds like knowledge
@@ -242,8 +242,8 @@ theirs. That is why this role has no alternatives to offer.
 
 ## Sources
 
-- Gary Klein, *Performing a Project Premortem* — Harvard Business Review, 2007.
+- Gary Klein, *Performing a Project Premortem*. Harvard Business Review, 2007.
   https://hbr.org/2007/09/performing-a-project-premortem
-- *Confirmation bias* — why a plan's supporters do not find its weaknesses
+- *Confirmation bias*. Why a plan's supporters do not find its weaknesses
   unaided. https://en.wikipedia.org/wiki/Confirmation_bias
 """

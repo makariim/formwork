@@ -62,8 +62,8 @@ instead: `formwork/fw check`, `formwork/fw demo`, `formwork/fw roles`. Run
 
 Everything else. **47 rules**, in two files.
 
-- `formwork/rules/core.md` — 13. You meet these every day.
-- `formwork/rules/full.md` — 34. Read one when you hit the situation it covers.
+- `formwork/rules/core.md` holds 13. You meet these every day.
+- `formwork/rules/full.md` holds 34. Read one when you hit the situation.
 
 > [!TIP]
 > Every rule says what it catches. None of them tells you a story, because the

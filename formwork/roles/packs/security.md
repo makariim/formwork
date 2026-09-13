@@ -66,8 +66,8 @@ system, the pipeline that publishes. The code you did not write, and the machine
 that assembles it.
 
 **Mishandling of exceptional conditions is new at number ten.** The error path
-is a security surface. What the system does when something goes wrong — what it
-reveals, what it skips, what it leaves half-done — is now on the list in its own
+is a security surface. What the system does when something goes wrong. What it
+reveals, what it skips, what it leaves half-done. Is now on the list in its own
 right.
 
 **Access control stayed at number one across both editions.** That is the single
@@ -102,12 +102,12 @@ forgotten.
 This single test finds more real holes than every other thing in this file.
 
 Guessable identifiers make it worse but are not the vulnerability. Unguessable
-ones are not a defence — they leak through logs, referrers, shared links, and
+ones are not a defence. They leak through logs, referrers, shared links, and
 support tickets.
 
 ### 2. Never trust anything from outside, including the parts that seem harmless
 
-The price, the user identifier, the role, the total, the "is admin" flag —
+The price, the user identifier, the role, the total, the "is admin" flag
 anything meaningful comes from your side, never from the request, however
 convenient it is that the client already has it.
 
@@ -121,10 +121,10 @@ And the file somebody uploads is not what its name says it is.
 The pattern is always the same: text arrives, text is joined to a command, the
 command runs.
 
-- a database — parameters, always, including the one-off script
-- a shell — do not build command strings from anything a person supplied
-- a browser — escape on the way out, and know which context you are in
-- a template — data is not a template
+- a database. Parameters, always, including the one-off script
+- a shell. Do not build command strings from anything a person supplied
+- a browser. Escape on the way out, and know which context you are in
+- a template. Data is not a template
 
 **Filtering the bad characters is the losing strategy.** It has been losing for
 thirty years. Separate the data from the instruction instead, so the question
@@ -143,9 +143,9 @@ users, analytics, crash reports, and the browser's own storage.
 
 ### 5. Dependencies are somebody else's code running as you
 
-A large and growing share of vulnerabilities arrive through this door — large
-enough that the public list moved it to third place in 2025 — and they are
-published — which means the attacker has the list and so can you.
+A large and growing share of vulnerabilities arrive through this door. Large
+enough that the public list moved it to third place in 2025, and they are
+published, which means the attacker has the list and so can you.
 
 **Know what you depend on, including what your dependencies depend on.** Check
 for known holes on a schedule rather than after an incident.
@@ -157,7 +157,7 @@ installs, and it can change hands without announcement.
 
 A stack trace shown to a user tells them your framework, your file paths, and
 often your query. An error saying "no such user" tells an attacker which
-accounts exist — where "wrong details" would have told them nothing.
+accounts exist. Where "wrong details" would have told them nothing.
 
 **And never log credentials, tokens, or personal data.** The log is frequently
 the least-protected place in the system, read by the most people, and kept the
@@ -185,8 +185,8 @@ the strength of the whole thing.
 Not "the endpoint is vulnerable". Say:
 
 - **exactly what to do** to reproduce it
-- **what an attacker gets** — data, access, money, denial
-- **how hard it is** — needs an account, needs to be on the network, needs
+- **what an attacker gets**. Data, access, money, denial
+- **how hard it is**. Needs an account, needs to be on the network, needs
   nothing
 - **what fixes it**
 
@@ -259,9 +259,9 @@ of a list of eleven.
 Public references for the material above. They are better than this page, and
 they are kept up to date by people who do this full time.
 
-- *OWASP Top 10:2025* — the current list, in order.
+- *OWASP Top 10:2025*. The current list, in order.
   https://top10.owasp.org/2025
-- *OWASP Top 10:2021* — the previous edition, worth reading beside it to see
+- *OWASP Top 10:2021*. The previous edition, worth reading beside it to see
   what moved. https://owasp.org/Top10/2021/
-- *API1:2023 Broken Object Level Authorization* — OWASP API Security Top 10.
+- *API1:2023 Broken Object Level Authorization*. OWASP API Security Top 10.
   https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/

@@ -14,10 +14,10 @@ formwork/guard/protected-files --format gemini-cli
 
 ## Roles
 
-`formwork roles --runtime gemini-cli` writes `.gemini/agents/<name>.md` —
+`formwork roles --runtime gemini-cli` writes `.gemini/agents/<name>.md`:
 markdown with YAML frontmatter, `kind: local`, and a `tools:` list.
 
-## Where the tool grant goes — and the gap
+## Where the tool grant goes, and the gap
 
 Gemini CLI takes a named allowlist and enforces it, which is what the kit
 wants. Two documented tool names are known and used:
@@ -35,7 +35,7 @@ silently take that tool away. So the generator **writes no list at all** for
 any role that needs `write`, and puts a line in the file saying why.
 
 The consequence, stated plainly: **most roles get no enforced grant on Gemini
-CLI today**, because most roles write. Read-only roles — the reviewer — get a
+CLI today**, because most roles write. Read-only roles, the reviewer, get a
 real one.
 
 Closing this needs one fact: the documented name of the write tool. It is a

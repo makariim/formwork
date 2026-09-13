@@ -44,7 +44,7 @@ docs/reports/0009-storage-shape.md     short. What came out, in a few lines,
 asked for, rounds included. Without the number, a round is the one kind of work
 that leaves no line in that list, and you would have to remember it happened.
 
-`<name>` is short and says what the round is about — `storage-shape`,
+`<name>` is short and says what the round is about, `storage-shape`,
 `auth-approach`. It is a folder name, so keep it plain.
 
 **`predictions.md` is not optional and not last.** A check looks for it. See
@@ -89,7 +89,7 @@ Do not copy the round record into it. One fact, one home.
 
 **7. Anything decided gets a decision record.** Use
 [`templates/decision.md`](templates/decision.md), numbered, in
-`docs/decisions/`. Never edited afterwards — superseded by a later one.
+`docs/decisions/`. Never edited afterwards. Superseded by a later one.
 
 ---
 
@@ -135,7 +135,7 @@ alone; nothing else does.
 `predictions.md` at all. That is a real finding and it exits 1.
 
 **What it only warns about:** modification times that look out of order. A file
-time is weak evidence — a copy, a checkout, a touch, an editor all change it —
+time is weak evidence, a copy, a checkout, a touch, an editor all change it,
 so the check says so and does not fail the gate on it.
 
 **What it cannot tell you at all:** whether the predictions are any good. It

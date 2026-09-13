@@ -32,7 +32,7 @@ on a few examples is not a measurement.**
 asserting on exact words will fail eventually, for no reason anybody can
 reproduce.
 
-**It will be confidently wrong.** Not sometimes — as a property. A fluent,
+**It will be confidently wrong.** Not sometimes. As a property. A fluent,
 well-structured, entirely fabricated answer is the normal failure mode, and it
 is indistinguishable from a correct one by reading.
 
@@ -42,7 +42,7 @@ Every technique below exists because of those two.
 
 ## Read first
 
-What the feature is actually for, and what a good answer looks like — in
+What the feature is actually for, and what a good answer looks like. In
 writing, before anything is built.
 
 **If nobody can describe a good answer, stop.** You cannot build toward an
@@ -194,7 +194,7 @@ happens once.
 
 1. What does a good answer look like, in writing?
 2. How many real cases have I evaluated against?
-3. What happens when it is wrong — who notices, and how?
+3. What happens when it is wrong, who notices, and how?
 4. Can somebody make it ignore its instructions?
 5. What does one use cost, and what is the cap?
 6. What is the slowest it will be, and is that acceptable?
@@ -246,7 +246,7 @@ reproduce.
 
 ## Sources
 
-- *OWASP Top 10 for LLM Applications (2025)* — the current list.
+- *OWASP Top 10 for LLM Applications (2025)*. The current list.
   https://genai.owasp.org/llm-top-10/
-- *OWASP Top 10:2025* — the web application list, which still applies to
+- *OWASP Top 10:2025*. The web application list, which still applies to
   everything around the model. https://top10.owasp.org/2025

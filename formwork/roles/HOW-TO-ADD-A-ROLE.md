@@ -13,7 +13,7 @@
 5. Run `formwork check`.
 
 **There is no step that registers it anywhere.** Every role in
-`formwork/roles/` is available. Nothing to add to `.formwork.toml` — and a
+`formwork/roles/` is available. Nothing to add to `.formwork.toml`, and a
 check refuses a `[roles]` section if you add one.
 
 If a section is missing, or another role already claims your `owns` slug, the
@@ -49,7 +49,7 @@ Every role in `formwork/roles/` is currently available. There is no switch.
 
 The intention is a `[roles]` block in `.formwork.toml` naming which packs are
 on. Until something actually reads it, writing one would be configuration that
-does nothing — and a setting that appears to work and does not is worse than an
+does nothing, and a setting that appears to work and does not is worse than an
 honest absence.
 
 ---
@@ -81,7 +81,7 @@ most of the team over a restriction they were not relying on is worse than a
 stated limit. What it does not do is pretend.
 
 This is not only written here. `role-shape` refuses any document in this
-repository that claims a grant binds on a runtime that cannot express one —
+repository that claims a grant binds on a runtime that cannot express one
 because a sentence can be deleted by somebody tidying up, and a check cannot.
 
 It caught the first draft of this very paragraph, which is the best argument

@@ -19,7 +19,7 @@ How to write a reply: formwork/style.md. If the project has a docs/style.md, tha
 **Tools.** Reading only. A reviewer who can edit stops being a second pair of
 eyes and becomes a second author.
 
-**Stops when.** The change is too large to hold in one reading. Say so — that is
+**Stops when.** The change is too large to hold in one reading. Say so. That is
 a finding about the work, not an admission about the reviewer.
 
 **Would be wrong if.** It commented on naming while a real defect went past.
@@ -31,7 +31,7 @@ a finding about the work, not an admission about the reviewer.
 A diff shows you what moved. It hides what the moved thing touches.
 
 **Open the files either side of every change**, not just the changed lines. Most
-real defects are not in the diff — they are in the thing the diff assumed.
+real defects are not in the diff. They are in the thing the diff assumed.
 
 Three questions before line-by-line reading:
 
@@ -50,14 +50,14 @@ Strictly this order. Most reviews go wrong by starting at the bottom.
 
 **Two public findings about review are worth holding while you work.**
 
-**Review mostly produces code improvements — not defects, and not design
+**Review mostly produces code improvements, not defects, and not design
 either.** The largest study of the question found about one comment in eight
 was about a defect, and nearly a third were improvements: readability, dead
 code, better practice. It also found the defect comments tended to be small and
 surface-level, where the people involved had expected deeper ones.
 
 So the value is real and it is not what people claim it is. **Do not let
-anybody tell you a passing review means the code works** — that is what tests
+anybody tell you a passing review means the code works**. That is what tests
 are for.
 
 **Size makes review worse, though not in the way people say.** Bigger changes
@@ -67,7 +67,7 @@ outcome and often the most useful one.
 
 ### 1. Does it do the wrong thing?
 
-Is the logic correct — not tidy, correct? Walk one real input through it by
+Is the logic correct, not tidy, correct? Walk one real input through it by
 hand. Then walk the annoying input: empty, missing, zero, negative, enormous,
 two at once.
 
@@ -137,7 +137,7 @@ Three levels is enough:
 **Ask rather than assert when you might be wrong.** "What happens here if the
 list is empty?" beats "this crashes on an empty list" when you have not run it.
 
-**Say what is good, briefly.** Not politeness — it tells the author which
+**Say what is good, briefly.** Not politeness. It tells the author which
 instincts to keep, and a review that is only negative gets read defensively.
 
 ---
@@ -201,13 +201,13 @@ and after a while nobody waits for it.
 ## Sources
 
 - Bacchelli and Bird, *Expectations, Outcomes, and Challenges of Modern Code
-  Review* — where the figures above come from: about 14% of comments were
+  Review*. Where the figures above come from: about 14% of comments were
   about defects and 29% about code improvements, and the defect comments were
   more superficial than the participants expected.
   https://www.microsoft.com/en-us/research/publication/expectations-outcomes-and-challenges-of-modern-code-review/
-- *Modern Code Review: A Case Study at Google* — review at scale: size,
+- *Modern Code Review: A Case Study at Google*. Review at scale: size,
   latency, reviewer count.
   https://research.google/pubs/modern-code-review-a-case-study-at-google/
-- *Google's Code Review Developer Guide* — the standard a change is held to.
+- *Google's Code Review Developer Guide*. The standard a change is held to.
   https://google.github.io/eng-practices/review/
 """

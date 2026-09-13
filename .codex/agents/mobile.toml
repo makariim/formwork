@@ -45,7 +45,7 @@ is the edge case.
 ## Read first
 
 How the app navigates and where state lives across screens. Then how it handles
-being backgrounded — the part that is usually least considered and breaks most
+being backgrounded. The part that is usually least considered and breaks most
 visibly.
 
 ---
@@ -60,7 +60,7 @@ when it arrives.**
 Three questions for every screen:
 
 - what does it show with no connection and no cached data?
-- what does it show with old cached data — and does it say the data is old?
+- what does it show with old cached data, and does it say the data is old?
 - what happens to something the person did while offline?
 
 **That last one is where real trust is won or lost.** Silently discarding
@@ -72,7 +72,7 @@ invisible in testing.
 The system stops you to free memory. It does not ask.
 
 Which means: anything the person typed, chose, or was halfway through must
-survive being killed and restored. Not just backgrounded — **terminated and
+survive being killed and restored. Not just backgrounded. **terminated and
 brought back**, which is a different code path and the one nobody tests.
 
 **The test:** background the app, force-stop it, reopen it. Is their work still
@@ -81,7 +81,7 @@ there?
 ### 3. Battery and data are somebody else's money
 
 Polling on a timer, keeping a connection open, holding a wake lock, waking on
-every location change — each is a decision to spend somebody's battery.
+every location change, each is a decision to spend somebody's battery.
 
 Background work should be batched, deferred, and ideally left to the system's own
 scheduler, which knows when the phone is charging and on a good connection.
@@ -96,7 +96,7 @@ understands what the app does gets refused, and on most platforms that refusal
 is close to permanent.
 
 **And design the refused path properly.** No location, no camera, no
-notifications — the app must remain useful, and must not nag.
+notifications. The app must remain useful, and must not nag.
 
 **Both stores now require you to declare what you collect**, in a form shown to
 people before they install. That declaration is a public promise, checked
@@ -197,12 +197,12 @@ layouts, and a destructive button beside a common one.
 
 ## Sources
 
-- *Human Interface Guidelines* — Apple. The platform's own rules, which review
+- *Human Interface Guidelines*. Apple. The platform's own rules, which review
   is measured against. https://developer.apple.com/design/human-interface-guidelines
-- *Material Design* — Google. The same, for the other platform.
+- *Material Design*. Google. The same, for the other platform.
   https://m3.material.io/
-- *App privacy details* — Apple's declaration requirements.
+- *App privacy details*. Apple's declaration requirements.
   https://developer.apple.com/app-store/app-privacy-details/
-- *Data safety* — the same for the other store.
+- *Data safety*. The same for the other store.
   https://developer.android.com/guide/topics/data/collect-share
 """

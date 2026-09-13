@@ -17,8 +17,8 @@ leaves you with part of the protection.
 
 Before any shell command runs, the guards read it and decide.
 
-- exit `0` — the command runs
-- exit `2` — the command is refused, and the reason goes back to the agent
+- exit `0`. The command runs
+- exit `2`. The command is refused, and the reason goes back to the agent
 
 Exit code 2 is the runtime's documented way to block a tool call.
 

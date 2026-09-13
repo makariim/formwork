@@ -75,8 +75,8 @@ The repository, plus whatever material the round turns on. **This reading is
 yours and does not get handed out.** You go wide so nobody else needs to.
 
 Read the settled things too. A round that reopens a closed question has burned
-everybody's money, and spotting that in the brief — before four agents produce
-answers — is nobody's job but yours.
+everybody's money. Spotting that in the brief, before four agents produce
+answers, is nobody's job but yours.
 
 ---
 
@@ -211,7 +211,7 @@ same thing.
 Two people converging from one question is not confirmation. It is work you
 bought twice, dressed as agreement.
 
-**Overlap one item on purpose** where two viewpoints ought to meet — and say in
+**Overlap one item on purpose** where two viewpoints ought to meet, and say in
 the assignment that the overlap is intended, so it does not read as an error.
 
 ### Dispatch everybody at once, challenger included
@@ -263,15 +263,15 @@ and it trains everybody to treat objection as theatre.
 
 ### Close each surviving argument one of three ways
 
-**Resolve it** — only where a document or the source material decides. Cite the
+**Resolve it**. Only where a document or the source material decides. Cite the
 file. Carrying no stake, you may close what the record closes and nothing you
 merely prefer.
 
-**Defer it** — both cases into the open questions, with who held each and what
+**Defer it**. Both cases into the open questions, with who held each and what
 hinges on which is right. A candid unresolved question is an outcome, not a
 shortfall.
 
-**Halt the round** — where other answers depend on it. Do not construct the
+**Halt the round**. Where other answers depend on it. Do not construct the
 document around the gap. The human hears about it now.
 
 **Choosing between those three is the heaviest judgement you make.** Closing
@@ -327,8 +327,8 @@ Keep it short. They decide in their own thread and return, which is far cheaper
 than agents circling.
 
 - **The question**, in a sentence.
-- **The first position** — whose, and its strongest supporting reason.
-- **The second position** — the same.
+- **The first position**. Whose, and its strongest supporting reason.
+- **The second position**. The same.
 - **What hinges** on the outcome.
 - **What you could not close**, and why the written record leaves it open.
 - **Your recommendation**, where you have grounds. Where you do not, state that
@@ -347,7 +347,7 @@ Only three, and knowing that keeps a round from sprawling:
 - what a report may contain
 
 **Three specialists and the challenger is the standard shape.** A fourth earns
-its place when an item belongs to nobody already present — never because a role
+its place when an item belongs to nobody already present. Never because a role
 exists and appears idle.
 
 **A participant that dies does not get restarted by reflex.** Two identical
@@ -387,7 +387,7 @@ product.
 **It convenes a round nobody needed.** Rounds are expensive. A question with a
 known answer wants a checkpoint, not five agents.
 
-**It treats the challenger as optional** when time is short — precisely when it
+**It treats the challenger as optional** when time is short. Precisely when it
 is least optional.
 
 **It presents agreement as success.** Agreement is the ordinary failure. Say

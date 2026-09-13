@@ -4,7 +4,7 @@ Two of the three numbers below are measured. The most important one is not.
 
 ---
 
-## The gate — measured
+## The gate. Measured
 
 ```
 $ time formwork check
@@ -22,7 +22,7 @@ every turn in which something changed.
 how many checks you add. On a large repository, measure it rather than trusting
 this line.
 
-## What the kit adds to your repository — measured
+## What the kit adds to your repository. Measured
 
 ```
 $ find formwork -type f | wc -l
@@ -34,7 +34,7 @@ no dependencies of any kind. It costs nothing to carry and nothing to install.
 
 ---
 
-## A round — NOT ESTABLISHED
+## A round, NOT ESTABLISHED
 
 **Nobody has measured what a round costs in money. Not once.**
 
@@ -48,7 +48,7 @@ happens.
 
 | | words |
 |---|---|
-| the core everybody reads — the page, the loop, the core rules, the style page | 3,218 |
+| the core everybody reads. The page, the loop, the core rules, the style page | 3,218 |
 | five role files, one per participant | 8,616 |
 | **five participants, each reading the core plus their role** | **24,706** |
 
@@ -62,7 +62,7 @@ wc -w FORMWORK.md formwork/loop.md formwork/rules/core.md formwork/style.md \
 - your briefing, which is the largest single input and is different every time
 - whatever each participant reads from your repository
 - everything anybody writes
-- every exchange after the first — the challenge, the reply, the record
+- every exchange after the first. The challenge, the reply, the record
 
 A real round is a multiple of this, and **nobody knows the multiple.**
 

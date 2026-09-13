@@ -37,9 +37,9 @@ Pasted, so you can see nothing was staged.
 
 Everything above is routine. These are what you are actually reading for.
 
-- **Done but not asked for** — and why.
-- **Asked for but not done** — and why.
-- **Wrong in the brief** — anything that turned out not to match the files.
+- **Done but not asked for**, and why.
+- **Asked for but not done**, and why.
+- **Wrong in the brief**. Anything that turned out not to match the files.
 
 Work that followed the brief exactly needs no defence. What you are scanning
 for happens at the edges of an instruction, and only these three show it.

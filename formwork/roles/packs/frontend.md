@@ -40,7 +40,7 @@ show somebody an empty list and let them believe there is nothing there.
 The existing components and how state already moves. Most frontend defects come
 from adding a second way of doing something that already had one.
 
-Then the real API responses — not the documentation of them. Fields are
+Then the real API responses, not the documentation of them. Fields are
 frequently optional in practice and never in the description.
 
 ---
@@ -68,9 +68,9 @@ say which wins.
 
 Four renderings, always:
 
-- **nothing yet** — a shape, not a spinner in the middle of nowhere
-- **empty** — and say what to do about it
-- **error** — what happened and what they can do, with a way to retry
+- **nothing yet**. A shape, not a spinner in the middle of nowhere
+- **empty**, and say what to do about it
+- **error**. What happened and what they can do, with a way to retry
 - **there is data**
 
 A screen that shows "No results" while still loading has lied to somebody. This
@@ -89,7 +89,7 @@ somebody saw it work.
 
 Rendering a thousand rows is a decision, not an accident. So is fetching them.
 
-Paginate, or window, or both — decide before the data arrives rather than after
+Paginate, or window, or both. Decide before the data arrives rather than after
 somebody's laptop fan starts.
 
 And a list needs stable identity. **Never key a list by position.** Rows move,
@@ -100,9 +100,9 @@ completely fine.
 
 The parts that get skipped, every time:
 
-- what happens on submit — is it disabled, is it obvious?
+- what happens on submit. Is it disabled, is it obvious?
 - double submission
-- what somebody typed, after a failed submit — still there?
+- what somebody typed, after a failed submit. Still there?
 - validation timing. On every keystroke is hostile; only on submit is slow
 - keyboard: tab order, enter to submit, escape to cancel
 - the browser's own autofill, which will do things you did not plan for
@@ -112,7 +112,7 @@ distrust software.
 
 ### 6. The interface is not where rules go
 
-A discount, an eligibility rule, a total — if it matters, the server decides. The
+A discount, an eligibility rule, a total. If it matters, the server decides. The
 browser is a display that anybody can modify.
 
 Duplicating a rule for a fast response is legitimate. **Two implementations mean
@@ -144,7 +144,7 @@ Two details matter more than the numbers.
 not your machine. Three visits in four must be good.
 
 **Loading is the one most sites fail**, by a wide margin. On mobile, 62% of
-pages have good loading, 77% good responsiveness, 81% good layout stability —
+pages have good loading, 77% good responsiveness, 81% good layout stability
 and only 48% pass all three. So if you are fixing one, fix loading first.
 
 **Responsiveness is the one that needs real changes rather than a setting**,
@@ -161,12 +161,12 @@ Everything reachable by mouse is reachable by keyboard. Focus is visible. Focus
 goes somewhere sensible when a dialog opens and returns when it closes.
 
 **Use the real element.** A `div` pretending to be a button needs role, tabindex,
-key handling and focus styling to be reimplemented — and it will be
+key handling and focus styling to be reimplemented, and it will be
 reimplemented wrongly. The real button is free and correct.
 
 ### 9. Tests at the level a person uses it
 
-Assert on what somebody sees and does — the text, the label, the click — not on
+Assert on what somebody sees and does, the text, the label, the click, not on
 internal state or component structure.
 
 A test coupled to structure breaks on every refactor and catches nothing.
@@ -218,7 +218,7 @@ already gave away.
 
 ## Sources
 
-- *Core Web Vitals* — Google's published thresholds and how they are measured.
+- *Core Web Vitals*. Google's published thresholds and how they are measured.
   https://web.dev/articles/vitals
-- *Web Content Accessibility Guidelines (WCAG)* — W3C.
+- *Web Content Accessibility Guidelines (WCAG)*. W3C.
   https://www.w3.org/WAI/standards-guidelines/wcag/

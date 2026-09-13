@@ -61,7 +61,7 @@ external system that can be wrong, out of date, or compromised.
 field they widened without telling you becomes your incident.
 
 And accept that they will add fields. Ignore what you do not recognise, rather
-than failing — otherwise their harmless addition is your outage.
+than failing. Otherwise their harmless addition is your outage.
 
 ### 2. Wrap them, and never let them leak inward
 
@@ -92,9 +92,9 @@ twice.** If they offer one, use it, always.
 
 This is a product decision that arrives disguised as a technical one.
 
-- **Degrade** — the feature is unavailable, the rest works
-- **Queue** — accept it now, do it when they return
-- **Fail** — some things genuinely cannot proceed
+- **Degrade**. The feature is unavailable, the rest works
+- **Queue**. Accept it now, do it when they return
+- **Fail**. Some things genuinely cannot proceed
 
 Whichever you pick, say it out loud and tell the user the truth. **A spinner
 that never resolves is the worst of all options.**
@@ -142,7 +142,7 @@ are on something deprecated and when it disappears.
 **Assume a breaking change arrives at the worst possible moment**, because it
 tends to arrive when they are busy, which is when you are busy.
 
-Where it matters, have a second option identified — not built, identified. That
+Where it matters, have a second option identified, not built, identified. That
 is the difference between a bad week and a bad quarter.
 
 ### 8. Their credentials are your liability
@@ -162,14 +162,14 @@ Test accounts, sandboxes, recorded responses. Real calls cost money, send real
 messages to real people, and cannot be undone.
 
 **And know how the sandbox differs**, because it always does, and always in the
-failure paths — which is exactly the part you were trying to test.
+failure paths, which is exactly the part you were trying to test.
 
 ---
 
 ## The pass before shipping an integration
 
 1. What happens when they are down? What does the user see?
-2. What happens when they are slow — do we hold resources?
+2. What happens when they are slow. Do we hold resources?
 3. Is every retry safe, and does anything have an idempotency key?
 4. Are incoming callbacks verified, and safe run twice?
 5. What is the rate limit, and are we inside it?
@@ -211,11 +211,11 @@ messages, duplicate records.
 
 ## Sources
 
-- Michael Nygard, *Release It!* (ISBN 978-1680502398) — the write-up that
+- Michael Nygard, *Release It!* (ISBN 978-1680502398). The write-up that
   named these as stability patterns. The circuit breaker is his; the bulkhead
   is an older idea from shipbuilding that he named for software.
-- *Circuit Breaker* — Martin Fowler's write-up of the pattern.
+- *Circuit Breaker*. Martin Fowler's write-up of the pattern.
   https://martinfowler.com/bliki/CircuitBreaker.html
-- *Idempotent requests* — Stripe API reference, on safe retries against a
+- *Idempotent requests*. Stripe API reference, on safe retries against a
   third party. https://docs.stripe.com/api/idempotent_requests
 """

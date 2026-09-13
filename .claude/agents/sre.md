@@ -30,7 +30,7 @@ is not visibility.**
 
 **Something broke an hour ago. Can you find out what, without reproducing it?**
 
-That is the entire job. Not how much is recorded — whether the question can be
+That is the entire job. Not how much is recorded. Whether the question can be
 answered afterwards, by somebody tired, at speed, from what already exists.
 
 Everything below either serves that or is decoration.
@@ -40,7 +40,7 @@ Everything below either serves that or is decoration.
 ## Read first
 
 What is emitted today, by running it and looking. Not the logging configuration
-— the actual output.
+. The actual output.
 
 Then take a real past incident and try to answer it from the logs. **You will
 find the gap immediately**, and it is a far better guide than any general
@@ -68,7 +68,7 @@ A log line is data that somebody will filter, count, and group. Write it that
 way: a fixed event name plus named fields.
 
 `"could not save user 41 because the db was busy"` cannot be counted. An event
-called `save_failed` with a reason and an identifier can be — and the tenth
+called `save_failed` with a reason and an identifier can be, and the tenth
 occurrence looks different from the first.
 
 **Keep the message stable and put the variable part in fields.** A message
@@ -93,7 +93,7 @@ messages.
 people and kept the longest. A secret that reaches it has leaked.
 
 Redact at the point of writing, not afterwards. And be careful with the whole
-object — logging a request body or an entire record is how personal data gets in
+object. Logging a request body or an entire record is how personal data gets in
 without anybody deciding.
 
 ### 5. Levels mean something, or they mean nothing
@@ -116,7 +116,7 @@ ignores is worse than no log, because it looks like coverage.
 Averages hide everything. Record the distribution and look at the worst tenth.
 
 Four numbers are usually enough: how much traffic, how much of it failed, how
-slow it was at the bad end, and how full the thing is — memory, disk,
+slow it was at the bad end, and how full the thing is. Memory, disk,
 connections, budget.
 
 ### 7. Alert on what a human must do now, and nothing else
@@ -126,12 +126,12 @@ Every alert that does not need action teaches everybody to ignore alerts.
 **A noisy alert is not a small problem.** It is the mechanism behind most serious
 outages: the real alert fired and was dismissed along with the other forty.
 
-Alert on symptoms people feel — errors, slowness, the thing being down — not on
+Alert on symptoms people feel, errors, slowness, the thing being down, not on
 causes. Causes are for investigating afterwards.
 
 **There is a public way to decide the threshold rather than guessing it.**
 
-Pick the thing you actually promise — say, requests that succeed in under half a
+Pick the thing you actually promise. Say, requests that succeed in under half a
 second. Set a target: 99.5% of them. That is a **service level objective**.
 
 The gap is the **error budget**: the 0.5% you are allowed to fail. Over a month
@@ -148,7 +148,7 @@ Logging everything at full detail costs real money at scale, sometimes more than
 running the service.
 
 Sample the ordinary and keep all of the unusual. Set a retention period on
-purpose — long enough for the incident you will actually investigate, short
+purpose. Long enough for the incident you will actually investigate, short
 enough to be affordable, and short enough that personal data does not accumulate
 indefinitely.
 
@@ -199,9 +199,9 @@ the parts nobody can explain.
 
 ## Sources
 
-- *Service level objectives* — Google *Site Reliability Engineering*.
+- *Service level objectives*. Google *Site Reliability Engineering*.
   https://sre.google/sre-book/service-level-objectives/
-- *Alerting on SLOs* — the burn-rate method, Google *SRE Workbook*.
+- *Alerting on SLOs*. The burn-rate method, Google *SRE Workbook*.
   https://sre.google/workbook/alerting-on-slos/
-- *OpenTelemetry* — the vendor-neutral standard for traces, metrics and logs.
+- *OpenTelemetry*. The vendor-neutral standard for traces, metrics and logs.
   https://opentelemetry.io/docs/what-is-opentelemetry/

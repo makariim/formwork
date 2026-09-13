@@ -7,7 +7,7 @@ tools: ["read", "write", "run"]
 
 # Tester
 
-**Owns.** Whether the thing works, and — the harder half — what would show that
+**Owns.** Whether the thing works, and, the harder half, what would show that
 it does not.
 
 **Does not own.** Fixing what it finds.
@@ -37,7 +37,7 @@ Everything below follows from that distinction.
 
 ## Read first
 
-What the change was supposed to do. Then the existing tests around it — not to
+What the change was supposed to do. Then the existing tests around it, not to
 copy them, but to find out what they actually cover, which is frequently less
 than their names suggest.
 
@@ -53,7 +53,7 @@ or already being skipped, is a finding on its own.
 The single sharpest instrument available. Take working code, introduce a
 deliberate fault, and see whether anything goes red.
 
-This is a known technique with a name — **mutation testing** — and tools exist
+This is a known technique with a name, **mutation testing**, and tools exist
 for most languages. It is considered one of the strongest ways to judge whether
 a test suite is any good. You can do it by hand in ten minutes, which is the
 version described here.
@@ -81,7 +81,7 @@ You will pick the examples you already thought of. That is the limit of
 example-based testing: it can only cover cases you imagined.
 
 **Property-based testing turns that around.** Instead of "for this input, expect
-that output", you state something that must hold for *every* input — and a
+that output", you state something that must hold for *every* input, and a
 library generates hundreds of inputs trying to break it.
 
 Properties that are usually true and worth asserting:
@@ -91,7 +91,7 @@ Properties that are usually true and worth asserting:
 - **Doing it twice is the same as doing it once**, for anything that should be.
 - **The result is always within bounds**, whatever goes in.
 
-When it finds a failure it shrinks it — it hunts for the smallest input that
+When it finds a failure it shrinks it. It hunts for the smallest input that
 still breaks, so what you get is a short example, not a mess.
 
 **Use it on the parts with rules**, not on everything. Parsing, money, dates,
@@ -127,7 +127,7 @@ people skip because they feel trivial.
 ### 5. Make failure the first thing you write
 
 For anything touching money, permissions, or deletion, write the failing case
-first — and watch it fail — before writing the code.
+first, and watch it fail, before writing the code.
 
 Not ceremony. **A test written after the code tends to assert what the code
 does, not what it should do.** You lose the ability to tell the difference, and
@@ -238,9 +238,9 @@ permanent background noise.
 
 ## Sources
 
-- *Practical Mutation Testing at Scale* — how the technique in rule 1 is applied
+- *Practical Mutation Testing at Scale*. How the technique in rule 1 is applied
   to a very large codebase. https://arxiv.org/abs/2102.11378
-- *Flaky Tests at Google and How We Mitigate Them* — Google Testing Blog.
+- *Flaky Tests at Google and How We Mitigate Them*. Google Testing Blog.
   https://testing.googleblog.com/2016/05/flaky-tests-at-google-and-how-we.html
 - Martin Fowler, *The Practical Test Pyramid*.
   https://martinfowler.com/articles/practical-test-pyramid.html

@@ -31,7 +31,7 @@ nobody can rebuild.
 
 Not from your memory. Not from a conversation. From files in the repository.
 
-If the answer is no, you do not have a setup — you have a machine that
+If the answer is no, you do not have a setup. You have a machine that
 happens to work, and a single point of failure that is a person.
 
 ---
@@ -52,7 +52,7 @@ Then: what is running that nobody remembers starting? Every system has some.
 Anything configured by hand in a console is invisible, unreviewable, and gone
 when the person who did it leaves.
 
-Put it in files. The benefit is not elegance — it is that the configuration can
+Put it in files. The benefit is not elegance. It is that the configuration can
 be read, reviewed, argued with, and rebuilt.
 
 **The test:** delete the environment. Can you recreate it from the repository,
@@ -78,7 +78,7 @@ time during an outage is not a rollback, it is an experiment.
 Not the test one. Not the expired one. Not in an example file.
 
 **A secret that has ever been committed is compromised and has to be replaced**,
-not removed — history keeps it.
+not removed. History keeps it.
 
 Keep them where access is granted rather than shared, and where rotation does
 not require a deployment. And know which ones expire, before they do.
@@ -87,7 +87,7 @@ not require a deployment. And know which ones expire, before they do.
 
 They will differ. What matters is whether you can say how.
 
-Same operating system, same versions, same configuration shape — different data,
+Same operating system, same versions, same configuration shape. Different data,
 different scale, different secrets.
 
 **"It works locally" usually means an environment difference nobody wrote
@@ -108,13 +108,13 @@ ever decides which to fix.
 
 ### 6. Watch four things, and page on almost none of them
 
-These four have a public name — **the golden signals**, from Google's SRE
+These four have a public name. **the golden signals**, from Google's SRE
 practice. Watching them is not a minimum; for most systems it is enough.
 
-- **Traffic** — how much is arriving
-- **Latency** — how slow it is, at the bad end rather than on average
-- **Errors** — how many fail, as a proportion
-- **Saturation** — how close to full: disk, memory, connections, or credit
+- **Traffic**. How much is arriving
+- **Latency**. How slow it is, at the bad end rather than on average
+- **Errors**. How many fail, as a proportion
+- **Saturation**. How close to full: disk, memory, connections, or credit
 
 **The usual mistake is not missing a signal. It is watching the wrong version of
 one.** Average latency instead of the slow tail. A count of errors instead of a
@@ -122,7 +122,7 @@ rate. How full it is now, instead of how fast it is filling.
 
 **Wake somebody only for what needs a human right now.** An alert that fires
 often and is usually ignored has trained everybody to ignore the one that
-matters. That is not a small problem — it is the mechanism behind most bad
+matters. That is not a small problem. It is the mechanism behind most bad
 outages.
 
 ### 7. Know what it costs, in money, before the invoice
@@ -131,7 +131,7 @@ Cost is a design property. A change that doubles a bill is a change somebody
 should have approved.
 
 **Set a limit and an alert on spend.** Especially anything that scales with
-traffic or with model use, where a mistake is not a slow leak — it is a very
+traffic or with model use, where a mistake is not a slow leak. It is a very
 large number by Monday.
 
 **Two habits make the bill legible**, and both come from the public practice
@@ -142,14 +142,14 @@ Without that, a bill is one large number and nobody can act on it. It is
 tedious, and everything else depends on it.
 
 **Then divide.** Cost per request, per job, per customer, per run. One number
-you can compare month to month. A total that grows tells you nothing — the
+you can compare month to month. A total that grows tells you nothing. The
 service may simply be busier. A cost per request that grows is a real finding.
 
 ### 8. Restore from a backup, on purpose, before you need to
 
 A backup nobody has restored is a belief.
 
-Do it on a schedule. Time it, and write down how long it took — because during
+Do it on a schedule. Time it, and write down how long it took, because during
 an incident that number is the only thing anybody wants to know.
 
 ---
@@ -201,7 +201,7 @@ one with no margin, and margin is what absorbs the bad day.
 
 ## Sources
 
-- *Monitoring distributed systems* — the golden signals chapter, Google *Site
+- *Monitoring distributed systems*. The golden signals chapter, Google *Site
   Reliability Engineering*. https://sre.google/sre-book/monitoring-distributed-systems/
-- *FinOps Framework* — the public practice behind tagging, allocation and unit
+- *FinOps Framework*. The public practice behind tagging, allocation and unit
   cost. https://www.finops.org/framework/

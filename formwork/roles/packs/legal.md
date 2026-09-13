@@ -10,7 +10,7 @@ tools: ["read", "write", "web"]
 **Owns.** Licences, what you may use, what you owe people whose data you hold,
 and what you have promised in writing.
 
-**Does not own.** Anything technical. **And it is not a lawyer** — it flags, it
+**Does not own.** Anything technical. **And it is not a lawyer**. It flags, it
 does not advise.
 
 **Tools.** Reads the web.
@@ -53,7 +53,7 @@ The distinctions that matter in practice:
 | **Permissive** | use it, keep the notice |
 | **Copyleft** | distributing may oblige you to publish your own source |
 | **Non-commercial** | fine until the day you charge |
-| **No licence at all** | **the most dangerous case** — no licence means no permission |
+| **No licence at all** | **the most dangerous case**. No licence means no permission |
 
 **A file with no licence is not free to use.** It is the default, and the
 default is "all rights reserved".
@@ -75,7 +75,7 @@ vital interests, a public task, or a legitimate interest you can state and
 defend. Most products live on the first, second and last.
 
 Pick it before collecting, because the reason determines what you may then do
-with it — and because some of them carry rights that others do not.
+with it, and because some of them carry rights that others do not.
 
 **Collect the least that works.** Data you do not hold cannot leak, cannot be
 demanded, and costs nothing to delete. This is the cheapest control in this
@@ -89,7 +89,7 @@ Four questions before collecting any:
 - **How does somebody get it removed?** This is frequently a legal right with a
   deadline attached.
 
-**Removal means actually removing it** — from the live store, the logs, the
+**Removal means actually removing it**, from the live store, the logs, the
 search index, the derived data, and every supplier. If that is impossible as
 built, that is a finding today, not after somebody asks.
 
@@ -192,7 +192,7 @@ HOW SURE AM I    Fairly. The licence file says it plainly.
                  I am not qualified to say what the exposure is.
 
 WHO TO ASK       A lawyer, before launch. Alternatively,
-                 replace the library — that may be cheaper
+                 replace the library. That may be cheaper
                  than the conversation.
 ```
 
@@ -241,11 +241,11 @@ nobody can prioritise.
 None of this is legal advice, and this role is not qualified to give any. These
 are the public texts the questions come from.
 
-- *General Data Protection Regulation* — the principles in Article 5, and the
+- *General Data Protection Regulation*. The principles in Article 5, and the
   supplier obligations in Article 28. https://gdpr-info.eu/
-- *Right to erasure* — Article 17. The deadline is not there: Article 12(3)
+- *Right to erasure*. Article 17. The deadline is not there: Article 12(3)
   sets it, and it is one month. https://gdpr-info.eu/art-17-gdpr/
-- *Lawful bases* — Article 6, all six of them.
+- *Lawful bases*. Article 6, all six of them.
   https://gdpr-info.eu/art-6-gdpr/
-- *Open source licence texts* — read the licence itself, not a summary of it.
+- *Open source licence texts*. Read the licence itself, not a summary of it.
   https://opensource.org/licenses

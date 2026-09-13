@@ -2,7 +2,7 @@
 
 Thirteen. These come up in almost every piece of work.
 
-Each says what it catches. None tells you a story — the stories belong to
+Each says what it catches. None tells you a story. The stories belong to
 somebody else's project, and a class of failure is more useful than one
 instance of it anyway.
 
@@ -37,7 +37,7 @@ Work that turns out to need a decision halts and surfaces two things: the subjec
 the decision, and which later work turns on it.
 
 A decision is a fork where the other road produces different work later, and
-editing will not get you back. Everything else is just a choice — make it and
+editing will not get you back. Everything else is just a choice. Make it and
 carry on.
 
 **Catches:** a choice made in passing that nobody reviewed, and that becomes
@@ -62,7 +62,7 @@ the reviewer is reading the thing that was requested.
 **Advice.**
 
 Every figure arrives with the command that produced it, and with what would make
-it wrong. Never type a new number over an old one — run the thing again.
+it wrong. Never type a new number over an old one. Run the thing again.
 
 **Catches:** a number nobody can reproduce. It looks exactly like a number
 somebody remembered, and there is no way to tell them apart later.
@@ -152,8 +152,8 @@ Put anything that conflicts with what you were told first, where it cannot be
 missed. Where somebody described a problem inaccurately, state that directly,
 and state it early.
 
-**Catches:** the most valuable thing an agent produces — the discovery that the
-person directing it has the wrong picture — arriving on page four where nobody
+**Catches:** the most valuable thing an agent produces. The discovery that the
+person directing it has the wrong picture. Arriving on page four where nobody
 reads it.
 
 ---
@@ -187,7 +187,7 @@ because it reads as competence.
 **Advice.**
 
 Keep your own list of the mistakes your project actually makes. Do not copy
-anybody else's — including the ones behind these rules.
+anybody else's, including the ones behind these rules.
 
 **Catches:** a borrowed list makes you watch for problems you do not have, and
 worse, makes you feel safe about the problems you do have.
