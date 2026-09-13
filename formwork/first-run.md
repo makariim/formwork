@@ -148,8 +148,9 @@ arrives:
 | | |
 |---|---|
 | [`loop.md`](loop.md) | the working loop in full: brief, work, check, report, stop |
+| [`threads.md`](threads.md) | how work starts, and where the plan lives between conversations |
 | [`round.md`](round.md) | how to run a round, and when one is worth the money |
-| [`templates/`](templates/) | the brief, the report, the decision record, the round |
+| [`templates/`](templates/) | the brief, the report, the decision record, the round, the standing brief |
 | [`roles/HOW-TO-ADD-A-ROLE.md`](roles/HOW-TO-ADD-A-ROLE.md) | adding your own |
 | [`COSTS.md`](COSTS.md) | what this costs, and the number nobody has |
 | [`limits.md`](limits.md) | what the guards cannot do. Read before trusting them |
@@ -161,7 +162,7 @@ arrives:
 ## What you have not been told
 
 Forty-six rules exist, in [`rules/`](rules/). Thirteen you meet daily,
-thirty-three for particular situations. You have seen three of them, by
+thirty-four for particular situations. You have seen three of them, by
 watching them catch something.
 
 Reading them now would be reading a list. You would agree with all of them and

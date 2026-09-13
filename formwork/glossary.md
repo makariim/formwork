@@ -18,7 +18,7 @@ which one you have in `.formwork.toml`.
 **Role**
 A job description for an agent. One file. It says what that job owns, what it
 does not own, when it should stop, and what bad work from it would look like.
-This kit ships twenty seven.
+This kit ships twenty eight.
 
 **Guard**
 A small program that refuses. Two of the three stop a command before it runs.
@@ -29,7 +29,7 @@ A small program that reads your project and says green or red. Checks look at
 what is there. Guards stop what is about to happen.
 
 **The gate**, also called **the aggregate**
-All nine checks, run together, with one answer at the end. Green or red.
+All eleven checks, run together, with one answer at the end. Green or red.
 
 You will see the word aggregate in a refusal: *the aggregate is red, so this
 turn cannot conclude*. It means the same thing.
@@ -71,6 +71,27 @@ coming out. Expensive. Only worth it for a decision you cannot easily undo. See
 **Predictions**
 What the challenger expects to go wrong, written before anybody proposes anything.
 Written after the fact it is not a prediction, it is agreement.
+
+**Standing brief**
+One short file saying where the project is right now: what you are building,
+where you are, what is decided, what is open, what is next. It lives at
+`docs/standing.md` and a new conversation reads it instead of being told the
+story again. The template is in `formwork/templates/standing.md`.
+
+**Director**
+The role that holds the whole picture across many conversations. It decides
+what happens next, writes the brief, reads the report, and keeps the standing
+brief true. One per project, one at a time. It never writes down a decision you
+did not make.
+
+**Director thread** and **working session**
+The two layers. The director thread holds the plan and never builds anything.
+The working session does one piece of work in the repository and stops. You
+carry the text between them. See `formwork/threads.md`.
+
+**Split brief**
+One piece of work that is too big for a single session, cut into pieces by
+`lead`, handed to different roles, and collected back into one report.
 
 **Decision record**
 One page saying what was decided, why, and what follows from it. Numbered.

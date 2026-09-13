@@ -24,6 +24,8 @@ rule the kit applies to its own decision records.
 | [`first-run.md`](first-run.md) | the design of the fifteen-minute first run |
 | [`runtime-capabilities.md`](runtime-capabilities.md) | what each of the four runtimes can actually enforce |
 | [`role-formats.md`](role-formats.md) | how a role is expressed in each runtime, and where the grant does not survive |
+| [`standing.md`](standing.md) | **live, not history. Where the kit is right now** |
+| [`to-document.md`](to-document.md) | **live, not history. Writing owed, so it is not remembered only in a chat** |
 | [`decisions/`](decisions/) | decision records |
 
 ## Why any of this is published

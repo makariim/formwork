@@ -39,6 +39,8 @@ These do not ask you. They refuse.
 | A declared runtime is actually wired up | `formwork/check/checks/guard-wired` |
 | The agent does not quietly alter the kit's own files | `formwork/guard/protected-files` |
 | A turn does not end while the aggregate is red | `formwork/guard/quality-gate` |
+| The standing brief is not older than the newest decision | `formwork/check/checks/standing-current` |
+| Work marked finished left a report behind | `formwork/check/checks/work-paired` |
 
 > [!NOTE]
 > **The last one refuses three times in a session, then stands aside**, so a
@@ -60,10 +62,10 @@ instead: `formwork/fw check`, `formwork/fw demo`, `formwork/fw roles`. Run
 
 ## What is advice
 
-Everything else. **46 rules**, in two files.
+Everything else. **47 rules**, in two files.
 
 - `formwork/rules/core.md` — 13. You meet these every day.
-- `formwork/rules/full.md` — 33. Read one when you hit the situation it covers.
+- `formwork/rules/full.md` — 34. Read one when you hit the situation it covers.
 
 > [!TIP]
 > Every rule says what it catches. None of them tells you a story, because the
@@ -122,7 +124,7 @@ FORMWORK_GATE=off
 
 ## Your team
 
-`formwork/roles/` holds 27 roles. Six run the method. Twenty-one do the work,
+`formwork/roles/` holds 28 roles. Seven run the method. Twenty-one do the work,
 grouped into packs.
 
 **All of them are available. There is no switch yet**, and this page says so
@@ -177,6 +179,7 @@ would establish the rest.
 [`formwork/first-run.md`](formwork/first-run.md). Fifteen minutes, on your own
 project.
 
-Then [`formwork/loop.md`](formwork/loop.md) for the working loop, and
-[`formwork/round.md`](formwork/round.md) when a decision is expensive enough to
-be worth a round.
+Then [`formwork/loop.md`](formwork/loop.md) for the working loop,
+[`formwork/threads.md`](formwork/threads.md) for how work starts and where the
+plan lives between conversations, and [`formwork/round.md`](formwork/round.md)
+when a decision is expensive enough to be worth a round.
