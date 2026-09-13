@@ -238,6 +238,54 @@ written from the brief template, no report from the report template, and no
 decision recorded from the decision template.
 
 **So the dogfooding is real for the enforced rules and absent for the advisory
-ones**, which is precisely the split you would expect — the enforced ones make
+ones**, which is precisely the split you would expect. The enforced ones make
 themselves felt, and the advice has to be chosen. That is itself a finding
 about the method, and it is not a flattering one.
+
+**Entry 10 is the first exception.** The kit was installed from the real index
+into a new empty repository, and the friction that produced is recorded below
+rather than fixed quietly.
+
+## 10 — The fallback did not exist yet at the moment it was needed
+
+**When.** The evening 0.2.0 was published, on the first fork: a new empty
+repository, by the author, installing from the real index like a stranger.
+
+**What happened.**
+
+```
+$ python3 -m pip install --upgrade formwork-kit
+  WARNING: The script formwork is installed in
+  '/Users/…/Library/Python/3.14/bin' which is not on PATH.
+Successfully installed formwork-kit-0.2.0
+$ formwork init
+zsh: command not found: formwork
+```
+
+The install worked. The command was not reachable. This is the ordinary result
+of `pip install --user`, and it had been written up in the README that same
+afternoon.
+
+**Why the written answer did not help.** The README offered two ways out:
+`python3 -m formwork_cli`, and `formwork/fw` from the top of the project. The
+second one does not exist yet at that moment, because `formwork/` is what
+`formwork init` puts there and `init` is the command that just failed. The
+first one was correct, and was inside a collapsed block halfway down the page.
+
+So the reader had one answer that could not work, and one they could not see.
+The author fixed it by editing `PATH`, which is the thing the page says you do
+not have to do.
+
+**What fixed it.** The working answer moved out of the fold and into the
+install steps, and onto `first-run.md`, which is the page people are sent to.
+The ordering matters more than the words: a failure that happens at step two
+needs its answer at step two.
+
+**The general form.** A fallback is only a fallback if it exists at the moment
+the thing it replaces fails. Two of ours were written together and only one of
+them was true that early. Nothing catches this except somebody standing at the
+exact point of failure with none of the context.
+
+**What it cost.** Five minutes, and it is the most useful five minutes in this
+log, because it is the first time anybody has installed this kit the way a
+stranger would.
