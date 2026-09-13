@@ -26,6 +26,7 @@ Exit status is whatever the program underneath returned, so this can be used in
 a script the same way as the programs it calls.
 """
 import os
+import re
 import subprocess
 import sys
 
@@ -69,20 +70,33 @@ def run(path, args):
         return 2
 
 
+# Every suite prints its own total, and they have to be added up. This command
+# used to end on "every test passed", so anybody checking the number the pages
+# claim had to do the addition by hand or take it on trust.
+TOTAL = re.compile(r"(\d+) of \1 behaved as specified|(\d+) passed, 0 failed")
+
+
 def run_tests():
     failed = []
+    total = 0
     for t in TESTS:
         full = os.path.join(HERE, t)
         if not os.path.isfile(full):
             continue
         print("\n%s" % t, flush=True)
-        if subprocess.run([sys.executable, full], cwd=PROJECT).returncode != 0:
+        p = subprocess.run([sys.executable, full], cwd=PROJECT,
+                           capture_output=True, text=True)
+        sys.stdout.write(p.stdout)
+        sys.stderr.write(p.stderr)
+        if p.returncode != 0:
             failed.append(t)
+        for m in TOTAL.finditer(p.stdout):
+            total += int(m.group(1) or m.group(2))
     print("")
     if failed:
         print("FAILED: %s" % ", ".join(failed), file=sys.stderr)
         return 1
-    print("every test passed")
+    print("%d tests, all passed" % total)
     return 0
 
 
