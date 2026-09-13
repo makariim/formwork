@@ -63,7 +63,7 @@ Never end on "and everything else passed" when something did not.
 Every count comes with what produced it.
 
 ```
-ls formwork/check/checks | wc -l     11
+ls formwork/check/checks | wc -l     12
 ```
 
 Not "about a dozen checks". Not a number with no source. **If you cannot show

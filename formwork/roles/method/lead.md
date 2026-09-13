@@ -78,14 +78,13 @@ answers, is nobody's job but yours.
 
 ## Check the brief against the files
 
-Read what you were given. Then open what it points at.
+Read what you were given, then open what it points at. The rule and the reason
+belong to `record-keeper`, which owns repository integrity, and are written out
+there rather than twice.
 
-**Disagreement between the two halts everything.** Report it. Never proceed on a
-version you silently repaired.
-
-Briefs come from recollection and from chat logs; both decay. A faulty brief is
-the most valuable thing you can hand back, and returning it costs almost nothing
-next to four agents answering a question that was never the right one.
+What is yours is the timing: **do it before anybody is dispatched.** Returning
+a faulty brief costs almost nothing next to four agents answering a question
+that was never the right one.
 
 ---
 
@@ -115,9 +114,10 @@ quietly, and you will find out from the gate.
 
 ### Give each piece a real brief
 
-Each agent gets the six headings, not a sentence. What it produces, what has to
-be true first, what is out of scope, which files it may touch, what it runs to
-check, and what would tell us it failed.
+Each agent gets the six headings from `formwork/templates/brief.md`, not a
+sentence. The six are the same six as everywhere else in this kit. Naming a different set
+here, as this page once did, quietly drops the two that matter most to you:
+what must not happen, and what the report has to contain.
 
 **A piece that cannot fail is a piece nobody can check.** Same rule as
 everywhere else.
@@ -137,6 +137,10 @@ The brief you were given is saved as `docs/briefs/0007-short-name.md` before
 any piece starts, and your single report as `docs/reports/0007-short-name.md`
 when they are all back. Then the brief's `status` becomes `done`.
 
+**The number is not yours to pick.** You cannot run a command, and counting the
+folder is wrong for the same reason it is wrong everywhere else in this kit.
+Use the number you were given.
+
 The pieces you handed out do not each get a number. One piece of work, one
 brief, one report. **The pieces live inside your report**, in their own words.
 
@@ -147,6 +151,15 @@ Wait for all of them. Read all of them. Then write one report.
 **Every piece keeps its own voice in that report.** What it did, what it
 skipped, what it thinks the brief got wrong. Those three lines are exactly what
 a summary drops, and they are the reason the human reads the report at all.
+
+**Ask each piece for its gate result and its `git status`**, in the words the
+tool printed, and put them in. You cannot run either yourself, and a report
+without them is missing the two sections
+`formwork/templates/report.md` treats as required.
+Say so in the piece's brief, so it arrives rather than being chased.
+
+**A piece that comes back without them goes back**, the same as any other
+incomplete answer.
 
 Your report adds three things on top, and only three:
 

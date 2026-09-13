@@ -89,7 +89,8 @@ You can run everything in one. It works for a while, and then it does not.
 
 A conversation that does the work fills up with the work. Fifty file reads and
 a long error later, the plan is still in there somewhere, underneath. The
-planning conversation stays small because it never reads a file.
+planning conversation stays small because it reads what a brief needs and
+stops, rather than reading its way through a problem.
 
 ---
 
@@ -144,8 +145,9 @@ second one. It is the same one, rebuilt from the standing brief.
    [`loop.md`](loop.md). When the answer is genuinely unclear and the choice is
    expensive, run a [round](round.md) instead.
 3. **The brief is written and saved** as `docs/briefs/0007-short-name.md`, with
-   `status: open`. The number comes from
-   `formwork/check/checks/work-paired --next .`, never from counting.
+   `status: open`. You take the number, with
+   `formwork/check/checks/work-paired --next .`. Never by counting the folder,
+   because gaps are allowed.
 4. **The working session gets it.** Pasted, or "do brief 0007". If it is too
    big for one session, give it to the `lead` role, which splits it, hands the
    pieces out, and gives back one report.
