@@ -166,8 +166,8 @@ formwork check
 **That last line should say green on Claude Code**, and red on the other three
 until you write the hook file, as above.
 
-Leave `--runtime` off and it finds your agent itself. It only asks when you
-have more than one set up, or none yet.
+Leave `--runtime` off and it finds your agent itself. When you have more than
+one set up, or none yet, it stops and tells you to name one.
 
 > [!TIP]
 > **Would you rather be walked through it?**
@@ -226,8 +226,9 @@ formwork/fw check
 The copy is the whole kit, so you can delete `the-kit` afterwards. There is no
 `init` step here, because copying the folder in **is** the init step.
 
-Every other command exists both ways: `formwork check` becomes
-`formwork/fw check`. Run `formwork/fw` on its own for the list.
+`formwork check` becomes `formwork/fw check`, and the same for `install`,
+`setup`, `demo`, `roles`, `record` and `test`. Run `formwork/fw` on its own for
+the list. `where` and `version` belong to the installed command only.
 
 ### What each step does
 
@@ -238,9 +239,11 @@ Every other command exists both ways: `formwork check` becomes
 | `setup` | asks eleven questions once, then writes your style file, your standing brief, and the folders for decisions, briefs and reports |
 | `check` | runs all twelve checks and says green or red |
 
-**What it touches.** It adds `formwork/` and `FORMWORK.md`, writes your agent's
-settings file keeping anything already there, and puts one file in
-`~/.formwork/` holding a fingerprint of each file that enforces a rule.
+**What it touches.** It adds `formwork/` and `FORMWORK.md`, writes
+`.formwork.toml`, writes your agent's settings file keeping anything already
+there, generates one role file per role into your agent's folder, and puts one
+file in `~/.formwork/` holding a fingerprint of each file that enforces a
+rule.
 
 | System | Does it work? |
 |---|---|
@@ -342,7 +345,7 @@ in your own words, which beats it. Every role points at both.
 | **12 checks** | small programs that read your project and say green or red | `ls formwork/check/checks \| wc -l` |
 | **28 roles** | one file each, saying what that job does and where it stops | `ls formwork/roles/*/*.md \| wc -l` |
 | **47 rules** | 13 you meet daily, 34 for when you need them | `grep -c '^### ' formwork/rules/*.md` |
-| **334 tests** | every guard and check, proved able to fail | `formwork test` |
+| **356 tests** | every guard and check, proved able to fail | `formwork test` |
 
 It is all text files and small programs. You can read every line. Nothing is
 hidden. Nothing is sent anywhere.
@@ -367,7 +370,7 @@ so in capitals rather than guessing. There are three:
 | | |
 |---|---|
 | **What a round costs in money** | never measured. [`COSTS.md`](formwork/COSTS.md) says NOT ESTABLISHED instead of guessing |
-| **Whether the guards stop a determined agent** | they do not. [`limits.md`](formwork/limits.md) lists every way around them |
+| **Whether the guards stop a determined agent** | they do not. [`limits.md`](formwork/limits.md) lists every route anybody has found |
 | **Whether three of the four agents work** | nobody has tried them. Said once already, near the top, because it changes what you get |
 
 > [!WARNING]
@@ -390,7 +393,7 @@ today:
 | **Skills** | one word for a common job, instead of a paragraph. Considered, not started |
 | **A model per role** | pick the model and effort level for each role. Only Claude Code is known to allow it. Nobody has checked the other three, so this would be one agent out of four until somebody does |
 | **Teams** | more than one person on the same standing brief. Today the method says one director at a time, and nobody has tried two |
-| **Roles invented on the fly** | asked for by somebody who tried the kit. It cuts across the check that stops two roles owning one job, so it is an open question rather than a plan |
+| **Roles invented on the fly** | asked for by somebody who tried the kit. It cuts across the check that stops two roles owning one job, so it stays a question we have not settled |
 
 None of these is promised. They are written down so you can see the edge of
 what is here.

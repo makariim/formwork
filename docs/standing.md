@@ -17,21 +17,25 @@ nothing about anybody's product. It is the shape, empty.
 
 ## Where we are now
 
-Version 0.1.0 is published on PyPI as `formwork-kit` and the repository is
-public. Three guards, ten checks, twenty seven roles, forty seven rules, 295
-tests across five suites.
+**0.1.0 is what is on PyPI. 0.2.0 is ready and not released**, and until it is,
+the README describes commands a reader cannot install.
 
-Version two is being built. In: the standing brief, the two layer mechanism,
-the `lead` role widened so it also splits a brief that is too big for one
-session, a new `director` role that holds the upper layer, briefs and reports as files
-in `docs/briefs/` and `docs/reports/` with a check that catches work marked
-finished that left no report, one page saying how agents talk to you, and `formwork setup`, which asks a few
-questions once and writes what they imply: the style file, the standing brief,
-the three document folders and the strength values. Twenty eight roles, twelve checks, 328 tests.
+Three guards, twelve checks, twenty eight roles, forty seven rules, 356 tests
+across six suites.
 
-Still to do: how agents report to you, skills, model and effort per role, the
-questions `formwork init` asks a first timer, and the settings section the
-README does not have yet.
+Version two added: the standing brief and its check, a `director` role holding
+the upper layer, `lead` widened to split a brief as well as run a round, briefs
+and reports as numbered files with a check that catches work marked finished
+that left nothing behind, one page saying how the agents talk to you, and
+`formwork setup`, which asks eleven questions once and writes what they imply.
+
+**Then five audits attacked it and found 71 defects**, nearly all in what had
+just been written. The serious ones are fixed: `setup` no longer edits the
+section it promised never to touch, no longer reads Ctrl-C as consent, and no
+longer overwrites a file made while it was asking; `install` refuses rather
+than wiring the wrong project; and the three new checks no longer report clean
+while examining nothing. Every fix carries a test or a fixture that fails
+without it.
 
 ## What is decided
 

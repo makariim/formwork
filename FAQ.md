@@ -35,7 +35,7 @@ read. You commit, the agent works. If you disagree, it is one line in
 
 Yes, in one way: every piece of work stops and waits for you. On a busy day
 that is the bottleneck, and it is also the point. Everything else is fast. The
-gate takes about two seconds, measured in
+gate takes about three seconds, measured in
 [`formwork/COSTS.md`](formwork/COSTS.md).
 
 ---
@@ -167,7 +167,7 @@ before you decide what you think of the rest.
 
 ### Is it stable?
 
-The guards and checks have 334 tests and four audit rounds behind them. Every
+The guards and checks have 356 tests and five audit rounds behind them. Every
 check has been watched failing on purpose, and you can watch them yourself with
 `formwork demo`.
 

@@ -168,6 +168,42 @@ way around the guard.
 
 ---
 
+## The guard does not cover every tool the same way
+
+Self-protection reads a command line. An agent's file-editing tool is not a
+command line, so the guard sees it only where the runtime routes it through
+one.
+
+During this kit's own building, the same change to a check was refused when
+made with the editing tool and allowed when made by a short script. Both are
+the same act. The pattern caught one shape of it.
+
+**What holds the line is not the guard here, it is `kit-integrity`:** any
+change to a file that enforces something turns the gate red until a person
+records it. The guard makes the ordinary route awkward. The record is what
+makes the change visible.
+
+---
+
+## What five audits found, after everything above was written
+
+Five agents attacked version two: the three new checks, `formwork setup`,
+`formwork install`, the two new roles, and every page. **71 findings.**
+
+The pattern worth repeating, because it is the one this kit exists to prevent:
+**six of the fifteen check defects were the check reporting clean having
+examined nothing**, and printing a count that made the emptiness look like
+coverage. A decision record moved one folder deeper vanished, and the check
+said it was ahead of all 0 records. A report file was never opened, so `touch`
+satisfied it. A role mentioning "lifestyle.md" satisfied the style check.
+
+All of those are closed and each has a fixture. What the episode establishes
+is smaller and more useful than any of the fixes: **a check written by whoever
+wrote the thing it checks tends to pass for the wrong reason**, and only
+somebody trying to break it finds out.
+
+---
+
 ## The honest summary
 
 This kit will stop an agent doing the wrong thing by habit. **It will not stop

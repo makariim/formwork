@@ -41,8 +41,9 @@ These do not ask you. They refuse.
 | Every generated role names the style page | `formwork/check/checks/style-pointed` |
 
 > [!NOTE]
-> **The last one refuses three times in a session, then stands aside**, so a
-> genuinely stuck turn is not trapped for ever. Change it with `gate_budget`.
+> **The turn-end gate refuses three times in a session, then stands aside**, so
+> a genuinely stuck turn is not trapped for ever. Change it with `gate_budget`.
+> The rows below it are checks, and none of them has a budget.
 
 Run them:
 

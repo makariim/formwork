@@ -20,9 +20,17 @@ Nothing here is a decision. It is a list of writing owed.
 
 | What | Where it lands |
 |---|---|
+| **The published package is 0.1.0 and the pages describe version two.** Anybody following the README today gets `ERROR: no such command: setup` and a gate that says 9 checks. Either release, or say on the page which version it describes | `README.md`, or the release |
 | Numbers in `docs/` that are now stale | those pages are history and say so at the top. Decide whether that is enough, or mark the figures |
-| **Em dashes still in the programs**, in comments and in the findings they print: `0001-x.md — no date`. There it is a column separator, not a pause in a sentence. Left alone on purpose. Changing it means editing every guard and check, which means re-recording all of them | your call. The prose is done |
+| **Em dashes still in the programs**, in comments and in the findings they print: `0001-x.md — no date`. There it is a column separator, not a pause in a sentence. Left alone on purpose | your call. The prose is done |
 | Not a file: the repository has no About text, no website and no topics on GitHub | the repository page. Only you can set it |
+
+## Found by the audits, and left on purpose
+
+| What | Why it stays |
+|---|---|
+| `style-pointed` goes green when the generated roles are **deleted** rather than fixed | to catch it, the check would have to know which roles ought to exist, which means a second copy of the generator. A checker built out of the thing it checks is not a check. Written on the check itself |
+| Four of the ten must-pass fixtures pass **vacuously**: the check exits 0 having examined nothing | arguably correct behaviour, but it means the gate's "shown to accept the right" line counts cases rather than coverage |
 
 ## Dropped, with the reason
 
@@ -31,23 +39,18 @@ nothing to document. The README lists them as not here, and says the model one
 is known to work on Claude Code only, because nobody has read the other three
 publishers' documentation.
 
-## Done in the documentation pass
+## Done, and kept here for one release
 
-Kept for one release, so the next pass can tell what was deliberate.
-
-- the two layers, the director, the folder of briefs and reports, and the
-  `lead` splitting a brief now appear in `FORMWORK.md`, `loop.md`,
-  `threads.md`, `round.md` and `README.md`
-- `first-run.md` gained `formwork setup` and a worked first turn
-- `limits.md` gained the four things nobody has run, and the two guards that
-  refuse ordinary writing
-- `README.md` gained the settings section, the install split, a first turn and
-  a version one statement
-- repeated wording between pages cut roughly in half, measured as shared runs
-  of seven words or more across twenty one pages: 240 before, 89 after
-- 328 em dashes replaced across the kit's pages and role files. Two dashes in
-  one sentence became commas, one became a full stop, and six were repaired by
-  hand where the sentence had wrapped across two lines
-- `formwork/install` run from a subfolder wrote into that subfolder and called
-  it a success. It now installs into the project holding the kit, and says
-  which one it chose
+- the documentation pass: one home per fact, routers fixed, repeated wording
+  cut from 240 shared runs of seven words or more to 89, measured across
+  twenty one pages
+- 328 em dashes replaced in the pages and role files, six repaired by hand,
+  one table cell repaired after an audit found it
+- `formwork/install` run from a subfolder wrote into that subfolder; the first
+  fix moved the bug to a kit run from elsewhere; it now refuses rather than
+  guessing, and eight tests watch all three cases
+- `formwork setup` edited `[bindings]`, could corrupt a config into
+  unparseable TOML, read Ctrl-C as consent, and overwrote a file created while
+  it was asking. All four closed, fourteen tests added
+- the three new checks each reported clean while examining nothing. Six such
+  routes closed, with a fixture each

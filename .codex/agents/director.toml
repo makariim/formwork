@@ -179,8 +179,11 @@ Nothing moves on its own.
 The report comes back as `docs/reports/0007-short-name.md`, the same number.
 When it is in, the brief's `status` becomes `done`.
 
-**Ask for the number, do not count.** `formwork/check/checks/work-paired
---next .` gives it. Counting the files collides with a number already taken.
+**You do not pick the number.** You have no way to run anything, and counting
+the folder collides with a number already taken, because gaps are allowed. Say
+what the brief should be called and leave the number to the human, who is
+saving the file anyway. `formwork/templates/brief.md` says where it comes
+from.
 
 **A round takes a number like anything else.** Its file in `docs/briefs/` is
 short and points at `docs/rounds/<name>/`, where the real brief and the

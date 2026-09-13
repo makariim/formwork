@@ -73,9 +73,13 @@ how they are, and readers stop being able to tell which sentences are current.
 
 ### 3. Numbers come from the record, never from memory
 
-Identifiers for decisions are computed from what exists. Count the directory,
-add one. Never assigned from recollection, from a summary, or from a working
-copy that has not been merged.
+Identifiers are computed from what exists, never from recollection, a summary,
+or a working copy that has not been merged.
+
+**Ask the check, do not count.** `decision-ids --next` for a decision,
+`work-paired --next` for a brief. Counting the folder looks like the same
+thing and is not: gaps are allowed, so the count and the next free number
+part company the first time a number is skipped.
 
 The failure this prevents is dull and expensive: two threads working at once,
 each reading a different stale state, both confident, both picking the same

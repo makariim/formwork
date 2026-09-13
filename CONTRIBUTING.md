@@ -26,7 +26,7 @@ both answers help.
 ```
 formwork check    must say green
 formwork demo     must reject every broken test case
-formwork test     all 334 must pass
+formwork test     all 356 must pass
 ```
 
 ---

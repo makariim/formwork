@@ -41,8 +41,9 @@ Pointers, not arguments. The record holds the reasoning.
 - `0001` short title
 - `0002` short title
 
-If a decision is not written down here or in `docs/decisions/`, it is not
-decided. It is a thing somebody remembers.
+**These are pointers, not the decisions themselves.** If it is not in
+`docs/decisions/`, it is not decided. It is a thing somebody remembers, and a
+line here will not make it one.
 
 ## What is open
 

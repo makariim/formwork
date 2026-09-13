@@ -18,7 +18,7 @@ BRIEF → WORK → CHECK → REPORT → STOP → you say go → BRIEF …
 | checkpoint | one sitting | six headings | the full list |
 | round | hours to days | a question per role | a round record |
 | phase | weeks | what it settles | one document |
-| milestone | months | a direction |. |
+| milestone | months | a direction | none |
 
 **These are names for how big a turn was.** They are not five different
 processes. A task and a phase run the same loop.
