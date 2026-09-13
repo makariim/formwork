@@ -1,0 +1,116 @@
+#!/usr/bin/env python3
+"""Check: the roles your agent actually loads point at the style page.
+
+    style-pointed <directory>
+
+How a reply is written lives in one page, `formwork/style.md`. It is not
+copied into twenty eight role files. The generator writes a pointer to it into
+every file it produces, and this check is the reason that pointer can be
+trusted.
+
+CATCHES  The pointer quietly leaving. Delete the two lines in the generator
+         that write it, run the generator again, and every generated role
+         loses the pointer at once. `generated-current` compares what is on
+         disk against what the source produces, so both halves change together
+         and it sees nothing wrong. The gate stayed green while the style page
+         became a document nothing led to.
+
+         Also a project that has `formwork/style.md` and a generated tree that
+         predates it, which is the same silence for a duller reason.
+
+WHAT IT CANNOT DO
+
+Tell whether the page is read, or followed. Nothing can. It checks that the
+road exists, not that anybody drove down it.
+
+Exit status:
+    0   every generated role points at the page, or there is nothing to check
+    1   at least one does not, and it is named
+    2   the check could not run
+"""
+import os
+import sys
+
+PAGE = os.path.join("formwork", "style.md")
+NEEDLE = "style.md"
+
+# Where each runtime's generated roles live. The same list the generator
+# writes to, and guard-wired reads from.
+TREES = [
+    (os.path.join(".claude", "agents"), ".md"),
+    (os.path.join(".gemini", "agents"), ".md"),
+    (os.path.join(".codex", "agents"), ".toml"),
+]
+
+SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv"}
+EXCLUDED = [os.path.abspath(p) for p in
+            os.environ.get("FORMWORK_EXCLUDE", "").split(os.pathsep) if p]
+
+
+def excluded(path):
+    a = os.path.abspath(path)
+    return any(a == e or a.startswith(e + os.sep) for e in EXCLUDED)
+
+
+def generated(root):
+    """Every generated role file, with the runtime folder it came from."""
+    out = []
+    for rel, ending in TREES:
+        d = os.path.join(root, rel)
+        if not os.path.isdir(d) or excluded(d):
+            continue
+        for fn in sorted(os.listdir(d)):
+            if not fn.endswith(ending) or fn.startswith("."):
+                continue
+            out.append((os.path.join(rel, fn), os.path.join(d, fn)))
+    return out
+
+
+def main(argv):
+    args = [a for a in argv[1:] if not a.startswith("--")]
+    if not args:
+        print("usage: style-pointed <directory>", file=sys.stderr)
+        return 2
+    root = args[0]
+    if not os.path.isdir(root):
+        print("ERROR: not a directory: %s" % root, file=sys.stderr)
+        return 2
+
+    if not os.path.isfile(os.path.join(root, PAGE)):
+        print("no %s here, nothing to point at" % PAGE)
+        return 0
+
+    files = generated(root)
+    if not files:
+        print("nothing generated here yet, nothing to check")
+        return 0
+
+    missing = []
+    for rel, full in files:
+        try:
+            text = open(full, encoding="utf-8", errors="replace").read()
+        except OSError as e:
+            print("ERROR: cannot read %s: %s" % (rel, e), file=sys.stderr)
+            return 2
+        # A generated role is allowed to say it in any wording. What is not
+        # allowed is never naming the page at all.
+        if NEEDLE not in text:
+            missing.append(rel)
+
+    if missing:
+        print("%d of %d generated role(s) do not name %s"
+              % (len(missing), len(files), PAGE))
+        for rel in missing[:10]:
+            print("  %s" % rel)
+        if len(missing) > 10:
+            print("  and %d more" % (len(missing) - 10))
+        print("  Run formwork roles. If the generator stopped writing the "
+              "pointer, that is the bug.")
+        return 1
+
+    print("%d generated role(s), every one names %s" % (len(files), PAGE))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

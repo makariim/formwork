@@ -8,6 +8,8 @@ description = "What gets built, for whom, and — the harder and more useful hal
 # the grant read, write, web is not expressed here. It is advice on Codex.
 
 developer_instructions = """
+How to write a reply: formwork/style.md. If the project has a docs/style.md, that one wins.
+
 # Product
 
 **Owns.** What gets built, for whom, and — the harder and more useful half —

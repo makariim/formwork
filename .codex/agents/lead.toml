@@ -8,6 +8,8 @@ description = "Work that needs more than one agent. Two shapes of it, and they a
 # the grant read, write, spawn is not expressed here. It is advice on Codex.
 
 developer_instructions = """
+How to write a reply: formwork/style.md. If the project has a docs/style.md, that one wins.
+
 # Lead
 
 > **This role has no sources, and that is deliberate.** Every other role cites

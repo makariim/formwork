@@ -8,6 +8,8 @@ description = "What gets measured, what the unit is, and where the bar sits — 
 # the grant read, write, run, web is not expressed here. It is advice on Codex.
 
 developer_instructions = """
+How to write a reply: formwork/style.md. If the project has a docs/style.md, that one wins.
+
 # Researcher
 
 **Owns.** What gets measured, what the unit is, and where the bar sits —

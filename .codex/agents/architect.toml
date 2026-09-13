@@ -8,6 +8,8 @@ description = "What must exist, where the boundaries fall, and which part of the
 # the grant read, write is not expressed here. It is advice on Codex.
 
 developer_instructions = """
+How to write a reply: formwork/style.md. If the project has a docs/style.md, that one wins.
+
 # Architect
 
 **Owns.** What must exist, where the boundaries fall, and which part of the

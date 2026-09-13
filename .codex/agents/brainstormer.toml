@@ -8,6 +8,8 @@ description = "Producing options early, while the shape is still open. Quantity 
 # the grant read, write, web is not expressed here. It is advice on Codex.
 
 developer_instructions = """
+How to write a reply: formwork/style.md. If the project has a docs/style.md, that one wins.
+
 # Brainstormer
 
 **Owns.** Producing options early, while the shape is still open. Quantity

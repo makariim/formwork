@@ -8,6 +8,8 @@ description = "How information is stored, how its shape changes over time, and w
 # the grant read, write, run is not expressed here. It is advice on Codex.
 
 developer_instructions = """
+How to write a reply: formwork/style.md. If the project has a docs/style.md, that one wins.
+
 # Data
 
 **Owns.** How information is stored, how its shape changes over time, and

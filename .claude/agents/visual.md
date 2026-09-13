@@ -7,6 +7,8 @@ tools: Read, Glob, Grep, Write, Edit
 <!-- GENERATED FROM formwork/roles/packs/visual.md — DO NOT EDIT. -->
 <!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
+> **How to write a reply:** `formwork/style.md`. If the project has a `docs/style.md`, that one wins.
+
 # Visual
 
 **Owns.** Look, type, colour, spacing, and whether the whole thing appears to
