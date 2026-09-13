@@ -41,6 +41,7 @@ These do not ask you. They refuse.
 | A turn does not end while the aggregate is red | `formwork/guard/quality-gate` |
 | The standing brief is not older than the newest decision | `formwork/check/checks/standing-current` |
 | Work marked finished left a report behind | `formwork/check/checks/work-paired` |
+| Every generated role names the style page | `formwork/check/checks/style-pointed` |
 
 > [!NOTE]
 > **The last one refuses three times in a session, then stands aside**, so a
@@ -105,6 +106,18 @@ protect_files = "block"          # block | warn | off
 `[strength]` tunes how hard the enforced guards bite. `[bindings]` is your
 setup. There is no third section: see above.
 
+**You do not have to write any of it by hand.** `formwork setup` asks a few
+questions once, shows you everything it is about to do, and writes it only if
+you say yes:
+
+- `docs/style.md`, from how you said you want to be spoken to
+- `docs/standing.md`, seeded with what you are building and what is next
+- `docs/decisions/`, `docs/briefs/`, `docs/reports/`, started and explained
+- the `[strength]` values, including `gate_budget`
+
+It never overwrites a file you already have, and it never touches
+`[bindings]`, which the installer worked out by looking at your project.
+
 **Two more keys exist and both live in `[strength]`:**
 
 ```toml
@@ -132,6 +145,12 @@ rather than describing one that does not exist.
 
 Adding your own is copying `TEMPLATE.md`, filling in five sections and four
 frontmatter fields. A role missing any of them does not load.
+
+**How they talk to you** is one page, [`formwork/style.md`](formwork/style.md),
+pointed at from every generated role. Short by default, red first, a number
+with the command that made it, and NOT ESTABLISHED where nothing was measured.
+Write your own in `docs/style.md` and it wins. Nothing enforces either, and the
+page says so.
 
 The installer generates them for your runtime. To regenerate after an edit:
 

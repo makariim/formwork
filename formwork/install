@@ -387,6 +387,7 @@ def main(argv):
 
     print("")
     print("Check it took:  formwork check")
+    print("Then:           formwork setup, a few questions, once")
     print("Then:           formwork/first-run.md")
     return DONE
 

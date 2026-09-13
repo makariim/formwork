@@ -41,6 +41,32 @@ Nothing here is a decision. It is a list of writing owed.
 | **Settings.** The README does not use the word configuration once. Nobody is told when to change a setting, or where | `README.md`, and `FORMWORK.md` has the file but not the when |
 | This is version one, and version two is coming | `README.md` |
 
+## Asked for by people who tried it
+
+Two people outside the project read it and ran it. This is what they said.
+
+| What | Where it lands |
+|---|---|
+| **Split the install section in two.** A packaged install, and "install nothing, the kit is just files". Right now they are one run of text and the second one reads like an afterthought | `README.md` |
+| **`pipx` is not the only answer.** A virtual environment is the ordinary way to do this and the page does not mention one | `README.md` |
+| **Show how to actually instruct an agent.** One or two worked examples of starting a project with the kit. Whoever forks this already knows how to use an agent. What they do not know is what to type on the first turn | `README.md`, and `formwork/first-run.md` |
+| The repository has no About text, no website and no topics on GitHub | not a file. A setting on the repository page |
+
+## Owed from the style page
+
+| What | Where it lands |
+|---|---|
+| `formwork/style.md` exists and every generated role points at it | `README.md` names it in the map but does not say what it is for. `formwork/loop.md` says nothing about how a report is written |
+| `docs/style.md` beats the kit default, and the kit only checks that the pointer exists, never that the style is followed | `FAQ.md`. Somebody will ask why the agent ignored their style file |
+| `style-pointed` is the twelfth check | `formwork/glossary.md` counts them, `docs/design.md` and `docs/gap-map.md` are history and stay as written |
+
+## Owed from setup
+
+| What | Where it lands |
+|---|---|
+| `formwork setup` exists, asks five questions, and writes `docs/style.md` and `docs/standing.md` | `README.md` and `formwork/first-run.md` still send people straight from install to check |
+| **Nobody outside has run setup.** NOT ESTABLISHED | `formwork/limits.md` |
+
 ## Small things owed
 
 | What | Where |

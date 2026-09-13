@@ -1,0 +1,603 @@
+#!/usr/bin/env python3
+"""Ask what the kit cannot work out on its own, then write it down.
+
+    formwork/setup                 ask, then write
+    formwork/setup --dry-run       ask, then say what it would write
+    formwork/setup --defaults      do not ask. Take the default for everything
+
+Run this once, after `formwork install`.
+
+WHAT IT ASKS ABOUT
+
+    you          how long you want replies, in which language, how much you
+                 already know, and anything you never want to see again
+    the project  what it is, where it is now, what is next
+    strength     how hard the guards bite, and how many times the turn-end
+                 gate refuses before it stands aside
+    folders      whether to start docs/decisions, docs/briefs, docs/reports
+
+Every question has a default and enter takes it. Nothing here is required.
+
+WHAT IT WRITES
+
+    docs/style.md        how you want the agents to talk to you
+    docs/standing.md     where the project is, for the director to read
+    docs/*/README.md     one line each, so the folders exist and are explained
+    .formwork.toml       the [strength] values, only where you asked
+
+WHAT IT WILL NOT DO
+
+It never overwrites a file you already have. If `docs/style.md` exists, it says
+so and leaves it alone. Your words are worth more than its defaults.
+
+It never touches `[bindings]`. That is what `formwork/install` worked out by
+looking at your project, and a question here would only let you get it wrong.
+
+It shows you everything it is about to do, and asks, before writing anything.
+
+Exit status:
+    0   everything written, or it was already there, or you said no
+    1   something could not be written, and the reason is named
+    2   it could not run
+"""
+import datetime
+import os
+import re
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+PROJECT = os.path.dirname(HERE)
+CONFIG = os.path.join(PROJECT, ".formwork.toml")
+DOCS = os.path.join(PROJECT, "docs")
+STYLE = os.path.join(DOCS, "style.md")
+STANDING = os.path.join(DOCS, "standing.md")
+TEMPLATE = os.path.join(HERE, "templates", "standing.md")
+
+
+# ---------------------------------------------------------------- appearance
+#
+# Colour and box characters only where they will land on a terminal that
+# wants them. A pipe, a log file, or an agent reading this gets plain text,
+# because escape codes in a captured transcript are noise nobody asked for.
+
+WIDTH = 74
+
+
+def _colour_wanted():
+    if os.environ.get("NO_COLOR"):
+        return False
+    if os.environ.get("TERM", "") in ("", "dumb"):
+        return False
+    return sys.stdout.isatty()
+
+
+def _can_draw():
+    try:
+        "┌─".encode(sys.stdout.encoding or "utf-8")
+        return True
+    except (UnicodeEncodeError, LookupError):
+        return False
+
+
+COLOUR = _colour_wanted()
+DRAW = _can_draw()
+H = "─" if DRAW else "-"
+TL, TR, BL, BR = ("┌", "┐", "└", "┘") if DRAW \
+    else ("+", "+", "+", "+")
+V = "│" if DRAW else "|"
+TICK = "✓" if DRAW else "+"
+KEEP = "·" if DRAW else "."
+
+
+def paint(text, code):
+    return "\033[%sm%s\033[0m" % (code, text) if COLOUR else text
+
+
+def bold(t):
+    return paint(t, "1")
+
+
+def dim(t):
+    return paint(t, "2")
+
+
+def accent(t):
+    return paint(t, "36")
+
+
+def good(t):
+    return paint(t, "32")
+
+
+def alert(t):
+    return paint(t, "33")
+
+
+def wrap(text, width):
+    words, lines, line = text.split(), [], ""
+    for w in words:
+        if line and len(line) + 1 + len(w) > width:
+            lines.append(line)
+            line = w
+        else:
+            line = (line + " " + w).strip()
+    if line:
+        lines.append(line)
+    return lines or [""]
+
+
+def row(plain, painted=None):
+    """One line inside a box, padded by the width of the plain text."""
+    pad = max(0, WIDTH - 4 - len(plain))
+    return "%s %s%s %s" % (accent(V), painted or plain, " " * pad, accent(V))
+
+
+def box(title, lines):
+    print("")
+    print(accent(TL + H * (WIDTH - 2) + TR))
+    print(row(title, bold(title)))
+    if lines:
+        print(row(""))
+    for plain, painted in lines:
+        print(row(plain, painted))
+    print(accent(BL + H * (WIDTH - 2) + BR))
+
+
+def section(name):
+    print("")
+    print("  %s %s %s" % (accent(H + H), bold(name.upper()),
+                          accent(H * max(0, WIDTH - 9 - len(name)))))
+
+
+# ------------------------------------------------------------------ answers
+
+LENGTHS = {
+    "1": ("short", "**Short.** Answer first. Three lines where three lines "
+                   "will do. I will ask when I want more."),
+    "2": ("normal", "**Normal length.** Enough to follow what happened, "
+                    "without the working."),
+    "3": ("full", "**Tell me everything.** I would rather read too much than "
+                  "find out later. Show the commands and their output."),
+}
+KNOWING = {
+    "1": ("new to this", "**I am new to coding agents.** Say what a thing is "
+                         "the first time you use the word. Do not assume I "
+                         "know what a hook or a runtime is."),
+    "2": ("used them before", "**I have used coding agents before.** Explain "
+                              "the parts that are particular to this kit, not "
+                              "the ordinary ones."),
+    "3": ("know them well", "**I know this area well.** No explaining. Give "
+                            "me the change, the reason, and what it costs."),
+}
+STRENGTHS = {"1": "block", "2": "warn", "3": "off"}
+STRENGTH_KEYS = ("git_boundary", "protect_files", "aggregate_gate")
+
+FOLDERS = [
+    ("decisions", "One file per decision, numbered in the order you accepted "
+                  "them.\nOnly you write these. See "
+                  "`formwork/templates/decision.md`."),
+    ("briefs", "One file per piece of work asked for, numbered.\n`status` is "
+               "open, done or dropped. See `formwork/templates/brief.md`."),
+    ("reports", "One file per piece of work finished, carrying the same "
+                "number\nas its brief. See `formwork/templates/report.md`."),
+]
+
+FENCE = re.compile(r"```markdown\n(.*?)```", re.S)
+
+
+# -------------------------------------------------------------- the asking
+
+def read_answer():
+    """One line typed by a person, or None if nobody is there any more."""
+    try:
+        got = input("      %s " % accent(">")).strip()
+    except (EOFError, KeyboardInterrupt):
+        print("")
+        return None
+    return got
+
+
+class Asker(object):
+    """Asks the questions and counts them, so each one says where you are."""
+
+    def __init__(self, total):
+        self.total = total
+        self.n = 0
+
+    def _head(self, question, why):
+        self.n += 1
+        print("")
+        # Right aligned, so question ten does not shove the question along by
+        # one character and make the whole column look bent.
+        counter = "%s of %d" % (str(self.n).rjust(len(str(self.total))),
+                                self.total)
+        print("  %s  %s" % (dim(counter), bold(question)))
+        for line in wrap(why, WIDTH - 12):
+            print("            %s" % dim(line))
+        print("")
+
+    def choice(self, question, why, options, default):
+        self._head(question, why)
+        for key in sorted(options):
+            mark = dim("   (default)") if key == default else ""
+            print("      %s  %s%s" % (accent(key), options[key], mark))
+        for _ in range(3):
+            got = self._read()
+            if got is None or not got:
+                return default
+            if got in options:
+                return got
+            print("      %s" % dim("A number, or enter for the default."))
+        return default
+
+    def text(self, question, why, hint="enter to skip"):
+        self._head(question, why)
+        print("      %s" % dim("(%s)" % hint))
+        got = self._read()
+        return " ".join(got.split()) if got else ""
+
+    def number(self, question, why, default, low, high):
+        self._head(question, why)
+        print("      %s" % dim("a number between %d and %d, enter for %d"
+                               % (low, high, default)))
+        for _ in range(3):
+            got = self._read()
+            if got is None or not got:
+                return default
+            try:
+                n = int(got)
+            except ValueError:
+                print("      %s" % dim("A whole number."))
+                continue
+            if low <= n <= high:
+                return n
+            print("      %s" % dim("Between %d and %d." % (low, high)))
+        return default
+
+    def _read(self):
+        return read_answer()
+
+
+# -------------------------------------------------------------- what we write
+
+def style_page(a):
+    out = ["# How to talk to me", "",
+           "Written by `formwork/setup`. Change it whenever you like. It is "
+           "yours, and it beats", "`formwork/style.md` wherever the two "
+           "disagree.", ""]
+    out += [LENGTHS[a["length"]][1], ""]
+    out += [KNOWING[a["knowing"]][1], ""]
+    language = a["language"]
+    if language and language.lower() not in ("english", "en"):
+        out += ["**Write to me in %s.** Leave code, file paths and commands as "
+                "they are." % language, ""]
+    else:
+        out += ["**Plain simple English.** Simple words, short sentences. "
+                "Assume the reader is", "working in their second language.",
+                ""]
+    if a["never"]:
+        out += ["**Never do this:** %s" % a["never"], ""]
+    out += ["**Say what changed and what happens next.** Those two are what I "
+            "am reading for.", "",
+            "**Ask me one thing at a time.**", ""]
+    return "\n".join(out)
+
+
+def replace_section(text, heading, body):
+    """Put one line under a heading, in place of whatever the template said."""
+    pattern = re.compile(r"(^## %s\n)(.*?)(?=^## |\Z)"
+                         % re.escape(heading), re.S | re.M)
+    if not pattern.search(text):
+        return text
+    return pattern.sub(lambda m: "%s\n%s\n\n" % (m.group(1), body), text)
+
+
+def standing_page(a):
+    """The example inside the template, seeded with whatever was answered.
+
+    Copying the whole template gave a docs/standing.md that was a page about
+    standing briefs rather than a standing brief, and the check passed it,
+    because everything it looks for was there inside the fence.
+    """
+    try:
+        raw = open(TEMPLATE, encoding="utf-8").read()
+    except OSError:
+        return None
+    m = FENCE.search(raw)
+    if not m:
+        return None
+    body = m.group(1)
+    body = re.sub(r"^updated:.*$", "updated: %s"
+                  % datetime.date.today().isoformat(), body, count=1,
+                  flags=re.M)
+    body = re.sub(r"^by:.*$", "by: formwork setup", body, count=1, flags=re.M)
+    if a["building"]:
+        body = replace_section(body, "What we are building", a["building"])
+    if a["now"]:
+        body = replace_section(body, "Where we are now", a["now"])
+    if a["next"]:
+        body = replace_section(body, "What is next", "- %s" % a["next"])
+    return body
+
+
+def set_strength(text, value, budget):
+    """Set the [strength] values, leaving every other line alone.
+
+    A new key goes in right after the last key already in the section. Adding
+    it at the end of the section put it below the block of comments that
+    closes the file, where it is valid TOML and reads like a mistake.
+    """
+    out, changed = [], 0
+    in_strength = False
+    seen_budget = False
+    last_key_line = None
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("["):
+            in_strength = stripped == "[strength]"
+        key = stripped.split("=")[0].strip() if "=" in stripped else ""
+        is_key = bool(key) and not stripped.startswith("#")
+        if is_key and key in STRENGTH_KEYS and value:
+            tail = ""
+            if "#" in line:
+                tail = "   # " + line.split("#", 1)[1].strip()
+            out.append('%s = "%s"%s' % (key, value, tail))
+            changed += 1
+        elif is_key and key == "gate_budget":
+            seen_budget = True
+            if budget is not None:
+                out.append("gate_budget = %d" % budget)
+                changed += 1
+            else:
+                out.append(line)
+        else:
+            out.append(line)
+        if in_strength and is_key:
+            last_key_line = len(out) - 1
+    if budget is not None and not seen_budget and last_key_line is not None:
+        out.insert(last_key_line + 1, "gate_budget = %d" % budget)
+        changed += 1
+    return "\n".join(out) + ("\n" if text.endswith("\n") else ""), changed
+
+
+class Plan(object):
+    """Everything that would be written, decided before anything is."""
+
+    def __init__(self):
+        self.files = []
+        self.config = None
+        self.already = []
+        self.refused = []
+
+    def add(self, path, text):
+        if text is None:
+            return
+        if os.path.exists(path):
+            self.already.append(os.path.relpath(path, PROJECT))
+            return
+        self.files.append((path, text))
+
+    def empty(self):
+        return not self.files and not self.config
+
+    def show(self):
+        lines = []
+        for path, _ in self.files:
+            rel = os.path.relpath(path, PROJECT)
+            lines.append(("%s  write   %s" % (TICK, rel),
+                          "%s  %s   %s" % (good(TICK), dim("write"), rel)))
+        if self.config:
+            what = "%s  write   .formwork.toml, %d value(s)" % (TICK,
+                                                                self.config[1])
+            lines.append((what, what.replace(TICK, good(TICK), 1)))
+        for rel in self.already:
+            lines.append(("%s  keep    %s, which you already have"
+                          % (KEEP, rel),
+                          "%s  %s    %s" % (dim(KEEP), dim("keep"),
+                                            dim("%s, which you already have"
+                                                % rel))))
+        if self.empty() and not self.already:
+            lines.append(("nothing to write", dim("nothing to write")))
+        box("This is everything it would do", lines)
+
+    def apply(self, wrote):
+        for path, text in self.files:
+            try:
+                if os.path.dirname(path):
+                    os.makedirs(os.path.dirname(path), exist_ok=True)
+                with open(path, "w", encoding="utf-8") as f:
+                    f.write(text)
+            except OSError as e:
+                self.refused.append("could not write %s: %s"
+                                    % (os.path.relpath(path, PROJECT), e))
+            else:
+                wrote.append(os.path.relpath(path, PROJECT))
+        if self.config:
+            try:
+                with open(CONFIG, "w", encoding="utf-8") as f:
+                    f.write(self.config[0])
+            except OSError as e:
+                self.refused.append("could not write .formwork.toml: %s" % e)
+            else:
+                wrote.append(".formwork.toml")
+
+
+# ------------------------------------------------------------ the interview
+
+TOTAL = 11
+
+
+def interview():
+    box("Formwork setup",
+        [("Eleven questions, once. Enter takes the default every time.",
+          dim("Eleven questions, once. Enter takes the default every time.")),
+         ("Nothing is required, and nothing you say leaves this machine.",
+          dim("Nothing is required, and nothing you say leaves this "
+              "machine."))])
+    q = Asker(TOTAL)
+    a = {}
+
+    section("you")
+    a["length"] = q.choice(
+        "How long should replies be?",
+        "How much comes back after a piece of work. You can change this any "
+        "day by editing one file.",
+        {k: v[0] for k, v in LENGTHS.items()}, "1")
+    a["knowing"] = q.choice(
+        "How much do you already know about coding agents?",
+        "This sets how much gets explained to you. There is no right answer "
+        "and nothing is judged by it.",
+        {k: v[0] for k, v in KNOWING.items()}, "2")
+    a["language"] = q.text(
+        "Which language should replies be written in?",
+        "Code, file paths and commands stay as they are. Only the writing "
+        "around them changes.")
+    a["never"] = q.text(
+        "Anything you never want to see?",
+        "One thing that annoys you. Long apologies, emoji, being told what "
+        "it is about to do instead of what it did.")
+
+    section("the project")
+    a["building"] = q.text(
+        "What are you building?",
+        "One line a stranger could read and know what this is. This goes in "
+        "the standing brief, which every new conversation reads first.")
+    a["now"] = q.text(
+        "Where is it now?",
+        "What works, what is half done, what is broken and known. This is the "
+        "line that goes stale fastest, and it is meant to be rewritten often.")
+    a["next"] = q.text(
+        "What is the next thing?",
+        "One or two things, not a backlog. A long list here means the "
+        "thinking has not been done yet.")
+
+    section("how hard it bites")
+    a["strength"] = q.choice(
+        "The guards refuse things. How hard?",
+        "They stop your agent writing to version control, and stop it "
+        "quietly changing the kit's own files. Block refuses outright. Warn "
+        "lets it through and tells you.",
+        {"1": "block, they refuse",
+         "2": "warn, they let it through and tell you",
+         "3": "off, nothing is stopped"}, "1")
+    a["budget"] = q.number(
+        "How many refusals before the turn-end gate stands aside?",
+        "A red gate stops a turn from ending. After this many refusals in one "
+        "session it steps aside and says so loudly, so a genuinely stuck turn "
+        "is not trapped for ever.",
+        3, 1, 99)
+
+    section("folders")
+    a["folders"] = q.choice(
+        "Start docs/decisions, docs/briefs and docs/reports?",
+        "Three folders with a line of explanation each: decisions you "
+        "accepted, work you asked for, work that came back. Empty until you "
+        "use them.",
+        {"1": "yes", "2": "no"}, "1")
+    a["standing"] = q.choice(
+        "Start docs/standing.md?",
+        "One short file saying where the project is. A new conversation reads "
+        "it instead of being told the whole story again.",
+        {"1": "yes", "2": "no"}, "1")
+    return a
+
+
+def defaults():
+    return {"length": "1", "knowing": "2", "language": "", "never": "",
+            "building": "", "now": "", "next": "", "strength": "1",
+            "budget": 3, "folders": "1", "standing": "1"}
+
+
+def main(argv):
+    dry = "--dry-run" in argv
+    quiet = "--defaults" in argv
+    if not quiet and not sys.stdin.isatty():
+        print("ERROR: setup asks questions, and nothing is typing here.",
+              file=sys.stderr)
+        print("       Run it in a terminal, or use --defaults.",
+              file=sys.stderr)
+        return 2
+
+    a = defaults() if quiet else interview()
+
+    plan = Plan()
+    plan.add(STYLE, style_page(a))
+    if a["standing"] == "1":
+        page = standing_page(a)
+        if page is None:
+            plan.refused.append("the standing template has no example in it, "
+                                "so there is nothing to copy")
+        else:
+            plan.add(STANDING, page)
+    if a["folders"] == "1":
+        for name, what in FOLDERS:
+            plan.add(os.path.join(DOCS, name, "README.md"),
+                     "# %s\n\n%s\n" % (name, what))
+
+    value = STRENGTHS[a["strength"]]
+    want_value = value if value != "block" else None
+    want_budget = a["budget"] if a["budget"] != 3 else None
+    if want_value or want_budget:
+        if not os.path.isfile(CONFIG):
+            plan.refused.append("there is no .formwork.toml yet. Run "
+                                "`formwork install` first")
+        else:
+            try:
+                old = open(CONFIG, encoding="utf-8").read()
+            except OSError as e:
+                plan.refused.append("could not read the configuration: %s" % e)
+            else:
+                new, n = set_strength(old, want_value, want_budget)
+                if n:
+                    plan.config = (new, n)
+                else:
+                    plan.refused.append("the configuration has no [strength] "
+                                        "section to change")
+
+    plan.show()
+
+    if dry:
+        print("")
+        print("  %s" % dim("--dry-run, so nothing was written."))
+        print("")
+        return 1 if plan.refused else 0
+
+    if not quiet and not plan.empty():
+        print("")
+        print("  %s" % bold("Write it?"))
+        print("")
+        print("      %s  yes%s" % (accent("1"), dim("   (default)")))
+        print("      %s  no, change nothing" % accent("2"))
+        got = read_answer()
+        if got == "2":
+            print("")
+            print("  %s" % alert("Nothing was written."))
+            print("")
+            return 0
+
+    wrote = []
+    plan.apply(wrote)
+
+    lines = [("%s  %s" % (TICK, rel), "%s  %s" % (good(TICK), rel))
+             for rel in wrote]
+    for line in plan.refused:
+        lines.append(("!  REFUSED: %s" % line,
+                      "%s  %s" % (alert("!"), alert("REFUSED: " + line))))
+    if not lines:
+        lines = [("nothing needed writing", dim("nothing needed writing"))]
+    box("Done", lines)
+
+    print("")
+    if value != "block":
+        for line in wrap("The guards are on %s. That is your call, and it is "
+                         "written down where anybody can read it." % value,
+                         WIDTH - 4):
+            print("  %s" % alert(line))
+        print("")
+    print("  %s  %s" % (bold("Next"), "formwork check"))
+    print("")
+    return 1 if plan.refused else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

@@ -3,6 +3,7 @@
 
     formwork/fw                 what you can do
     formwork/fw install         set this project up
+    formwork/fw setup           answer a few questions, write what they imply
     formwork/fw check           run every check
     formwork/fw demo            watch every check refuse a broken input
     formwork/fw roles           rebuild the role files after editing one
@@ -32,6 +33,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 COMMANDS = [
     ("install", "set this project up. Add --runtime <name> to pick your agent"),
+    ("setup",   "answer a few questions, and write the files nobody knows to write"),
     ("check",   "run every check on this project"),
     ("demo",    "watch every check refuse a broken input"),
     ("roles",   "rebuild the role files after editing one"),
@@ -45,6 +47,7 @@ TESTS = [
     os.path.join("guard", "test_quality_gate.py"),
     os.path.join("check", "test_gate.py"),
     "test_install.py",
+    "test_setup.py",
 ]
 
 
@@ -100,6 +103,8 @@ def main(argv):
     cmd, rest = argv[1], argv[2:]
     if cmd == "install":
         return run("install", rest)
+    if cmd == "setup":
+        return run("setup", rest)
     if cmd == "check":
         return run(os.path.join("check", "run"), rest)
     if cmd == "demo":
