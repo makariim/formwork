@@ -2,10 +2,8 @@
 
 **The challenger writes this before anybody proposes anything.**
 
-It is the file the whole round rests on. A prediction written after the answer
-is not a prediction, it is agreement.
-
-Save it as `docs/rounds/<name>/predictions.md`.
+Save it as `docs/rounds/<name>/predictions.md`. A check looks for it, and
+[`../round.md`](../round.md) says why the order matters.
 
 ---
 

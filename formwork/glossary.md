@@ -78,21 +78,16 @@ What the challenger expects to go wrong, written before anybody proposes anythin
 Written after the fact it is not a prediction, it is agreement.
 
 **Standing brief**
-One short file saying where the project is right now: what you are building,
-where you are, what is decided, what is open, what is next. It lives at
-`docs/standing.md` and a new conversation reads it instead of being told the
-story again. The template is in `formwork/templates/standing.md`.
+`docs/standing.md`. One short file saying where the project is right now, so a
+new conversation does not have to be told. What goes in it:
+`formwork/templates/standing.md`.
 
 **Director**
-The role that holds the whole picture across many conversations. It decides
-what happens next, writes the brief, reads the report, and keeps the standing
-brief true. One per project, one at a time. It never writes down a decision you
-did not make.
+The role that owns what happens next. One per project, one at a time.
 
 **Director thread** and **working session**
-The two layers. The director thread holds the plan and never builds anything.
-The working session does one piece of work in the repository and stops. You
-carry the text between them. See `formwork/threads.md`.
+The two layers: the one that plans and the one that builds. You carry the text
+between them. See `formwork/threads.md`.
 
 **Split brief**
 One piece of work that is too big for a single session, cut into pieces by
@@ -123,9 +118,9 @@ How hard a guard bites. Three settings: `block` refuses, `warn` lets it through
 and tells you, `off` does nothing. Set in `.formwork.toml`.
 
 **Refusal budget**
-The turn-end gate refuses a red gate three times in one session, then steps
-aside and says so loudly. Without this, a genuinely stuck turn would be stuck
-for ever.
+How many times the turn-end gate refuses before it steps aside. Three by
+default, set by `gate_budget`. `formwork/limits.md` says why it gives up at
+all.
 
 **Fingerprint**
 A short code worked out from the exact contents of a file. Change one character

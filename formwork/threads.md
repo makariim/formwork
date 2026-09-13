@@ -161,6 +161,36 @@ Anything that turns out to be a real decision gets its own record in
 
 ---
 
+## The same thing, as it actually looks
+
+Two windows. You are the only connection between them.
+
+**Window one, the director.** You paste the role file and your standing brief,
+then say what you want:
+
+> The login page takes four seconds. I want it fixed.
+
+It reads the standing brief, says back where it thinks you are, and writes a
+brief sized to the work. Not six headings for a one line job.
+
+**Window two, the working session**, in the repository:
+
+> Do brief 0007. Nothing else. Run `formwork check`, then report and stop.
+
+It works. The gate runs. It writes `docs/reports/0007-slow-login.md`, sets the
+brief to `status: done`, and stops.
+
+**Back to window one.** You paste the whole report, or say "0007 is done" if
+the director can read the folder itself.
+
+> Accepted. Nothing unasked, nothing skipped. Next is the printing bug.
+> I have updated the standing brief.
+
+That is one turn of the loop. Two sentences from you, two files on disk, and
+nothing started without you saying so.
+
+---
+
 ## When to start a new thread
 
 Start a new working session for each piece of work. They are cheap, and a fresh

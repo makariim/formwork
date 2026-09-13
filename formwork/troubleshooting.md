@@ -13,10 +13,16 @@ Find the message you saw. Every entry says what happened, why, and what to do.
 > formwork/fw record
 > ```
 >
-> **If you did install it and still get this**, pip put the command somewhere
-> your shell does not look. It says so in a warning when it installs. Add that
-> folder to your PATH, or use `pipx install formwork-kit` instead, which
-> handles this for you.
+> **If you did install it and still get this**, pip put the command in a folder
+> your shell does not search. You do not need to fix your PATH. This is the
+> same command, run through Python:
+>
+> ```
+> python3 -m formwork_cli check
+> ```
+>
+> To avoid it next time, install with `pipx install formwork-kit`, or into a
+> virtual environment.
 
 
 
@@ -63,7 +69,7 @@ point: a record kept beside the thing it describes protects nothing.
 **What to do.** Run the installer again. It takes the first record for you:
 
 ```
-formwork install --runtime claude-code
+formwork install
 ```
 
 ### `guard-wired: runtime 'X' is declared, but .../hooks.json does not exist`
@@ -180,10 +186,13 @@ a stuck turn is not stuck for ever.
 **What happened.** There is no `.claude`, `.codex`, `.cursor` or `.gemini`
 folder, so it cannot guess.
 
-**What to do.** Tell it:
+**What to do.** Tell it which one, using the name of your agent:
 
 ```
 formwork install --runtime claude-code
+formwork install --runtime codex
+formwork install --runtime cursor
+formwork install --runtime gemini-cli
 ```
 
 ### `more than one runtime is set up here`

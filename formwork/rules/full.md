@@ -455,13 +455,11 @@ yours.
 
 **Enforced** by `formwork/check/checks/standing-current`.
 
-One short file says what you are building, where you are now, what is decided,
-what is open and what is next. `docs/standing.md`. A new conversation reads it
-instead of being told the story again.
+The state a project is in between pieces of work belongs in `docs/standing.md`,
+updated before a conversation closes rather than afterwards. What goes in it is
+[`../templates/standing.md`](../templates/standing.md).
 
-It is updated before a planning conversation is closed, not afterwards. The
-check goes red when a decision record or a round record carries a later date
-than the standing brief.
+The check compares its date against your newest decision and round.
 
 **Catches:** the plan living in one chat window, which means it ends when the
 window does, and the next conversation starts from somebody's memory.
@@ -509,6 +507,6 @@ one person.
 
 What goes back up is the entire report, not somebody's account of it.
 
-**Catches:** a summary dropping exactly the three lines that matter — what was
-done unasked, what was skipped, and what the brief got wrong. Those are the
-first things a summariser cuts.
+**Catches:** a summary that keeps the routine part and drops the three lines a
+report exists for. Those are the first things anybody shortening it cuts,
+because they read like exceptions rather than results.

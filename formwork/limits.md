@@ -131,6 +131,43 @@ wrong assumption shows up as a refusal rather than as silent permission.
 
 ---
 
+## Four things nobody has run
+
+Written, tested where a program can test them, used by nobody.
+
+| | |
+|---|---|
+| **The director role** | the upper layer that holds the plan. It has never held a real project |
+| **A split brief** | `lead` cutting one brief into pieces and joining the reports back. Never done once |
+| **The folder route** | briefs and reports as numbered files, rather than pasted into a chat |
+| **`formwork setup`** | its tests pass. No stranger has answered the questions |
+
+**NOT ESTABLISHED** for all four. They are shapes that work when a check is
+pointed at them, which is a much smaller claim than working.
+
+---
+
+## A guard that refuses ordinary writing
+
+The version-control boundary reads a command line. When text is being fed into
+a program that could run it, the guard cannot tell writing *about* a command
+from running one.
+
+So writing documentation that contains a version-control command, through a
+shell, is refused. The self-protection guard does the same: text containing the
+words that would re-record the fingerprints is refused, whether or not anything
+would run.
+
+Both happened while writing this kit's own pages.
+
+**There is no fix inside the pattern.** The guard would have to understand
+where a string ends and a command begins, which is the same problem as being
+safe against somebody hiding one inside the other. The way through is to write
+the file with an editor rather than a shell. That is a different tool, not a
+way around the guard.
+
+---
+
 ## The honest summary
 
 This kit will stop an agent doing the wrong thing by habit. **It will not stop
