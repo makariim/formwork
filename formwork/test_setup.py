@@ -221,6 +221,133 @@ subprocess.run([sys.executable, "-c", script], capture_output=True, text=True,
 check("wrote no style file", read(p, "docs/style.md"), None)
 check("and left the configuration alone", read(p, ".formwork.toml"), CONFIG)
 
+print("The promises an audit broke")
+# Each of these is a defect that shipped. The suite above passed while every
+# one of them was true, which is why they are written out one by one.
+import importlib.util                                          # noqa: E402
+from importlib.machinery import SourceFileLoader                # noqa: E402
+
+# The program has no .py ending, so it needs the loader named explicitly.
+_spec = importlib.util.spec_from_loader("fwsetup",
+                                        SourceFileLoader("fwsetup", SETUP))
+S = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(S)
+
+print("  it never touches [bindings]")
+stray = ('[bindings]\nruntime = "claude-code"\ngit_boundary = "block"\n'
+         'gate_budget = 42\n\n[strength]\ngit_boundary = "block"\n'
+         'protect_files = "block"\n')
+new, _n = S.set_strength(stray, "warn", 7)
+head = new.split("[strength]")[0]
+check("a lookalike key in [bindings] is left alone",
+      'git_boundary = "block"' in head and "gate_budget = 42" in head, True,
+      new)
+check("and the budget still reaches [strength]",
+      "gate_budget = 7" in new.split("[strength]")[1], True, new)
+
+print("  it never writes a file that is not TOML any more")
+arr = ('[bindings]\nruntime = "c"\n\n[strength]\ngit_boundary = "block"\n'
+       'exempt = [\n  "docs/keep.md",\n]\n')
+new, _n = S.set_strength(arr, "block", 5)
+check("a new key does not land inside a multi-line array",
+      new.index("gate_budget") < new.index("exempt = ["), True, new)
+three = ('[bindings]\nnote = """\ngit_boundary = "off"\n"""\n\n[strength]\n'
+         'git_boundary = "block"\n')
+new, _n = S.set_strength(three, "warn", None)
+check("a lookalike inside a quoted string is left alone",
+      'git_boundary = "off"' in new, True, new)
+
+print("  it does not rewrite the whole file's line endings")
+crlf = '[bindings]\r\nruntime = "x"\r\n\r\n[strength]\r\ngit_boundary = "block"\r\n'
+new, _n = S.set_strength(crlf, "warn", None)
+check("CRLF survives", new.count("\r\n"), crlf.count("\r\n"), repr(new))
+
+print("  an answer cannot become structure")
+check("a heading typed as an answer is not a heading",
+      S.clean("## What is next"), "What is next")
+check("control characters are dropped",
+      S.clean("\x1b[2Jred\x07"), "[2Jred")
+check("newlines collapse", S.clean("a\nb"), "a b")
+
+print("Cancelling means no, everywhere")
+# Ctrl-D at the confirm prompt. Ctrl-C lands in the same except clause, one
+# line away, but driving a signal through a pseudo-terminal is flaky enough
+# that the suite would hang rather than fail, and a test that can hang is
+# worse than no test.
+p = project(config=CONFIG)
+script = (
+    "import os, pty, signal, sys\n"
+    "signal.alarm(30)\n"
+    "pid, fd = pty.fork()\n"
+    "if pid == 0:\n"
+    "    os.chdir(%r)\n"
+    "    os.execv(sys.executable, [sys.executable, %r])\n"
+    "os.write(fd, b'\\n'*11)\n"
+    "import time; time.sleep(1)\n"
+    "os.write(fd, b'\\x04')\n"           # end of input at 'Write it?'
+    "try:\n"
+    "    while os.read(fd, 4096): pass\n"
+    "except OSError:\n"
+    "    pass\n"
+    % (p, os.path.join(p, "formwork", "setup")))
+subprocess.run([sys.executable, "-c", script], capture_output=True, text=True,
+               timeout=60)
+check("end of input at 'Write it?' writes nothing",
+      read(p, "docs/style.md"), None)
+check("and leaves the configuration alone", read(p, ".formwork.toml"), CONFIG)
+
+print("Anything that is not yes is no")
+p = project(config=CONFIG)
+script = (
+    "import os, pty, signal, sys\n"
+    "signal.alarm(30)\n"
+    "pid, fd = pty.fork()\n"
+    "if pid == 0:\n"
+    "    os.chdir(%r)\n"
+    "    os.execv(sys.executable, [sys.executable, %r])\n"
+    "os.write(fd, b'\\n'*11 + b'no\\n')\n"
+    "try:\n"
+    "    while os.read(fd, 4096): pass\n"
+    "except OSError:\n"
+    "    pass\n"
+    % (p, os.path.join(p, "formwork", "setup")))
+subprocess.run([sys.executable, "-c", script], capture_output=True, text=True,
+               timeout=60)
+check("typing 'no' writes nothing", read(p, "docs/style.md"), None)
+
+print("A file that appears while you are answering is not overwritten")
+p = project(config=CONFIG)
+script = (
+    "import os, pty, sys, time\n"
+    "pid, fd = pty.fork()\n"
+    "if pid == 0:\n"
+    "    os.chdir(%r)\n"
+    "    os.execv(sys.executable, [sys.executable, %r])\n"
+    "os.write(fd, b'\\n'*11)\n"
+    "time.sleep(1)\n"
+    "os.makedirs(%r, exist_ok=True)\n"
+    "open(%r, 'w').write('MINE, WRITTEN WHILE IT WAS ASKING\\n')\n"
+    "os.write(fd, b'\\n')\n"
+    "try:\n"
+    "    while os.read(fd, 4096): pass\n"
+    "except OSError:\n"
+    "    pass\n"
+    % (p, os.path.join(p, "formwork", "setup"),
+       os.path.join(p, "docs"), os.path.join(p, "docs", "style.md")))
+subprocess.run([sys.executable, "-c", script], capture_output=True, text=True,
+               timeout=90)
+check("the file written during the questions survives",
+      read(p, "docs/style.md"), "MINE, WRITTEN WHILE IT WAS ASKING\n")
+
+print("A dangling symlink is a file somebody put there")
+p = project(config=CONFIG)
+outside = os.path.join(tempfile.mkdtemp(prefix="fw-outside-"), "secret.md")
+os.makedirs(os.path.join(p, "docs"), exist_ok=True)
+os.symlink(outside, os.path.join(p, "docs", "style.md"))
+code, out = setup(p, "--defaults")
+check("nothing is written through it", os.path.exists(outside), False, out)
+check("and it is reported as kept", "you already have" in out, True, out)
+
 print("")
 print("%d passed, %d failed" % (results.count(True), results.count(False)))
 sys.exit(1 if False in results else 0)

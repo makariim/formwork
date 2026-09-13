@@ -187,14 +187,38 @@ FENCE = re.compile(r"```markdown\n(.*?)```", re.S)
 
 # -------------------------------------------------------------- the asking
 
+class Cancelled(Exception):
+    """Ctrl-C, Ctrl-D, or the terminal going away."""
+
+
+# Control characters, and the markdown characters that would turn an answer
+# into structure. An audit typed "## What is next" as the answer to "what are
+# you building", and it became a real heading: the standing brief then had two
+# of that section, the answer landed under the wrong one, and the check that
+# reads the file failed on what setup itself had just written.
+CONTROL = re.compile(r"[\x00-\x08\x0b-\x1f\x7f]")
+
+
+def clean(answer):
+    """One line of somebody's own words, and nothing that changes the file."""
+    if not answer:
+        return ""
+    answer = CONTROL.sub("", answer)
+    answer = " ".join(answer.split())
+    return answer.lstrip("#>-*+ ").strip()
+
+
+# Everything a person can type that is not a plain answer. An audit found that
+# Ctrl-C at the final "Write it?" prompt was read as yes, because the reader
+# returned None and only the literal "2" stopped anything. The gesture
+# everybody uses to escape meant go ahead.
 def read_answer():
-    """One line typed by a person, or None if nobody is there any more."""
+    """One line typed by a person. Raises Cancelled if nobody is there."""
     try:
-        got = input("      %s " % accent(">")).strip()
+        return input("      %s " % accent(">")).strip()
     except (EOFError, KeyboardInterrupt):
         print("")
-        return None
-    return got
+        raise Cancelled()
 
 
 class Asker(object):
@@ -223,7 +247,7 @@ class Asker(object):
             print("      %s  %s%s" % (accent(key), options[key], mark))
         for _ in range(3):
             got = self._read()
-            if got is None or not got:
+            if not got:
                 return default
             if got in options:
                 return got
@@ -233,8 +257,7 @@ class Asker(object):
     def text(self, question, why, hint="enter to skip"):
         self._head(question, why)
         print("      %s" % dim("(%s)" % hint))
-        got = self._read()
-        return " ".join(got.split()) if got else ""
+        return clean(self._read())
 
     def number(self, question, why, default, low, high):
         self._head(question, why)
@@ -242,7 +265,7 @@ class Asker(object):
                                % (low, high, default)))
         for _ in range(3):
             got = self._read()
-            if got is None or not got:
+            if not got:
                 return default
             try:
                 n = int(got)
@@ -326,24 +349,48 @@ def set_strength(text, value, budget):
     A new key goes in right after the last key already in the section. Adding
     it at the end of the section put it below the block of comments that
     closes the file, where it is valid TOML and reads like a mistake.
-    """
+
+    An audit broke all three of those sentences. The section was never
+    checked, so a `git_boundary` sitting in `[bindings]`, or inside a quoted
+    string, was rewritten too, and the header promises that section is never
+    touched. The value the person asked for then went missing, because the
+    stray key counted as the one already there. And "the last key" counted the
+    opening line of a multi-line array, so the new key landed inside the array
+    and the file stopped being TOML at all.
+
+    So: only inside `[strength]`, only at the top level of the file, and never
+    while a value is still open across lines.
+    """  # noqa
     out, changed = [], 0
     in_strength = False
     seen_budget = False
     last_key_line = None
+    open_value = None          # what is still to close: "]" or the quote used
     for line in text.splitlines():
         stripped = line.strip()
+
+        if open_value is not None:
+            # Inside a value that spans lines. Nothing here is a key, whatever
+            # it looks like.
+            out.append(line)
+            if open_value in stripped:
+                open_value = None
+            continue
+
         if stripped.startswith("["):
             in_strength = stripped == "[strength]"
+
         key = stripped.split("=")[0].strip() if "=" in stripped else ""
-        is_key = bool(key) and not stripped.startswith("#")
-        if is_key and key in STRENGTH_KEYS and value:
+        is_key = bool(key) and not stripped.startswith("#") and " " not in key
+        rhs = stripped.split("=", 1)[1].strip() if is_key else ""
+
+        if is_key and in_strength and key in STRENGTH_KEYS and value:
             tail = ""
             if "#" in line:
                 tail = "   # " + line.split("#", 1)[1].strip()
             out.append('%s = "%s"%s' % (key, value, tail))
             changed += 1
-        elif is_key and key == "gate_budget":
+        elif is_key and in_strength and key == "gate_budget":
             seen_budget = True
             if budget is not None:
                 out.append("gate_budget = %d" % budget)
@@ -352,12 +399,24 @@ def set_strength(text, value, budget):
                 out.append(line)
         else:
             out.append(line)
-        if in_strength and is_key:
+
+        if is_key:
+            for opener, closer in (("[", "]"), ('"""', '"""'), ("'''", "'''")):
+                if rhs.startswith(opener) and not rhs[len(opener):].endswith(closer):
+                    open_value = closer
+                    break
+        if in_strength and is_key and open_value is None:
             last_key_line = len(out) - 1
+
     if budget is not None and not seen_budget and last_key_line is not None:
         out.insert(last_key_line + 1, "gate_budget = %d" % budget)
         changed += 1
-    return "\n".join(out) + ("\n" if text.endswith("\n") else ""), changed
+
+    # Whatever line ending the file already used. Rewriting a whole file from
+    # CRLF to LF turns two intended edits into a diff of every line.
+    ending = "\r\n" if "\r\n" in text else "\n"
+    body = ending.join(l.rstrip("\r") for l in out)
+    return body + (ending if text.endswith(("\n", "\r")) else ""), changed
 
 
 class Plan(object):
@@ -372,7 +431,9 @@ class Plan(object):
     def add(self, path, text):
         if text is None:
             return
-        if os.path.exists(path):
+        # lexists, not exists: a symlink pointing at nothing is still a file
+        # somebody put there, and following it would write outside the project.
+        if os.path.lexists(path):
             self.already.append(os.path.relpath(path, PROJECT))
             return
         self.files.append((path, text))
@@ -396,22 +457,36 @@ class Plan(object):
                           "%s  %s    %s" % (dim(KEEP), dim("keep"),
                                             dim("%s, which you already have"
                                                 % rel))))
-        if self.empty() and not self.already:
+        for why in self.refused:
+            lines.append(("!  cannot   %s" % why,
+                          "%s  %s   %s" % (alert("!"), dim("cannot"),
+                                           alert(why))))
+        if self.empty() and not self.already and not self.refused:
             lines.append(("nothing to write", dim("nothing to write")))
         box("This is everything it would do", lines)
 
     def apply(self, wrote):
         for path, text in self.files:
+            rel = os.path.relpath(path, PROJECT)
             try:
                 if os.path.dirname(path):
                     os.makedirs(os.path.dirname(path), exist_ok=True)
-                with open(path, "w", encoding="utf-8") as f:
+                # O_EXCL, not open(path, "w"). The plan is made before the
+                # questions and written after them, and in that gap somebody
+                # can create the file. An audit did exactly that and watched
+                # their work replaced. O_EXCL also refuses to follow a broken
+                # symlink, which was a way to write outside the project while
+                # the plan said docs/style.md.
+                fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
+                with os.fdopen(fd, "w", encoding="utf-8") as f:
                     f.write(text)
+            except FileExistsError:
+                self.already.append("%s, which appeared while you were "
+                                    "answering" % rel)
             except OSError as e:
-                self.refused.append("could not write %s: %s"
-                                    % (os.path.relpath(path, PROJECT), e))
+                self.refused.append("could not write %s: %s" % (rel, e))
             else:
-                wrote.append(os.path.relpath(path, PROJECT))
+                wrote.append(rel)
         if self.config:
             try:
                 with open(CONFIG, "w", encoding="utf-8") as f:
@@ -511,14 +586,22 @@ def defaults():
 def main(argv):
     dry = "--dry-run" in argv
     quiet = "--defaults" in argv
-    if not quiet and not sys.stdin.isatty():
+    # stdin can be None when it was closed before this ran, and asking it
+    # anything is then a traceback rather than the exit 2 the contract wants.
+    if not quiet and (sys.stdin is None or not sys.stdin.isatty()):
         print("ERROR: setup asks questions, and nothing is typing here.",
               file=sys.stderr)
         print("       Run it in a terminal, or use --defaults.",
               file=sys.stderr)
         return 2
 
-    a = defaults() if quiet else interview()
+    try:
+        a = defaults() if quiet else interview()
+    except Cancelled:
+        print("")
+        print("  %s" % alert("Stopped. Nothing was written."))
+        print("")
+        return 0
 
     plan = Plan()
     plan.add(STYLE, style_page(a))
@@ -568,8 +651,13 @@ def main(argv):
         print("")
         print("      %s  yes%s" % (accent("1"), dim("   (default)")))
         print("      %s  no, change nothing" % accent("2"))
-        got = read_answer()
-        if got == "2":
+        # Anything that is not yes is no. Enter is the documented default and
+        # says yes; every other answer, and every way of leaving, says no.
+        try:
+            got = read_answer()
+        except Cancelled:
+            got = "no"
+        if got != "" and got != "1":
             print("")
             print("  %s" % alert("Nothing was written."))
             print("")
