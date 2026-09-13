@@ -20,10 +20,8 @@ Nothing here is a decision. It is a list of writing owed.
 
 | What | Where it lands |
 |---|---|
-| **The published package is 0.1.0 and the pages describe version two.** Anybody following the README today gets `ERROR: no such command: setup` and a gate that says 9 checks. Either release, or say on the page which version it describes | `README.md`, or the release |
 | Numbers in `docs/` that are now stale | those pages are history and say so at the top. Decide whether that is enough, or mark the figures |
 | **Em dashes still in the programs**, in comments and in the findings they print: `0001-x.md — no date`. There it is a column separator, not a pause in a sentence. Left alone on purpose | your call. The prose is done |
-| Not a file: the repository has no About text, no website and no topics on GitHub | the repository page. Only you can set it |
 
 ## Found by the audits, and left on purpose
 
@@ -31,6 +29,14 @@ Nothing here is a decision. It is a list of writing owed.
 |---|---|
 | `style-pointed` goes green when the generated roles are **deleted** rather than fixed | to catch it, the check would have to know which roles ought to exist, which means a second copy of the generator. A checker built out of the thing it checks is not a check. Written on the check itself |
 | Four of the ten must-pass fixtures pass **vacuously**: the check exits 0 having examined nothing | arguably correct behaviour, but it means the gate's "shown to accept the right" line counts cases rather than coverage |
+
+## Settled
+
+**0.2.0 is released and tagged**, so the pages and the package agree again.
+The About text, website and topics are set on the repository page.
+
+**This project does not use GitHub Releases.** Tags only. Nothing writes
+release notes, and no page should tell anybody to look for them.
 
 ## Dropped, with the reason
 
