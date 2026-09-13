@@ -153,7 +153,19 @@ pipx install formwork-kit
 ```
 
 pipx puts the `formwork` command on your path and keeps it in its own
-environment, away from your project's packages. Then, in your project:
+environment, away from your project's packages.
+
+> [!IMPORTANT]
+> **If you used plain `pip` instead, `formwork` will say `command not found`.**
+> It installed fine. pip put the command in a folder your shell does not
+> search. You do not have to fix anything: put `python3 -m formwork_cli` in
+> front of every command below and they all work.
+>
+> ```
+> python3 -m formwork_cli init
+> ```
+
+Then, in your project:
 
 ```
 cd /your/project
