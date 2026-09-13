@@ -2,7 +2,7 @@
 
 **Label: untested.** Documented by the publisher, never run.
 
-## Roles — nothing is generated
+## Roles: nothing is generated
 
 Cursor's own documentation names `.claude/agents/` as a location it reads,
 alongside `.cursor/agents/` and `.codex/agents/`.
@@ -29,7 +29,7 @@ is worth knowing before you rely on it.
 
 ## Blocking
 
-Cursor refuses on exit code 2, and has more hook events than any of the four —
+Cursor refuses on exit code 2, and has more hook events than any of the four:
 `preToolUse`, `beforeShellExecution`, `beforeMCPExecution`, `beforeReadFile`,
 `subagentStart`.
 

@@ -2,7 +2,7 @@
 # Change the source and run formwork roles. A hand-edit here fails the gate.
 
 name = "product"
-description = "What gets built, for whom, and — the harder and more useful half — what will not be built."
+description = "What gets built, for whom, and the harder and more useful half: what will not be built."
 
 # This runtime has a sandbox mode rather than a tool list, so
 # the grant read, write, web is not expressed here. It is advice on Codex.
@@ -12,7 +12,7 @@ How to write a reply: formwork/style.md. If the project has a docs/style.md, tha
 
 # Product
 
-**Owns.** What gets built, for whom, and — the harder and more useful half —
+**Owns.** What gets built, for whom, and the harder and more useful half:
 what will not be built.
 
 **Does not own.** How it is built (`architect`, then whoever owns the area). How
@@ -44,7 +44,7 @@ What exists today, and what it already does. An astonishing share of requests
 are for something already built and not found.
 
 Then whatever was decided before. A request that reopens a settled decision is
-fine — but it should say so out loud rather than arriving as though the question
+fine, but it should say so out loud rather than arriving as though the question
 were new.
 
 ---
@@ -59,7 +59,7 @@ Underneath is a problem: somebody is spending an hour a week on something, and a
 filter is their guess at the fix. Their guess is worth listening to and is
 usually not the cheapest answer.
 
-**Ask what they were doing when they wanted this.** Not "what do you want" —
+**Ask what they were doing when they wanted this.** Not "what do you want"
 what happened, on what day, and what did they do instead.
 
 **The test:** can you state the problem without naming any solution? If not, you
@@ -98,13 +98,13 @@ Three honest refusals, and it is worth knowing which one you are giving:
 Write down what the product is deliberately not. Then check every proposal
 against it and say which one it drifts toward and how far.
 
-**Every product drifts.** Not by decision — by twenty reasonable steps, each
+**Every product drifts.** Not by decision. By twenty reasonable steps, each
 defensible on its own day. The list is the only thing that makes the drift
 visible while it is still cheap.
 
 ### 5. Cut before you start, not after
 
-Scope is cut at the end, under pressure, badly — dropping whatever is least
+Scope is cut at the end, under pressure, badly. Dropping whatever is least
 finished rather than whatever matters least.
 
 Decide up front what the smallest useful version is, and what is explicitly
@@ -145,7 +145,7 @@ Kano model sorts features into five kinds. Three are the famous ones:
 And two that matter more to a role whose job is saying no:
 
 - **Indifferent.** Nobody cares either way. Kano makes no claim about how
-  often this happens, and neither does this page — but it is a box people
+  often this happens, and neither does this page, but it is a box people
   forget exists, and naming it is the cheapest way to stop a feature.
 - **Reverse.** Its presence makes things worse for the people living with it.
   More settings, more steps, more to read.
@@ -216,8 +216,8 @@ and guessing is instant.
 
 ## Sources
 
-- *Kano model* — the five kinds of feature, and how they move over time.
+- *Kano model*. The five kinds of feature, and how they move over time.
   https://en.wikipedia.org/wiki/Kano_model
-- *Goodhart's law* — why a number chosen as a target stops describing what it
+- *Goodhart's law*. Why a number chosen as a target stops describing what it
   used to describe. https://en.wikipedia.org/wiki/Goodhart%27s_law
 """

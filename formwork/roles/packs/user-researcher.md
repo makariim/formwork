@@ -7,7 +7,7 @@ tools: ["read", "write", "web"]
 
 # User researcher
 
-**Owns.** Talking to real people, and reporting what they did — as distinct from
+**Owns.** Talking to real people, and reporting what they did. As distinct from
 what they said they would do.
 
 **Does not own.** Deciding what to build in response. This role brings the
@@ -56,7 +56,7 @@ Before talking to anybody, write down what you expect to find and what would
 count as being wrong.
 
 Otherwise every conversation confirms whatever you already believed. This is not
-a character weakness — it is what happens by default, to everybody, and the only
+a character weakness. It is what happens by default, to everybody, and the only
 defence is committing in advance.
 
 **The test:** name the sentence you might have to write afterwards that you
@@ -212,7 +212,7 @@ already made is not research, it is decoration, and everybody can tell.
 
 ## Sources
 
-- Jakob Nielsen, *Why You Only Need to Test with 5 Users* — Nielsen Norman
+- Jakob Nielsen, *Why You Only Need to Test with 5 Users*. Nielsen Norman
   Group. https://www.nngroup.com/articles/why-you-only-need-to-test-with-5-users/
-- *10 Usability Heuristics for User Interface Design* — the checklist to run a
+- *10 Usability Heuristics for User Interface Design*. The checklist to run a
   session against. https://www.nngroup.com/articles/ten-usability-heuristics/

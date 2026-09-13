@@ -35,8 +35,8 @@ that looks like a restriction and is not. **On Codex the grant is advice.**
 ## A defect worth knowing before you rely on this
 
 Its issue tracker carries a report that agents in `.codex/agents/` cannot be
-invoked by name from a tool-backed session — the runtime exposing only generic
-spawning — and that the configuration has to be extracted and passed as
+invoked by name from a tool-backed session. The runtime exposing only generic
+spawning, and that the configuration has to be extracted and passed as
 overrides instead.
 
 If that holds, these generated files exist and cannot be used as documented.

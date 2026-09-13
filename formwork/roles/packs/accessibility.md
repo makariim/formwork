@@ -23,12 +23,12 @@ nobody can actually use. **Those checks catch a fraction of real barriers.**
 
 ## The number worth knowing
 
-**Automated tools find a minority of accessibility problems** — commonly put
+**Automated tools find a minority of accessibility problems**. Commonly put
 between a third and a half, depending on whether you count rules or issues.
 
-Everything else — whether a label describes the thing, whether focus goes
+Everything else. Whether a label describes the thing, whether focus goes
 somewhere sensible, whether an error is announced, whether a flow can be
-completed — needs a person.
+completed. Needs a person.
 
 So a green automated report is a starting point and never a conclusion. Reporting
 one as though it were a conclusion is the main way this role fails.
@@ -52,7 +52,7 @@ The most effective accessibility technique is not adding anything. It is using
 the real button, the real link, the real checkbox, the real heading.
 
 The platform's own elements come with keyboard behaviour, focus handling,
-announcement, and states — all of it correct, all of it free.
+announcement, and states. All of it correct, all of it free.
 
 **A `div` with a click handler has none of that**, and rebuilding it requires
 getting six things right that the real element already had. It will be rebuilt
@@ -84,7 +84,7 @@ But so are: position alone, an icon with no label, an animation nobody sees, an
 asterisk meaning "required".
 
 **Every control needs a name that says what it does.** A button containing only
-an icon is announced as "button" and nothing else — which is nothing.
+an icon is announced as "button" and nothing else, which is nothing.
 
 ### 4. Meet the contrast ratio, including the states you did not design
 
@@ -98,7 +98,7 @@ Then check the places it fails after the main design: placeholder text, text
 over an image, the dark theme somebody added later, the hover state.
 
 **Disabled controls are exempt**, by the standard's own words. Check them
-anyway if you like — just do not report one as a conformance failure, because
+anyway if you like, just do not report one as a conformance failure, because
 it is not.
 
 **Light grey on white is the most common failure and it is usually chosen
@@ -111,7 +111,7 @@ before, and they are the ones to check first.
 
 **Touch targets: at least 24 by 24 CSS pixels**, or enough space around them.
 Small icon buttons crowded together are the usual failure. CSS pixels, not
-device pixels — the distinction matters on a zoomed page.
+device pixels. The distinction matters on a zoomed page.
 
 **Focus must not be hidden.** If a sticky header, a cookie bar or a floating
 button covers the thing being focused, keyboard users cannot see where they are.
@@ -120,8 +120,8 @@ This one is almost always caused by a component added late.
 **Anything you drag must also work without dragging.** A slider, a reorderable
 list, a map. Provide buttons as well.
 
-The standard exempts the case where dragging is genuinely essential — a drawing
-canvas — and the case where the browser provides the behaviour and you have not
+The standard exempts the case where dragging is genuinely essential. A drawing
+canvas, and the case where the browser provides the behaviour and you have not
 changed it. **Those are narrow. Assume yours is not one of them** until you have
 read the criterion and decided it is.
 
@@ -130,7 +130,7 @@ read the criterion and decided it is.
 A screen reader user does not see the new content appear.
 
 Form errors, "saved", search results updating, a running total, content loading
-in — each needs to be announced, and no more often than is useful.
+in, each needs to be announced, and no more often than is useful.
 
 **Move focus to the error when a form fails.** Otherwise somebody is sitting at
 the submit button being told nothing happened.
@@ -139,9 +139,9 @@ the submit button being told nothing happened.
 
 They have told their device what they need. Listen.
 
-- **Reduced motion** — for some people, animation causes real nausea
-- **Larger text** — a layout that breaks at 200 per cent is a broken layout
-- **High contrast and dark mode** — do not override them
+- **Reduced motion**, for some people, animation causes real nausea
+- **Larger text**. A layout that breaks at 200 per cent is a broken layout
+- **High contrast and dark mode**. Do not override them
 
 Never disable zoom. Never fix a font size in a unit that ignores their
 preference.
@@ -151,7 +151,7 @@ preference.
 If something disappears on a timer, somebody reading slowly will miss it.
 Anything important stays until dismissed.
 
-Carousels, auto-playing video, content that reorders itself — each needs a way
+Carousels, auto-playing video, content that reorders itself, each needs a way
 to stop it.
 
 ### 9. Test with the real thing, and say what you did not
@@ -187,7 +187,7 @@ product, and the requirement usually arrives with a deadline rather than a
 warning.
 
 **Practically**, a meaningful fraction of people have a disability, and far more
-have a temporary one — a broken arm, bright sunlight, a bad connection, a
+have a temporary one. A broken arm, bright sunlight, a bad connection, a
 borrowed device.
 
 **And the fixes are cheap when they are early.** A real button costs nothing. A
@@ -228,9 +228,9 @@ which ones actually shut somebody out.
 
 ## Sources
 
-- *Web Content Accessibility Guidelines (WCAG) 2.2* — W3C, the standard itself.
+- *Web Content Accessibility Guidelines (WCAG) 2.2*. W3C, the standard itself.
   https://www.w3.org/TR/WCAG22/
-- *What's new in WCAG 2.2* — the nine added requirements, explained.
+- *What's new in WCAG 2.2*. The nine added requirements, explained.
   https://www.w3.org/WAI/standards-guidelines/wcag/new-in-22/
-- *ARIA Authoring Practices Guide* — how to build a component that behaves
+- *ARIA Authoring Practices Guide*. How to build a component that behaves
   correctly, before writing your own. https://www.w3.org/WAI/ARIA/apg/

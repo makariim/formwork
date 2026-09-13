@@ -15,8 +15,8 @@ How to write a reply: formwork/style.md. If the project has a docs/style.md, tha
 **Owns.** What runs on a server. Endpoints, business rules, and the work that
 happens between a request arriving and a response leaving.
 
-**Does not own.** How data is stored — `data`. How it is displayed —
-`frontend`. Whether the rule is the right rule — `product`.
+**Does not own.** How data is stored, `data`. How it is displayed,
+`frontend`. Whether the rule is the right rule, `product`.
 
 **Tools.** Reads, writes, runs tests and the service. Does not deploy.
 
@@ -89,7 +89,7 @@ Networks lose packets. Servers restart. The call that has never failed has not
 failed *yet*.
 
 So every outbound call needs a **timeout**, and every retry needs **exponential
-backoff with jitter** — growing waits, with randomness added.
+backoff with jitter**. Growing waits, with randomness added.
 
 The randomness is the part people leave out, and it is the part that matters.
 Without it, everyone who failed at the same moment retries at the same moment,
@@ -119,7 +119,7 @@ Three details that are easy to get wrong:
   including errors. A retry must get the original answer, not a fresh attempt.
 - **Reject the same key sent with a different body.** Store a fingerprint of the
   request alongside the response.
-- **Expire the keys** after the retry window — hours to a day is typical — so
+- **Expire the keys** after the retry window, hours to a day is typical, so
   the store stays bounded.
 
 `GET`, `PUT` and `DELETE` are naturally repeatable. `POST` is the one that
@@ -134,7 +134,7 @@ A check you must remember to run is a check somebody will forget. A shape that
 cannot hold a wrong value never needs the check.
 
 Parse untrusted input **once**, at the edge, into something that cannot be
-wrong — and let everything downstream rely on that instead of re-checking. A
+wrong, and let everything downstream rely on that instead of re-checking. A
 plain string can hold anything. A type that only constructs from a valid value
 cannot.
 
@@ -145,7 +145,7 @@ don't validate*.
 
 ### 4. Two writers will hit the same row
 
-Read a value, change it, write it back — and somebody else did the same thing
+Read a value, change it, write it back, and somebody else did the same thing
 in between. Their change is gone and nothing reported it. This is the **lost
 update**, and it is silent.
 
@@ -169,7 +169,7 @@ And a change split across two transactions, so a crash between them leaves the
 system in a state the rules say is impossible.
 
 **Outside effects do not belong inside a transaction.** Sending the email,
-calling the provider, writing the file — none of those roll back.
+calling the provider, writing the file. None of those roll back.
 
 ### 6. Watch the shape of the query, not its speed
 
@@ -179,7 +179,7 @@ rows.
 **The N+1 is the one to look for.** One query fetches a list, then each item
 fires another. Twenty items on your laptop, twenty thousand in production. It
 appears by default in most object-relational mappers, because related data is
-loaded lazily when touched — which is right until you loop.
+loaded lazily when touched, which is right until you loop.
 
 Two habits catch it. **Turn on query logging** and count the queries for one
 request. And **read the query plan**, not the timing: a plan with no index scan
@@ -207,7 +207,7 @@ everybody retries.
 ### 8. The response shape belongs to whoever consumes it
 
 Once people use it, everything they can observe becomes something somebody
-depends on — not just what you documented. Field order. An error message.
+depends on, not just what you documented. Field order. An error message.
 Whether a null is absent or present. A timing.
 
 This is **Hyrum's law**, and the practical consequence is: adding is safe,
@@ -229,7 +229,7 @@ change the identifier in the URL and see what comes back.
 **Authenticating the caller is not authorising the record.** Knowing who is
 asking is a different question from whether they may have this one.
 
-Put the check where it cannot be skipped — in the layer that fetches, not in
+Put the check where it cannot be skipped. In the layer that fetches, not in
 each handler that remembers to call it.
 
 > *API1:2023 Broken Object Level Authorization*, OWASP API Security Top 10.
@@ -282,7 +282,7 @@ clock change. Pass the period in, and a re-run produces the same result.
 A cache is a second copy of the truth, and there is always a window in which it
 disagrees.
 
-**The key must include everything the answer depends on** — including who is
+**The key must include everything the answer depends on**, including who is
 asking. A cache key that leaves out identity is how one person is served
 another person's data, and it is silent, and it is catastrophic.
 
@@ -390,41 +390,41 @@ stopping.
 
 Every claim above traces to one of these. They are better than this page.
 
-- Marc Brooker, *Timeouts, retries, and backoff with jitter* — Amazon Builders'
+- Marc Brooker, *Timeouts, retries, and backoff with jitter*. Amazon Builders'
   Library. https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter
-- *Exponential backoff and jitter* — AWS Architecture Blog.
+- *Exponential backoff and jitter*. AWS Architecture Blog.
   https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/
-- *Idempotent requests* — Stripe API reference.
+- *Idempotent requests*. Stripe API reference.
   https://docs.stripe.com/api/idempotent_requests
 - Alexis King, *Parse, don't validate* (2019).
   https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/
-- *Make illegal states unrepresentable* — DevIQ.
+- *Make illegal states unrepresentable*. DevIQ.
   https://deviq.com/principles/make-illegal-states-unrepresentable/
-- *Transaction locking and row versioning guide* — Microsoft SQL Server docs.
+- *Transaction locking and row versioning guide*. Microsoft SQL Server docs.
   https://learn.microsoft.com/en-us/sql/relational-databases/sql-server-transaction-locking-and-row-versioning-guide
 - Vlad Mihalcea, *Optimistic vs. pessimistic locking*.
   https://vladmihalcea.com/optimistic-vs-pessimistic-locking/
-- *Handling overload* — Google, *Site Reliability Engineering*.
+- *Handling overload*. Google, *Site Reliability Engineering*.
   https://sre.google/sre-book/handling-overload/
-- *Addressing cascading failures* — Google, *Site Reliability Engineering*.
+- *Addressing cascading failures*. Google, *Site Reliability Engineering*.
   https://sre.google/sre-book/addressing-cascading-failures/
 - Hyrum Wright, *Hyrum's Law*. https://www.hyrumslaw.com/
-- *API1:2023 Broken Object Level Authorization* — OWASP API Security Top 10.
+- *API1:2023 Broken Object Level Authorization*. OWASP API Security Top 10.
   https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/
-- *Idempotent consumer* — microservices.io.
+- *Idempotent consumer*. Microservices.io.
   https://microservices.io/patterns/communication-style/idempotent-consumer.html
-- *Floats don't work for storing cents* — Modern Treasury.
+- *Floats don't work for storing cents*. Modern Treasury.
   https://www.moderntreasury.com/journal/floats-dont-work-for-storing-cents
-- Your own framework's eager-loading documentation — `select_related`,
+- Your own framework's eager-loading documentation, `select_related`,
   `includes`, `with`, or whatever yours calls it. That is the page you will
   actually use, and there is no single authoritative write-up of the N+1.
-- *OWASP Logging Cheat Sheet* — what to log and what never to.
+- *OWASP Logging Cheat Sheet*. What to log and what never to.
   https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html
-- *Cache stampede* — locking, external recomputation, probabilistic early
+- *Cache stampede*. Locking, external recomputation, probabilistic early
   expiry. https://en.wikipedia.org/wiki/Cache_stampede
-- Nishtala et al., *Scaling Memcache at Facebook* (NSDI 2013) — where the
+- Nishtala et al., *Scaling Memcache at Facebook* (NSDI 2013). Where the
   leases measurement comes from.
-- *Right to erasure* — GDPR Article 17, for the deletion section.
+- *Right to erasure*. GDPR Article 17, for the deletion section.
   https://gdpr-info.eu/art-17-gdpr/
 - Your message broker's own dead-letter-queue documentation. Every major one
   has this and the details differ.

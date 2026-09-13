@@ -38,7 +38,7 @@ trace back to this decision.
 
 ## Read first
 
-What is already stored, and what actually appears in the columns — not what the
+What is already stored, and what actually appears in the columns, not what the
 schema says should appear. Look at real values.
 
 **There is always more variety than the definition admits.** Nulls where nothing
@@ -64,7 +64,7 @@ are for.
 
 ### 2. Store a thing once
 
-The same fact in two tables will disagree. Not might — will, after the update
+The same fact in two tables will disagree. Not might. Will, after the update
 that touched one of them.
 
 Deliberate duplication for speed is a real technique and needs two things said
@@ -73,15 +73,15 @@ cache. Without them it is two truths.
 
 ### 3. Choose types like they are permanent, because they are
 
-- **Money** — never floating point. Integers of the smallest unit, or a decimal
+- **Money**. Never floating point. Integers of the smallest unit, or a decimal
   type.
-- **Time** — store the instant, in one timezone, and convert on the way out. A
+- **Time**. Store the instant, in one timezone, and convert on the way out. A
   local time with no offset is unrecoverable later.
-- **Identifiers** — decide whether they are guessable. Sequential integers leak
+- **Identifiers**. Decide whether they are guessable. Sequential integers leak
   how many you have and let people walk your data.
-- **Enumerations** — the fourth value always arrives. Make sure adding one is
+- **Enumerations**. The fourth value always arrives. Make sure adding one is
   cheap.
-- **Text** — a limit somebody invented is a defect waiting for a real name.
+- **Text**. A limit somebody invented is a defect waiting for a real name.
 
 ### 4. A migration is code, and it will run once, under pressure
 
@@ -94,7 +94,7 @@ that belongs to the human. Say so before writing anything.
 backfill, deploy the code that reads it, remove the old one. Five boring steps,
 each reversible, beats one clever step that cannot be undone.
 
-This has a public name — **expand and contract**. Expand: add the new shape
+This has a public name. **expand and contract**. Expand: add the new shape
 beside the old one. Migrate: keep both working while the code moves over.
 Contract: remove the old shape once nothing uses it.
 
@@ -120,7 +120,7 @@ in one place everything shares.
 **And check what points at it.** A removed row with references still aimed at it
 is either a broken link or a cascade removing things nobody expected.
 
-Legal removal of personal data means removing it from everywhere it is live —
+Legal removal of personal data means removing it from everywhere it is live
 the table, replicas, caches, logs, search indexes, derived data, suppliers.
 
 **Backups are the exception, and the accepted practice is documented.** Editing
@@ -206,7 +206,7 @@ with added confidence.
 
 ## Sources
 
-- *Expand and Contract* — Tim Wellhausen, the pattern written up in full.
+- *Expand and Contract*. Tim Wellhausen, the pattern written up in full.
   https://www.tim-wellhausen.de/papers/ExpandAndContract/ExpandAndContract.html
-- Danilo Sato, *ParallelChange* — the same pattern written up by name, for code
+- Danilo Sato, *ParallelChange*. The same pattern written up by name, for code
   as well as schemas. https://martinfowler.com/bliki/ParallelChange.html

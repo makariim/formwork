@@ -18,7 +18,7 @@ BRIEF → WORK → CHECK → REPORT → STOP → you say go → BRIEF …
 | checkpoint | one sitting | six headings | the full list |
 | round | hours to days | a question per role | a round record |
 | phase | weeks | what it settles | one document |
-| milestone | months | a direction | — |
+| milestone | months | a direction |. |
 
 **These are names for how big a turn was.** They are not five different
 processes. A task and a phase run the same loop.
@@ -45,17 +45,17 @@ piece of work nobody can check.
 Start small. The cost of picking too small is one more turn of the loop. The
 cost of picking too big is work nobody can review, which is worse.
 
-**Task** — you can describe it in a sentence and it touches a file or two.
+**Task**. You can describe it in a sentence and it touches a file or two.
 
-**Checkpoint** — you need to state what is out of scope. Past a small number of
+**Checkpoint**. You need to state what is out of scope. Past a small number of
 files you are looking at two of them.
 
-**Round** — the answer is genuinely unclear and you want it argued. Rounds cost
+**Round**. The answer is genuinely unclear and you want it argued. Rounds cost
 real money and nobody has measured how much. Do not run one out of habit.
 
-**Phase** — a question big enough that its answer is a document.
+**Phase**. A question big enough that its answer is a document.
 
-**Milestone** — a direction, not a piece of work. It contains phases.
+**Milestone**. A direction, not a piece of work. It contains phases.
 
 ---
 

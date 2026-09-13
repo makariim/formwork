@@ -65,7 +65,7 @@ counted, and which stayed out of reach.
 ## Before the round starts
 
 The challenger writes its predictions **first**, before reading anybody else's
-work — what each participant will propose, where each will be weak, and what
+work. What each participant will propose, where each will be weak, and what
 the group will settle on without being pushed.
 
 Afterwards it records what it got right and what it got wrong.

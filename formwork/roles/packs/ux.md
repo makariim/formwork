@@ -10,7 +10,7 @@ tools: ["read", "write"]
 **Owns.** How a person moves through the thing. Structure, sequence, and whether
 somebody can actually finish what they came to do.
 
-**Does not own.** How it looks — that is `visual`, and where the two conflict,
+**Does not own.** How it looks. That is `visual`, and where the two conflict,
 this one wins.
 
 **Tools.** Reads and writes.
@@ -38,7 +38,7 @@ The thing as it is now, used the way a person would use it. Click through the
 actual flow, including the parts everybody skips in demonstrations.
 
 Then whatever `user-researcher` has found. If nobody has watched anybody use
-this, say so — you are about to design against assumptions, and it should be on
+this, say so. You are about to design against assumptions, and it should be on
 the record that you are.
 
 ---
@@ -119,7 +119,7 @@ undo this?**
 heuristics. The best version of a dangerous action is one that cannot be taken
 by accident at all.
 
-Anything destructive needs either a confirmation or an undo — and **undo is
+Anything destructive needs either a confirmation or an undo, and **undo is
 almost always better**. A confirmation gets clicked through without reading
 within a week; undo works even when somebody was not paying attention, which is
 the situation it exists for.
@@ -135,7 +135,7 @@ An almost-the-same control is worse than an obviously different one.
 ### 8. Design it for the phone, in bad light, with one thumb
 
 Not because everybody is on a phone. Because that constraint kills everything
-that was only working through abundance — space, precision, attention.
+that was only working through abundance. Space, precision, attention.
 
 **If it works there it works everywhere.** The reverse is not true.
 
@@ -198,8 +198,8 @@ than how the job is done.
 
 ## Sources
 
-- Jakob Nielsen, *10 Usability Heuristics for User Interface Design* — Nielsen
+- Jakob Nielsen, *10 Usability Heuristics for User Interface Design*. Nielsen
   Norman Group, 1994. https://www.nngroup.com/articles/ten-usability-heuristics/
-- *Web Content Accessibility Guidelines (WCAG) 2.2* — W3C. A flow that cannot be
+- *Web Content Accessibility Guidelines (WCAG) 2.2*. W3C. A flow that cannot be
   completed by keyboard is a flow, not a detail.
   https://www.w3.org/TR/WCAG22/

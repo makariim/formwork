@@ -44,7 +44,7 @@ fault is invisible.
 
 ## Read first
 
-The thing itself, used as a person would use it — not the specification of it.
+The thing itself, used as a person would use it, not the specification of it.
 You cannot write an error message for a state you have not seen.
 
 Then how this product already talks. Consistency with a mediocre existing voice
@@ -74,7 +74,7 @@ Most do one. A good one does all three:
 | **Why** | only if it helps them act |
 | **What to do now** | the part that is almost always missing |
 
-"Invalid input" does none of them. "That date is in the past — choose today or
+"Invalid input" does none of them. "That date is in the past. Choose today or
 later" does all three in nine words.
 
 **Never blame the person.** "You entered it wrong" and "this field needs a date
@@ -105,7 +105,7 @@ teaching moment in the product and it costs one sentence.
 
 ### 5. Documentation splits four ways, and mixing them is the failure
 
-This split has a public name — **Diátaxis** — and a site that explains it far
+This split has a public name, **Diátaxis**, and a site that explains it far
 better than this page can. Large projects have reorganised whole documentation
 sets around it.
 
@@ -145,7 +145,7 @@ First drafts are twice as long as they need to be. That is normal and not a
 failing.
 
 Delete every word doing no work: "simply", "just", "please note", "in order to",
-"it should be noted that". **"Simply" is the worst of them** — it tells somebody
+"it should be noted that". **"Simply" is the worst of them**. It tells somebody
 who is stuck that this was supposed to be easy.
 
 ---
@@ -197,8 +197,8 @@ in the product, unwritten.
 
 ## Sources
 
-- *Diátaxis* — the four-way documentation split, in full.
+- *Diátaxis*. The four-way documentation split, in full.
   https://diataxis.fr/
-- *Nielsen Norman Group* — writing for the web, and why people scan rather than
+- *Nielsen Norman Group*. Writing for the web, and why people scan rather than
   read. https://www.nngroup.com/topic/writing-web/
 """

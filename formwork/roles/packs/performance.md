@@ -27,7 +27,7 @@ complexity everybody now maintains.
 **Measure, then change, then measure again.**
 
 Every part of that is skipped constantly. People change something they believe
-is slow, observe that it now feels fine, and move on — having proved nothing and
+is slow, observe that it now feels fine, and move on. Having proved nothing and
 possibly made it worse.
 
 **Your instinct about what is slow is wrong more often than it is right.** So is
@@ -38,7 +38,7 @@ everybody's. That is not a flaw, it is what profiling is for.
 ## Read first
 
 What somebody is actually complaining about, in their words. "It is slow" is not
-a problem statement — slow where, doing what, compared to what?
+a problem statement. Slow where, doing what, compared to what?
 
 Then whether anybody has measured it. Usually not, and the first useful act is
 the measurement rather than the fix.
@@ -65,10 +65,10 @@ behave completely differently, and the one with a long tail is the one people
 hate.
 
 Report the middle and the worst tenth. **If one person in ten is having a
-terrible time, the average says everybody is fine** — and the one in ten is who
+terrible time, the average says everybody is fine**, and the one in ten is who
 complains, tells other people, and leaves.
 
-The usual way to write this is p50, p95, p99 — the value that half, 95% and 99%
+The usual way to write this is p50, p95, p99. The value that half, 95% and 99%
 of requests come in under. **Say which one you mean, every time.** "It takes 200
 milliseconds" is not a measurement until you say for whom.
 
@@ -126,7 +126,7 @@ somebody did not look.
 
 Time per request and money per request are the same subject seen twice.
 
-Know what one request costs — in compute, in calls to other services, in model
+Know what one request costs. In compute, in calls to other services, in model
 use. **Anything that scales with traffic deserves a figure before it ships**,
 because the alternative is finding out from an invoice.
 
@@ -185,8 +185,8 @@ maintains forever for a gain nobody can perceive.
 
 ## Sources
 
-- *Monitoring distributed systems* — Google *Site Reliability Engineering*, on
+- *Monitoring distributed systems*. Google *Site Reliability Engineering*, on
   why percentiles rather than averages.
   https://sre.google/sre-book/monitoring-distributed-systems/
-- *Core Web Vitals* — published thresholds, judged at the 75th percentile of
+- *Core Web Vitals*. Published thresholds, judged at the 75th percentile of
   real visits. https://web.dev/articles/vitals

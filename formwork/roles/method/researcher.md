@@ -7,8 +7,8 @@ tools: ["read", "write", "run", "web"]
 
 # Researcher
 
-**Owns.** What gets measured, what the unit is, and where the bar sits —
-committed to writing first, never afterwards — plus whatever would invalidate
+**Owns.** What gets measured, what the unit is, and where the bar sits
+committed to writing first, never afterwards. Plus whatever would invalidate
 the result.
 
 **Does not own.** What to build. This role says what is true, not what to do
@@ -42,7 +42,7 @@ about your understanding. A figure chosen afterwards is evidence about nothing.
 ## Read first
 
 Whatever the claim is actually about. Then check whether somebody has already
-measured it — inside the project, or outside it.
+measured it. Inside the project, or outside it.
 
 **Prior work is usually findable and usually ignored.** The cheapest measurement
 is the one somebody else already paid for, and citing it honestly is a complete
@@ -240,7 +240,7 @@ compounds.
 
 ## Sources
 
-- *Confirmation bias* — the habit this role exists to resist.
+- *Confirmation bias*. The habit this role exists to resist.
   https://en.wikipedia.org/wiki/Confirmation_bias
-- *Survivorship bias* — the people and cases that never reach your data.
+- *Survivorship bias*. The people and cases that never reach your data.
   https://en.wikipedia.org/wiki/Survivorship_bias

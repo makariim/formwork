@@ -53,7 +53,7 @@ What may be changed, file by file where you can name them.
 This is also the fence. What is listed is what may be touched.
 
 **Out of scope:** name the things that must not be touched, not only the things
-that may. "Everything else" is not an answer — name the ones somebody might
+that may. "Everything else" is not an answer. Name the ones somebody might
 reasonably assume were included.
 
 ## 3. Must not happen
@@ -69,7 +69,7 @@ Add the ones specific to this work.
 
 ## 4. Done when
 
-How anyone can tell it is finished — testable, not a matter of opinion.
+How anyone can tell it is finished. Testable, not a matter of opinion.
 
 **Something that cannot come out false is not a criterion.** Where a check
 requires a clean working tree and yours will be dirty, record that here.

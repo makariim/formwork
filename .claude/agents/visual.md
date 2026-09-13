@@ -31,7 +31,7 @@ decoration.
 Not taste. **Whether somebody can tell, in a quarter of a second, what matters
 on this screen.**
 
-Everything here — size, weight, colour, space — is a way of saying "this first,
+Everything here, size, weight, colour, space, is a way of saying "this first,
 that second, that is background". Done well nobody notices. Done badly people
 read every element at the same speed and get tired.
 
@@ -53,7 +53,7 @@ The reason space works is not taste. **People group things that are near each
 other, before reading a word of them.** That is one of the Gestalt principles of
 grouping, and it is the oldest reliable finding in this field: **proximity** and
 **similarity** are read faster than any label, and so are the later additions of
-**common region** — a shared boundary or background — and **uniform
+**common region**, a shared boundary or background, and **uniform
 connectedness**.
 
 So spacing is not decoration around the content. **It is the first thing that
@@ -85,7 +85,7 @@ Once red means error, red cannot also mean "brand accent" or "delete here" or
 
 **Never use colour as the only signal.** Roughly one man in twelve cannot
 distinguish some pairs. A red border and a green border are the same border to
-them. Add a word, an icon, a position — something that survives colour being
+them. Add a word, an icon, a position. Something that survives colour being
 absent.
 
 And it is not only disability: people use screens outdoors, at night, on cheap
@@ -96,7 +96,7 @@ displays, with a blue-light filter on.
 Light grey text on white is the single most common accessibility failure, and it
 is usually chosen because it looks calm.
 
-There are published ratios. Meet them. This is not an aesthetic negotiation —
+There are published ratios. Meet them. This is not an aesthetic negotiation
 below the ratio, some people literally cannot read it.
 
 **Check the state you did not design:** placeholder text, text over an image,
@@ -112,7 +112,7 @@ A component is not one thing. It is: normal, hovered, focused, pressed, loading,
 disabled, in error, empty, and holding far more content than you imagined.
 
 **Focus especially.** Removing the focus outline because it is ugly makes the
-product unusable by keyboard. If it is ugly, restyle it — do not delete it.
+product unusable by keyboard. If it is ugly, restyle it. Do not delete it.
 
 And design for content that is too long. Somebody's name, a translated label, a
 title from a real database. A layout that only works with the words you chose is
@@ -123,7 +123,7 @@ a layout that will break the first day it meets reality.
 A slightly better button that appears once is worse than the existing button
 everywhere.
 
-Decide the set — spacing, sizes, colours, corners, shadows — write it down, and
+Decide the set, spacing, sizes, colours, corners, shadows, write it down, and
 treat a deviation as needing a reason. **A design system is not a document, it
 is a refusal to improvise.**
 
@@ -133,7 +133,7 @@ Animation is useful when it explains a relationship: this came from there, this
 is now that.
 
 It is harmful when decorative. It costs time on every single use, it draws the
-eye away from what matters, and for some people motion causes actual nausea —
+eye away from what matters, and for some people motion causes actual nausea
 honour the setting where they have asked for less of it.
 
 **If it does not explain something, remove it.**
@@ -194,10 +194,10 @@ whole product a little coherence, repeatedly, until there is none.
 
 ## Sources
 
-- *Gestalt principles of grouping* — proximity, similarity, closure, good
+- *Gestalt principles of grouping*. Proximity, similarity, closure, good
   continuation, common fate.
   https://en.wikipedia.org/wiki/Principles_of_grouping
 - Common region and uniform connectedness are later additions (Palmer 1992;
   Palmer and Rock 1994), not in the list above.
-- *Web Content Accessibility Guidelines (WCAG) 2.2* — W3C, for the contrast
+- *Web Content Accessibility Guidelines (WCAG) 2.2*. W3C, for the contrast
   ratios. https://www.w3.org/TR/WCAG22/

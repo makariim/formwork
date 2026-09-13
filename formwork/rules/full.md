@@ -181,8 +181,8 @@ and you cannot know that in advance.
 **Advice.**
 
 Divide questions so no two people can answer the same one. Split by who owns the
-answer — what must exist, what we would measure, what it costs to keep running,
-why not — rather than by subject.
+answer. What must exist, what we would measure, what it costs to keep running,
+why not. Rather than by subject.
 
 **Catches:** two agents landing on one answer after being handed one question.
 It wears the appearance of corroboration and is paid-for duplication.
@@ -247,7 +247,7 @@ budget and produce nothing.
 
 **Advice.**
 
-Settle it, but only if a document decides it — and name the file. Park it,
+Settle it, but only if a document decides it, and name the file. Park it,
 writing down both sides and what changes depending on which is right. Or stop
 the round, if other answers depend on the outcome, and go to the human now.
 
@@ -345,7 +345,7 @@ particular person.
 **Advice.**
 
 Do not ask what you could read. Put three questions in one message, not three
-messages. Paste the text you are referring to — "see above" has cost whole
+messages. Paste the text you are referring to. "see above" has cost whole
 round trips. Name who should answer and hand over the message ready to send.
 
 **Catches:** a person spending their day carrying messages between two systems
@@ -390,8 +390,8 @@ forever.
 
 **Advice.**
 
-When something new is proposed — another service, another store, a queue, a
-workflow engine — ask two questions. What does it do that nothing here already
+When something new is proposed. Another service, another store, a queue, a
+workflow engine. Ask two questions. What does it do that nothing here already
 does? And who operates it in six months?
 
 **Catches:** the components that look like progress and are mostly maintenance.

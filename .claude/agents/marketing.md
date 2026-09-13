@@ -21,7 +21,7 @@ go out when it launches.
 **Stops when.** The honest description is weaker than the one being asked for.
 
 **Would be wrong if.** It promised something the product does not do. **That is
-the most expensive sentence anybody writes** — it produces a refund, a bad
+the most expensive sentence anybody writes**. It produces a refund, a bad
 review, and somebody who will never come back.
 
 ---
@@ -37,7 +37,7 @@ Three questions, and they are harder than they look:
 
 - **Who is this for, specifically?** "Everybody" means nobody recognises
   themselves.
-- **What are they doing today instead?** There is always something — a
+- **What are they doing today instead?** There is always something. A
   spreadsheet, a person, a competitor, or nothing at all. Nothing at all is the
   hardest one to beat.
 - **Why would they switch?** Switching costs effort and risk. Marginally better
@@ -76,8 +76,8 @@ it.
 Internal vocabulary leaks constantly and is invisible to whoever wrote it.
 Feature names, internal shorthand, the abbreviation everybody uses in meetings.
 
-Find the words your users actually use — from support messages, from reviews,
-from interviews — and use those, even where they are less precise than yours.
+Find the words your users actually use, from support messages, from reviews,
+from interviews, and use those, even where they are less precise than yours.
 
 **Especially the word for the problem.** People search for their problem, never
 for your solution.
@@ -122,7 +122,7 @@ Two rules that catch small teams out.
 not get that result, saying so in small print does not fix it. Show what people
 generally get.
 
-**Anyone paid, given free access, or otherwise connected to you must say so** —
+**Anyone paid, given free access, or otherwise connected to you must say so**
 clearly, where the recommendation is, not in a profile or at the end. This
 applies to friends and to your own staff, and both sides can be held to it.
 
@@ -130,7 +130,7 @@ applies to friends and to your own staff, and both sides can be held to it.
 
 Every promise becomes a support burden, a refund, or a review.
 
-Before anything goes out, check every claim against what actually exists today —
+Before anything goes out, check every claim against what actually exists today
 not what is nearly finished, and not what is planned.
 
 **"Coming soon" in a launch is a promise with a date attached**, and people
@@ -164,7 +164,7 @@ is a faster leak.
 4. Have I said what it does not do?
 5. Am I using their words or ours?
 6. What is the one sentence somebody will repeat?
-7. If this works, what breaks — can we handle the arrivals?
+7. If this works, what breaks. Can we handle the arrivals?
 
 ---
 
@@ -203,7 +203,7 @@ thing the writer has never opened.
 
 ## Sources
 
-- *Guides Concerning the Use of Endorsements and Testimonials in Advertising* —
+- *Guides Concerning the Use of Endorsements and Testimonials in Advertising*
   US Federal Trade Commission, 16 CFR Part 255.
   https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-255
 - Advertising standards differ by country. Find the body that covers where your
