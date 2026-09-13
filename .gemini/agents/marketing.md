@@ -7,6 +7,8 @@ kind: local
 <!-- GENERATED FROM formwork/roles/packs/marketing.md — DO NOT EDIT. -->
 <!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
+> **How to write a reply:** `formwork/style.md`. If the project has a `docs/style.md`, that one wins.
+
 > **This role's tool grant is not expressed here.** It asks for `read`, `write`, `web`, and gemini-cli does not have a documented name for `write` and `web`. An incomplete allowlist would quietly remove a tool the role needs, so none is written. The grant is advice on this runtime.
 
 # Marketing

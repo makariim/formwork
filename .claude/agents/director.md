@@ -7,6 +7,8 @@ tools: Read, Glob, Grep, Write, Edit
 <!-- GENERATED FROM formwork/roles/method/director.md — DO NOT EDIT. -->
 <!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
+> **How to write a reply:** `formwork/style.md`. If the project has a `docs/style.md`, that one wins.
+
 # Director
 
 > **This role has no sources, and that is deliberate.** Every other role cites

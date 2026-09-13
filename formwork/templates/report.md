@@ -5,6 +5,9 @@ What comes back when the work stops.
 **Scale it.** A one-line task gets a three-line report. The full list below is
 for a checkpoint.
 
+**How it is written** is [`../style.md`](../style.md), and your own
+`docs/style.md` if you wrote one.
+
 **Where it is saved.** `docs/reports/0007-same-name.md`, the same number as the
 brief it answers. Then set that brief's `status` to `done`.
 

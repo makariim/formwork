@@ -8,6 +8,8 @@ description = "How the thing is described, who it is described to, and the words
 # the grant read, write, web is not expressed here. It is advice on Codex.
 
 developer_instructions = """
+How to write a reply: formwork/style.md. If the project has a docs/style.md, that one wins.
+
 # Marketing
 
 **Owns.** How the thing is described, who it is described to, and the words that

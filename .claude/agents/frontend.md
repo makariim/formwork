@@ -7,6 +7,8 @@ tools: Read, Glob, Grep, Write, Edit, Bash
 <!-- GENERATED FROM formwork/roles/packs/frontend.md — DO NOT EDIT. -->
 <!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
+> **How to write a reply:** `formwork/style.md`. If the project has a `docs/style.md`, that one wins.
+
 # Frontend
 
 **Owns.** What runs in a browser. Components, state, rendering, and everything

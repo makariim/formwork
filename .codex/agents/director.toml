@@ -8,6 +8,8 @@ description = "What happens next. Holding the whole picture, sizing and writing 
 # the grant read, write is not expressed here. It is advice on Codex.
 
 developer_instructions = """
+How to write a reply: formwork/style.md. If the project has a docs/style.md, that one wins.
+
 # Director
 
 > **This role has no sources, and that is deliberate.** Every other role cites

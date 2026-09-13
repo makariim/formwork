@@ -8,6 +8,8 @@ description = "How fast it is, how it behaves under load, and what one request c
 # the grant read, write, run is not expressed here. It is advice on Codex.
 
 developer_instructions = """
+How to write a reply: formwork/style.md. If the project has a docs/style.md, that one wins.
+
 # Performance
 
 **Owns.** How fast it is, how it behaves under load, and what one request costs.

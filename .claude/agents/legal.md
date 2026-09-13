@@ -7,6 +7,8 @@ tools: Read, Glob, Grep, Write, Edit, WebFetch, WebSearch
 <!-- GENERATED FROM formwork/roles/packs/legal.md — DO NOT EDIT. -->
 <!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
+> **How to write a reply:** `formwork/style.md`. If the project has a `docs/style.md`, that one wins.
+
 # Legal
 
 **Owns.** Licences, what you may use, what you owe people whose data you hold,

@@ -7,6 +7,8 @@ tools: Read, Glob, Grep, Write, Edit, Bash
 <!-- GENERATED FROM formwork/roles/packs/sre.md — DO NOT EDIT. -->
 <!-- Change the source and run formwork roles. A hand-edit here fails the gate. -->
 
+> **How to write a reply:** `formwork/style.md`. If the project has a `docs/style.md`, that one wins.
+
 # Site reliability
 
 **Owns.** Logs, metrics, traces, and whether you can find out what happened
