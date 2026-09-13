@@ -49,6 +49,7 @@ except ImportError:                     # pragma: no cover
 COMMANDS = [
     ("init",    "put the kit into this project"),
     ("install", "wire it up to your agent. --runtime <name> to choose"),
+    ("setup",   "answer a few questions, and write the files nobody knows to write"),
     ("check",   "run every check on this project"),
     ("demo",    "watch every check refuse a broken input"),
     ("roles",   "rebuild the role files after editing one"),
@@ -64,6 +65,7 @@ TESTS = [
     os.path.join("guard", "test_quality_gate.py"),
     os.path.join("check", "test_gate.py"),
     "test_install.py",
+    "test_setup.py",
 ]
 
 
@@ -299,6 +301,8 @@ def main(argv=None):
         return cmd_init(rest)
     if cmd == "install":
         return run_in_kit("install", rest)
+    if cmd == "setup":
+        return run_in_kit("setup", rest)
     if cmd == "check":
         return run_in_kit(os.path.join("check", "run"), rest)
     if cmd == "demo":

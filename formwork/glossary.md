@@ -29,7 +29,7 @@ A small program that reads your project and says green or red. Checks look at
 what is there. Guards stop what is about to happen.
 
 **The gate**, also called **the aggregate**
-All eleven checks, run together, with one answer at the end. Green or red.
+All twelve checks, run together, with one answer at the end. Green or red.
 
 You will see the word aggregate in a refusal: *the aggregate is red, so this
 turn cannot conclude*. It means the same thing.
@@ -58,6 +58,11 @@ gate runs at the end of every turn where something changed.
 **Brief**
 What you want, written down before any work starts. Six short headings. The
 template is in `formwork/templates/brief.md`.
+
+**Style**
+How an agent writes a reply, as against what it does. The kit's default is
+`formwork/style.md`. Your own goes in `docs/style.md` and wins where the two
+disagree. Nothing enforces either.
 
 **Report**
 What came back. What was done, what was skipped, what the agent thinks you

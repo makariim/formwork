@@ -8,13 +8,13 @@ Two of the three numbers below are measured. The most important one is not.
 
 ```
 $ time formwork check
-real 2.94
-real 2.98
-real 2.98
+real 2.95
+real 3.38
+real 3.18
 ```
 
 About three seconds on this repository, over three runs. That is one
-run of all eleven checks over 166 files, including the fixtures each check is tried
+run of all twelve checks over 183 files, including the fixtures each check is tried
 against. It runs at the end of
 every turn in which something changed.
 
@@ -26,10 +26,10 @@ this line.
 
 ```
 $ find formwork -type f | wc -l
-166
+183
 ```
 
-166 files. Plain text and a few small programs. Python 3, standard library only,
+183 files. Plain text and a few small programs. Python 3, standard library only,
 no dependencies of any kind. It costs nothing to carry and nothing to install.
 
 ---
@@ -48,12 +48,12 @@ happens.
 
 | | words |
 |---|---|
-| the core everybody reads — the page, the loop, the core rules | 2,370 |
-| five role files, one per participant | 7,733 |
-| **five participants, each reading the core plus their role** | **19,583** |
+| the core everybody reads — the page, the loop, the core rules, the style page | 3,218 |
+| five role files, one per participant | 8,616 |
+| **five participants, each reading the core plus their role** | **24,706** |
 
 ```
-wc -w FORMWORK.md formwork/loop.md formwork/rules/core.md \
+wc -w FORMWORK.md formwork/loop.md formwork/rules/core.md formwork/style.md \
       formwork/roles/method/{lead,challenger,architect,researcher,record-keeper}.md
 ```
 

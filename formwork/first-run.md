@@ -149,6 +149,7 @@ arrives:
 |---|---|
 | [`loop.md`](loop.md) | the working loop in full: brief, work, check, report, stop |
 | [`threads.md`](threads.md) | how work starts, and where the plan lives between conversations |
+| [`style.md`](style.md) | how the agents talk to you, and how to change it |
 | [`round.md`](round.md) | how to run a round, and when one is worth the money |
 | [`templates/`](templates/) | the brief, the report, the decision record, the round, the standing brief |
 | [`roles/HOW-TO-ADD-A-ROLE.md`](roles/HOW-TO-ADD-A-ROLE.md) | adding your own |

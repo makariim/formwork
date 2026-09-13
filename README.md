@@ -30,7 +30,7 @@ own. Projects never had that. Now they do.*
 $ pipx install formwork-kit
 $ formwork init && formwork install --runtime claude-code
 $ formwork check
-GATE: green. 11 check(s), each shown to reject the wrong and accept the right.
+GATE: green. 12 check(s), each shown to reject the wrong and accept the right.
 ```
 
 ---
@@ -154,10 +154,10 @@ settings file keeping anything already there, and puts one file in
 | | | count it yourself |
 |---|---|---|
 | **3 guards** | small programs that refuse. Two stop a command, one stops a turn ending | `ls formwork/guard \| grep -v test_` |
-| **11 checks** | small programs that read your project and say green or red | `ls formwork/check/checks \| wc -l` |
+| **12 checks** | small programs that read your project and say green or red | `ls formwork/check/checks \| wc -l` |
 | **28 roles** | one file each, saying what that job does and where it stops | `ls formwork/roles/*/*.md \| wc -l` |
 | **47 rules** | 13 you meet daily, 34 for when you need them | `grep -c '^### ' formwork/rules/*.md` |
-| **295 tests** | every guard and check, proved able to fail | `formwork test` |
+| **328 tests** | every guard and check, proved able to fail | `formwork test` |
 
 It is all text files and small programs. You can read every line. Nothing is
 hidden. Nothing is sent anywhere.
@@ -239,6 +239,7 @@ page says so.
 |---|---|
 | [`loop.md`](formwork/loop.md) | how one job goes, start to finish |
 | [`threads.md`](formwork/threads.md) | how work starts, and where the plan lives between conversations |
+| [`style.md`](formwork/style.md) | how the agents talk to you, and how to change it |
 | [`round.md`](formwork/round.md) | how to run a round, and when it is worth it |
 | [`templates/`](formwork/templates/) | brief, predictions, report, decision, round, standing brief |
 | [`roles/`](formwork/roles/) | the roles, and how to write your own |

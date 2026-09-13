@@ -25,6 +25,7 @@ rule the kit applies to its own decision records.
 | [`runtime-capabilities.md`](runtime-capabilities.md) | what each of the four runtimes can actually enforce |
 | [`role-formats.md`](role-formats.md) | how a role is expressed in each runtime, and where the grant does not survive |
 | [`standing.md`](standing.md) | **live, not history. Where the kit is right now** |
+| [`style.md`](style.md) | **live, not history. How this project wants to be spoken to** |
 | [`to-document.md`](to-document.md) | **live, not history. Writing owed, so it is not remembered only in a chat** |
 | [`decisions/`](decisions/) | decision records |
 

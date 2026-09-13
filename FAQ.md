@@ -168,7 +168,7 @@ that log before you decide what you think.
 
 ### Is it stable?
 
-The guards and checks have 295 tests and four audit rounds behind them. Every
+The guards and checks have 328 tests and four audit rounds behind them. Every
 check has been watched failing on purpose, and you can watch them yourself with
 `formwork demo`.
 
