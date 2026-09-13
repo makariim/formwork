@@ -315,20 +315,72 @@ def generate_roles(root, runtime, dry_run):
     return int(m.group(1)) if m else None
 
 
+def find_project():
+    """The project to install into, or (None, why).
+
+    Two wrong answers were shipped before this. `os.getcwd()` meant that
+    running from a subfolder wrote a configuration into the subfolder and
+    reported success, leaving the real project unwired. Replacing it with the
+    kit's own location moved the same bug: running a kit that lives elsewhere
+    then wired that other folder instead, also reporting success.
+
+    Neither location can be trusted on its own, so neither is used. The
+    project is found the way the rest of the kit finds it: walk up from where
+    you are standing until a complete kit appears. That is also why the
+    `python3 - < install` case is no longer wrong, since it never asks where
+    this file is.
+
+    When the kit you are running is not the kit in that project, it refuses.
+    The wiring it writes names paths inside a kit, and writing wiring that
+    points at somebody else's copy is how a guard silently stops guarding.
+    """
+    # Where this program is running from, when that can be established at all.
+    # Fed through a pipe, `__file__` is `<stdin>` and HERE becomes whatever
+    # directory you were standing in, which is not a kit. Copied out on its
+    # own, the same. Both used to pick a target and write into it.
+    mine = HERE if os.path.isfile(os.path.join(HERE, "check", "run")) else None
+
+    here = os.path.abspath(os.getcwd())
+    path = here
+    while True:
+        kit = os.path.join(path, "formwork")
+        if os.path.isfile(os.path.join(kit, "check", "run")):
+            if mine is None:
+                return None, ("this program cannot tell which kit it belongs "
+                              "to, because it was not run from a file inside "
+                              "one. The project at %s has a kit of its own"
+                              % path)
+            if os.path.realpath(kit) != os.path.realpath(mine):
+                return None, ("you are running the kit at %s, and the project "
+                              "at %s has its own copy" % (mine, path))
+            return path, ""
+        parent = os.path.dirname(path)
+        if parent == path:
+            return None, ("no formwork/ folder in %s, or in any folder above "
+                          "it" % here)
+        path = parent
+
+
 def main(argv):
     args = argv[1:]
     dry_run = "--dry-run" in args
-    # The project is the folder holding this kit, never the folder somebody
-    # happened to be standing in. Using the working directory meant that
-    # running this from a subfolder wrote a second configuration and a second
-    # settings file into that subfolder, reported success, and left the real
-    # project unwired. It also looked for the agent's folder in the wrong
-    # place and refused, saying no runtime was set up, while one sat one level
-    # above.
-    root = ROOT
+
+    root, why = find_project()
+    if root is None:
+        print("Cannot tell which project to install into: %s." % why,
+              file=sys.stderr)
+        print("", file=sys.stderr)
+        print("       Stand in the project that holds the kit, and run its "
+              "own copy:", file=sys.stderr)
+        print("           cd /your/project && formwork/install",
+              file=sys.stderr)
+        print("       Or put a kit there first, with `formwork init`.",
+              file=sys.stderr)
+        return CANNOT_RUN
+
     here = os.getcwd()
     if os.path.realpath(here) != os.path.realpath(root):
-        print("Installing into %s, which is where this kit lives." % root)
+        print("Installing into %s." % root)
         print("You are standing in %s." % here)
         print("")
 

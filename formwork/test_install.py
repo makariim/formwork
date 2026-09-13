@@ -153,6 +153,71 @@ check("and nothing else at all", strays, set(), out)
 check("the roles it generated are all it generated",
       len(files) - 2, 28, out)
 
+def outside(project, *args, **kw):
+    """Run the installer from somewhere, and see what the WHOLE tree did.
+
+    Every other helper looks only inside the project. An audit pointed out
+    that the bugs in this area all write somewhere else, so nothing in the
+    suite could see them.
+    """
+    env = dict(os.environ)
+    env["FORMWORK_STATE_DIR"] = os.path.join(STATE, "outside")
+    p = subprocess.run([sys.executable, kw["script"]] + list(args),
+                       capture_output=True, text=True, cwd=kw["cwd"], env=env)
+    return p.returncode, p.stdout + p.stderr
+
+
+def listing(d):
+    return sorted(os.listdir(d))
+
+
+print("It refuses rather than wiring the wrong thing")
+# Three ways the installer has picked the wrong target. The first two shipped:
+# the working directory, then the kit's own location. Each fix moved the bug
+# rather than closing it, so all three are held down here.
+home = tempfile.mkdtemp(prefix="fw-outer-")
+proj = os.path.join(home, "proj")
+os.makedirs(os.path.join(proj, ".claude"))
+shutil.copytree(HERE, os.path.join(proj, "formwork"),
+                ignore=shutil.ignore_patterns("__pycache__", "*.pyc",
+                                              "fixtures"))
+before_home = listing(home)
+
+stranger = tempfile.mkdtemp(prefix="fw-stranger-")
+shutil.copytree(HERE, os.path.join(stranger, "formwork"),
+                ignore=shutil.ignore_patterns("__pycache__", "*.pyc",
+                                              "fixtures"))
+
+code, out = outside(proj, "--runtime", "claude-code",
+                    script=os.path.join(stranger, "formwork", "install"),
+                    cwd=proj)
+check("a kit from elsewhere, run in a project that has its own: refused",
+      code, 2, out)
+check("and it wired nothing in the project",
+      os.path.exists(os.path.join(proj, ".formwork.toml")), False, out)
+check("and nothing in the stranger's folder",
+      os.path.exists(os.path.join(stranger, ".formwork.toml")), False, out)
+
+bare = tempfile.mkdtemp(prefix="fw-bare-")
+os.makedirs(os.path.join(bare, ".claude"))
+code, out = outside(bare, "--runtime", "claude-code",
+                    script=os.path.join(stranger, "formwork", "install"),
+                    cwd=bare)
+check("a kit from elsewhere, run where there is no kit: refused", code, 2, out)
+check("and wrote nothing there", listing(bare), [".claude"], out)
+
+# Fed through a pipe, __file__ is <stdin>, so the program cannot tell where it
+# lives. It used to answer anyway, and wrote into the parent of the project.
+piped = subprocess.run(
+    [sys.executable, "-"] + ["--runtime", "claude-code"],
+    stdin=open(os.path.join(proj, "formwork", "install")),
+    capture_output=True, text=True, cwd=proj,
+    env=dict(os.environ, FORMWORK_STATE_DIR=os.path.join(STATE, "piped")))
+check("fed through a pipe: refused rather than guessing", piped.returncode, 2,
+      piped.stdout + piped.stderr)
+check("and wrote nothing above the project", listing(home), before_home,
+      piped.stdout + piped.stderr)
+
 print("Run from a subfolder, it still means the project")
 p = project(**{".claude/": None, "src/main.py": "pass\n"})
 sub = os.path.join(p, "src")
@@ -171,8 +236,14 @@ check("wrote the configuration in the project",
       os.path.exists(os.path.join(p, ".formwork.toml")), True, out)
 check("and nothing into the subfolder",
       sorted(os.listdir(sub)), ["main.py"], out)
-check("and says which project it chose", "which is where this kit lives" in out,
-      True, out)
+# The old message said "which is where this kit lives", which was asserted and
+# never verified, and was false in three of the cases above. This checks the
+# named target instead of the wording.
+named = [l for l in out.split("\n") if l.startswith("Installing into ")]
+check("names one target", len(named), 1, out)
+check("and it is the project, not the subfolder",
+      os.path.realpath(named[0][len("Installing into "):].rstrip(".")),
+      os.path.realpath(p), out)
 
 print("When it cannot tell")
 p = project(**{"src/main.py": "pass\n"})
