@@ -10,8 +10,10 @@ about a second. Your share is step 4, which is real work on your own project,
 and nobody can time that for you.
 
 > [!TIP]
-> **`command not found: formwork`?** Every command here has a second form that
-> needs nothing installed. [`troubleshooting.md`](troubleshooting.md) has both.
+> **`command not found: formwork`?** It installed fine, and pip put it
+> somewhere your shell does not search. Put `python3 -m formwork_cli` in front
+> of every command here and they all work.
+> [`troubleshooting.md`](troubleshooting.md) has the other two ways.
 
 ---
 
