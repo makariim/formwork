@@ -21,14 +21,28 @@ agent, one report.
 
 ## The shape on disk
 
+**A round is one piece of work like any other, so it takes a number** from
+`docs/briefs/` and leaves a report behind. The argument itself lives in its own
+folder, because it is five files and they would drown the index.
+
 ```
-docs/rounds/<name>/
+docs/briefs/0009-storage-shape.md      status: open. Says "this is a round"
+                                       and points at the folder below
+
+docs/rounds/storage-shape/
     brief.md          what is being asked. You write this
     predictions.md    the challenger, written FIRST
                       template: formwork/templates/predictions.md
     <role>.md         one file per participant
     round.md          what came out of it. The lead writes this
+
+docs/reports/0009-storage-shape.md     short. What came out, in a few lines,
+                                       pointing at round.md for the argument
 ```
+
+**Why both.** `docs/briefs/` is the complete list of everything you have ever
+asked for, rounds included. Without the number, a round is the one kind of work
+that leaves no line in that list, and you would have to remember it happened.
 
 `<name>` is short and says what the round is about — `storage-shape`,
 `auth-approach`. It is a folder name, so keep it plain.
@@ -42,6 +56,10 @@ below for exactly what it can and cannot tell.
 
 **1. You write the brief.** Use [`templates/brief.md`](templates/brief.md). It
 is six headings and it is the whole input, so it is worth the twenty minutes.
+
+Take a number with `formwork/check/checks/work-paired --next .` and save a
+short `docs/briefs/0009-storage-shape.md` saying this is a round and where the
+folder is. The full brief goes in the folder as `brief.md`.
 
 **2. The challenger writes `predictions.md` first**, before anybody has
 proposed anything. It names the failures it expects and what result would show
@@ -63,7 +81,13 @@ in the open, not smoothed over.
 [`templates/round.md`](templates/round.md). What was asked, who said what, what
 was decided, what is still open.
 
-**6. Anything decided gets a decision record.** Use
+**6. The round leaves a report like any other work.** A short
+`docs/reports/0009-storage-shape.md`: what came out, what is still open, and a
+pointer to `round.md` for the argument. Then the brief becomes `status: done`.
+
+Do not copy the round record into it. One fact, one home.
+
+**7. Anything decided gets a decision record.** Use
 [`templates/decision.md`](templates/decision.md), numbered, in
 `docs/decisions/`. Never edited afterwards — superseded by a later one.
 
