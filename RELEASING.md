@@ -1,6 +1,9 @@
 # Publishing a release
 
-For the maintainer. Nobody else needs this page.
+**For the maintainer.** It is here in the open because the steps are worth
+copying, and because a project that hides how it ships is harder to trust. One
+step near the end needs files that only exist on the maintainer's machine, and
+it says so.
 
 **The agent never runs any of these.** Every one of them changes something
 outside your machine.
@@ -26,14 +29,21 @@ formwork demo      must reject every broken input
 formwork test      every test must pass
 ```
 
-Then the two privacy gates, which live outside this repository:
+> [!NOTE]
+> **The next step is for this repository's maintainer only.** It will not work
+> in a fork, and you do not need it.
+
+This kit was extracted from two private projects, so two scanners check that
+nothing from them reached the public files. They live outside the repository,
+because a list of forbidden words committed next to the thing it protects
+publishes the very words it guards.
 
 ```
 python3 ~/.formwork/tools/privacy_scan.py .
 python3 ~/.formwork/tools/overlap_scan.py .
 ```
 
-**Both must say clean.** A red scan is not a thing to think about. It is a
+**Both must say clean.** A red scan is not something to think about. It is a
 stop.
 
 ---
