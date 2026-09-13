@@ -1,10 +1,10 @@
 # The rest of the rules
 
-Thirty-three. Not for reading end to end. Find the one that matches the
+Thirty-four. Not for reading end to end. Find the one that matches the
 situation you are in.
 
-All advice. What is blocked is in `FORMWORK.md`. The thirteen you meet daily are
-in `core.md`.
+Advice, except one that names a check. What else is blocked is in
+`FORMWORK.md`. The thirteen you meet daily are in `core.md`.
 
 Some carry a **warning**. That means the rule costs something real, or stops
 working outside the conditions it was learned in. The warning is part of the
@@ -451,18 +451,37 @@ yours.
 
 ## Above the repository
 
-### Somebody holds the thread between sessions
+### The state between sessions lives in a file
+
+**Enforced** by `formwork/check/checks/standing-current`.
+
+One short file says what you are building, where you are now, what is decided,
+what is open and what is next. `docs/standing.md`. A new conversation reads it
+instead of being told the story again.
+
+It is updated before a planning conversation is closed, not afterwards. The
+check goes red when a decision record or a round record carries a later date
+than the standing brief.
+
+**Catches:** the plan living in one chat window, which means it ends when the
+window does, and the next conversation starts from somebody's memory.
+
+**Warning:** nothing can tell whether what you wrote is true. The check reads
+the date, the headings and the empty bullets. Those catch the way this file
+actually fails, and no more.
+
+---
+
+### Keep planning and working in separate conversations
 
 **Advice.**
 
-Separate from any working session, one long conversation decides what happens
-next, writes the instruction, and judges what comes back.
+One conversation decides what happens next and judges what comes back. Another
+does the work in the repository and stops. See
+[`../threads.md`](../threads.md).
 
-**Catches:** continuity living only in your head, which means it is gone the
-moment you are busy.
-
-**Warning:** this has no file, no configuration, and nothing you can review. It
-is the most load-bearing part of the arrangement and the least inspectable.
+**Catches:** the plan being buried under the work. A session that reads fifty
+files still has the plan in it somewhere, underneath everything it read.
 
 ---
 
@@ -470,15 +489,17 @@ is the most load-bearing part of the arrangement and the least inspectable.
 
 **Advice.**
 
-The layer above and the working session cannot see each other. A person moves
-text between them.
+Nothing moves between the two layers on its own. A person moves the text. The
+planning conversation may read the repository, and it still cannot see the
+working session, nor the working session it.
 
 **Catches:** work done twice, and work done against a decision that was already
-made upstairs. When nothing carries the messages, the two halves drift apart and
-neither knows it.
+made upstairs.
 
-**Warning:** known not to work beyond one person. Two people would need two
-relays and nothing joins them up.
+**Warning:** the relay is a person copying and pasting, so it is slow and it can
+be skipped. What stops it being skipped is that the standing brief is a file
+and a check reads its date. **No team has run this.** NOT ESTABLISHED beyond
+one person.
 
 ---
 
