@@ -131,19 +131,23 @@ wrong assumption shows up as a refusal rather than as silent permission.
 
 ---
 
-## Four things nobody has run
-
-Written, tested where a program can test them, used by nobody.
+## What has been run, and what has not
 
 | | |
 |---|---|
-| **The director role** | the upper layer that holds the plan. It has never held a real project |
-| **A split brief** | `lead` cutting one brief into pieces and joining the reports back. Never done once |
-| **The folder route** | briefs and reports as numbered files, rather than pasted into a chat |
-| **`formwork setup`** | its tests pass. No stranger has answered the questions |
+| **`formwork setup`** | run on a new project. Its questions have been answered once, by the author |
+| **The director role** | **run once**, on a different project, on the day it was written. It read a standing brief, saw the file was still the template and said so, wrote one numbered brief, argued for a recommendation, refused to decide it, and stopped on one question |
+| **The folder route** | used in that same session. The number came from the check, the brief was saved under it |
+| **A split brief** | `lead` cutting one brief into pieces and joining the reports back. **Never done once** |
 
-**NOT ESTABLISHED** for all four. They are shapes that work when a check is
-pointed at them, which is a much smaller claim than working.
+**One run by the person who wrote the method is not a trial.** What it
+establishes is narrow: the shape holds together for one turn, on a project that
+is not this one. It says nothing about the second week, about somebody else's
+judgement of the briefs, or about whether any of it survives a person who did
+not design it.
+
+**A split brief remains NOT ESTABLISHED**, and so does everything about more
+than one person.
 
 ---
 

@@ -289,3 +289,47 @@ exact point of failure with none of the context.
 **What it cost.** Five minutes, and it is the most useful five minutes in this
 log, because it is the first time anybody has installed this kit the way a
 stranger would.
+
+## 11 — The director held a project that was not this one
+
+**When.** The same evening as entry 10, an hour later, on a different project
+in a different repository.
+
+**What happened.** The kit was installed on a new project, `formwork setup` was
+answered for the first time by somebody other than a test, and the director was
+asked for the first piece of work.
+
+It behaved the way the page says, which is the finding. It read the standing
+brief before replying. It noticed the file was still the template below the
+first heading and **said so instead of carrying on**. It took the number from
+the check rather than counting. It wrote one numbered brief to `docs/briefs/`.
+It argued for a recommendation about how the work should be done, said plainly
+that the recommendation was not a decision and that no record existed, and
+**stopped on one question** rather than taking the small version of the choice
+itself.
+
+**What this establishes, narrowly.** The upper layer works for one turn on a
+project that is not the kit. `limits.md` said "never held a real project", and
+that sentence is now false and has been replaced with what is actually true.
+
+**What it does not establish.** It was one turn, run by the person who wrote
+the method, who knew what the role was supposed to do. Nothing is known about
+the second week, about somebody else reading those briefs, or about whether any
+of this survives a person who did not design it. A split brief has still never
+been run.
+
+**The friction, which is the part worth writing down.** Two things, neither of
+them the method:
+
+The commits carried a work email, because a global git identity applies to
+every repository on the machine. Nothing in this kit has an opinion about that,
+and it was caught by looking rather than by any check.
+
+The repository had no remote that existed. Again nothing to do with the kit,
+and again the fix was a person looking.
+
+**The general form.** The first real use of a method finds almost nothing wrong
+with the method, and two things wrong with the ground it is standing on. That
+is normal and it is worth expecting, because the temptation is to read a quiet
+first run as proof the method is good, when it mostly proves the setup was
+wrong in ways the method never claimed to cover.
