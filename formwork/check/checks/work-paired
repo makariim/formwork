@@ -1,0 +1,148 @@
+#!/usr/bin/env python3
+"""Check: every piece of work that was finished left a report.
+
+    work-paired <directory>
+    work-paired --next <directory>    print the number the next brief takes
+
+Briefs live in docs/briefs/, reports in docs/reports/, and they pair by the
+number at the front of the filename:
+
+    docs/briefs/007-slow-login.md
+    docs/reports/007-slow-login.md
+
+A brief carries `status: open`, `done` or `dropped`.
+
+A round is one piece of work like any other, so it takes a number too. Its
+brief is short and points at `docs/rounds/<name>/`, where the argument lives.
+The report at the same number says what came out.
+
+CATCHES  A brief marked done with no report. That is work that happened and
+         left nothing behind, which is the state everybody's memory is already
+         in and the reason none of this can be reconstructed later.
+
+         Also a report answering a brief that does not exist, two briefs
+         sharing a number, and a status nobody can read.
+
+An open brief is not a problem. Work in progress is the normal state of a
+project, and a check that complained about it would be a check people turn off.
+
+Exit status:
+    0   every finished brief has its report
+    1   at least one does not, and it is named
+    2   the check could not run
+"""
+import os
+import re
+import sys
+
+BRIEFS = os.path.join("docs", "briefs")
+REPORTS = os.path.join("docs", "reports")
+NUMBERED = re.compile(r"^(\d{1,6})[-_]")
+STATUS = re.compile(r"^\s*status\s*:\s*[\"']?([a-z]+)", re.M | re.I)
+
+OPEN, DONE, DROPPED = "open", "done", "dropped"
+ALLOWED = (OPEN, DONE, DROPPED)
+
+
+def numbered(root, sub):
+    """Every numbered markdown file in a folder, as {number: [filenames]}."""
+    d = os.path.join(root, sub)
+    out = {}
+    if not os.path.isdir(d):
+        return None
+    for fn in sorted(os.listdir(d)):
+        if not fn.endswith(".md") or fn.upper().startswith("README"):
+            continue
+        m = NUMBERED.match(fn)
+        if not m:
+            out.setdefault(None, []).append(fn)
+            continue
+        out.setdefault(int(m.group(1)), []).append(fn)
+    return out
+
+
+def main(argv):
+    want_next = "--next" in argv
+    args = [a for a in argv[1:] if not a.startswith("--")]
+    if not args:
+        print("usage: work-paired [--next] <directory>", file=sys.stderr)
+        return 2
+    root = args[0]
+    if not os.path.isdir(root):
+        print("ERROR: not a directory: %s" % root, file=sys.stderr)
+        return 2
+
+    briefs = numbered(root, BRIEFS)
+    reports = numbered(root, REPORTS)
+
+    if briefs is None:
+        if want_next:
+            print("0001")
+            return 0
+        print("no %s directory, nothing claimed" % BRIEFS)
+        return 0
+
+    if want_next:
+        taken = [n for n in briefs if n is not None]
+        print("%04d" % ((max(taken) + 1) if taken else 1))
+        return 0
+
+    problems = []
+    seen_status = []
+    reports = reports or {}
+
+    for fn in briefs.get(None, []):
+        problems.append("%s/%s — the filename does not start with a number"
+                        % (BRIEFS, fn))
+    for fn in reports.get(None, []):
+        problems.append("%s/%s — the filename does not start with a number"
+                        % (REPORTS, fn))
+
+    for n, names in sorted((k, v) for k, v in briefs.items() if k is not None):
+        if len(names) > 1:
+            problems.append("number %04d is used by %d briefs: %s"
+                            % (n, len(names), ", ".join(names)))
+            continue
+        fn = names[0]
+        try:
+            text = open(os.path.join(root, BRIEFS, fn),
+                        encoding="utf-8", errors="replace").read()
+        except OSError as e:
+            print("ERROR: cannot read %s/%s: %s" % (BRIEFS, fn, e),
+                  file=sys.stderr)
+            return 2
+        m = STATUS.search(text)
+        if not m:
+            problems.append("%s/%s — no 'status:' line. One of: %s"
+                            % (BRIEFS, fn, ", ".join(ALLOWED)))
+            continue
+        status = m.group(1).lower()
+        seen_status.append(status)
+        if status not in ALLOWED:
+            problems.append("%s/%s — status '%s' is not one of: %s"
+                            % (BRIEFS, fn, m.group(1), ", ".join(ALLOWED)))
+        elif status == DONE and n not in reports:
+            problems.append("%s/%s — says done, and there is no report for it "
+                            "in %s" % (BRIEFS, fn, REPORTS))
+
+    for n, names in sorted((k, v) for k, v in reports.items() if k is not None):
+        if n not in briefs:
+            problems.append("%s/%s — answers brief %04d, which does not exist"
+                            % (REPORTS, names[0], n))
+
+    if problems:
+        print("%d problem(s) across %d brief(s)"
+              % (len(problems), len([k for k in briefs if k is not None])))
+        for p in problems:
+            print("  %s" % p)
+        return 1
+
+    total = len([k for k in briefs if k is not None])
+    still_open = seen_status.count(OPEN)
+    print("%d brief(s), every finished one has its report%s"
+          % (total, (", %d still open" % still_open) if still_open > 0 else ""))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

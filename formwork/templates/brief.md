@@ -7,6 +7,37 @@ Scale the paperwork to the work, or the work stops happening.
 
 ---
 
+## Where it is saved
+
+`docs/briefs/0007-short-name.md`. The number comes from the check, never from
+counting the files:
+
+```
+formwork/check/checks/work-paired --next .
+```
+
+The top of the file carries two lines:
+
+```markdown
+---
+status: open
+date: 2026-09-13
+---
+```
+
+`status` is `open` while the work is live, `done` once the report is in
+`docs/reports/`, and `dropped` if it was abandoned. **A brief marked done with
+no report fails the gate**, because work that left nothing behind is work
+nobody can reconstruct later.
+
+Even a one line brief gets saved. One line plus those two is a complete file.
+
+**A round takes a number too.** Its `docs/briefs/` file is short: this is a
+round, and the argument is in `docs/rounds/<name>/`. The full brief lives in
+that folder. See [`../round.md`](../round.md).
+
+---
+
 ## 1. Goal
 
 What this is for, and why it exists. One paragraph.
