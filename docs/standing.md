@@ -58,12 +58,15 @@ and it cuts across what `role-shape` is for.
 
 ## What is next
 
-Skills, so the common jobs are one word instead of a paragraph.
-
-Then a model and an effort level per role, for people whose provider offers
-more than one.
+One aggressive audit pass over everything version two added, then release
+0.2.0.
 
 ## What we tried and stopped
+
+Skills, and a model and effort level per role. Both were planned for version
+two and both were dropped before starting. The model one turned out to be
+Claude Code only as far as anybody has checked, which makes it a smaller
+feature than it sounded.
 
 Scrambling the contents of fixtures so a check could not recognise them. It
 broke the checks that read filenames for real reasons. Recorded in
