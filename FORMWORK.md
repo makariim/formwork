@@ -12,16 +12,13 @@ Everything is one loop. Only the size changes.
 BRIEF → WORK → CHECK → REPORT → STOP → you say go → BRIEF …
 ```
 
-| Size | How long | The brief is | The report is |
-|---|---|---|---|
-| task | minutes | one line | files changed, check result |
-| checkpoint | one sitting | six headings | the full list |
-| round | hours to days | a question per role | a round record |
-| phase | weeks | what it settles | one document |
-| milestone | months | a direction | — |
+**The agent halts at STOP and waits for you**, however small the job was.
 
-Each one answers four questions: what it produces, what must be true before it
-starts, who says go, and **what would tell us it failed.**
+Five sizes run this way, from a task of minutes to a milestone of months. The
+sizes, and how to pick one, are in [`formwork/loop.md`](formwork/loop.md).
+
+Work is handed down from a planning conversation and reported back up by you.
+That part is in [`formwork/threads.md`](formwork/threads.md).
 
 ---
 
@@ -92,7 +89,7 @@ A rule you follow without understanding gets dropped quietly later anyway.
 
 ## Settings
 
-This is the whole file, and the installer writes it for you:
+One file, `.formwork.toml`, and the installer writes it for you:
 
 ```toml
 [bindings]
@@ -101,10 +98,15 @@ runtime = "claude-code"          # which tool you use
 [strength]
 git_boundary = "block"           # block | warn | off
 protect_files = "block"          # block | warn | off
+aggregate_gate = "block"         # the turn-end gate
+gate_budget = 3                  # refusals before it stands aside
 ```
 
-`[strength]` tunes how hard the enforced guards bite. `[bindings]` is your
-setup. There is no third section: see above.
+`[bindings]` is your setup. `[strength]` tunes how hard the enforced guards
+bite. There is no third section: see above.
+
+**The last two lines appear only once you change them.** They have working
+defaults, so a fresh file is shorter than this.
 
 **You do not have to write any of it by hand.** `formwork setup` asks a few
 questions once, shows you everything it is about to do, and writes it only if
@@ -117,13 +119,6 @@ you say yes:
 
 It never overwrites a file you already have, and it never touches
 `[bindings]`, which the installer worked out by looking at your project.
-
-**Two more keys exist and both live in `[strength]`:**
-
-```toml
-aggregate_gate = "block"   # block | warn | off. The turn-end gate
-gate_budget = 3            # how many times it refuses before standing aside
-```
 
 For one session only:
 
@@ -147,10 +142,7 @@ Adding your own is copying `TEMPLATE.md`, filling in five sections and four
 frontmatter fields. A role missing any of them does not load.
 
 **How they talk to you** is one page, [`formwork/style.md`](formwork/style.md),
-pointed at from every generated role. Short by default, red first, a number
-with the command that made it, and NOT ESTABLISHED where nothing was measured.
-Write your own in `docs/style.md` and it wins. Nothing enforces either, and the
-page says so.
+pointed at from every generated role. Your own `docs/style.md` overrides it.
 
 The installer generates them for your runtime. To regenerate after an edit:
 
@@ -176,9 +168,9 @@ trusting any of this further than it deserves.
 **A check that refuses rather than advises.** Most tooling tells you something
 is wrong and lets the work continue. This stops the turn.
 
-**Rules about what counts as evidence.** A figure is reported together with the
-command behind it. Anything unmeasured says so in capitals. A check that nobody has
-watched fail is not treated as proof of anything.
+**Rules about what counts as evidence.** A figure arrives with the command
+behind it. A gap is named rather than filled. A check nobody has watched fail
+is not treated as proof of anything.
 
 Both came out of real use. Neither has been tried by anybody else yet, and the
 kit would rather say that than imply a crowd that does not exist.

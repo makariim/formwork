@@ -1,16 +1,8 @@
 # Questions people ask
 
-> **`command not found: formwork`?**
->
-> You have the kit but not the command. Everything on this page also works
-> with `formwork/fw` from the top of your project:
->
-> ```
-> formwork/fw check
-> formwork/fw record
-> ```
->
-> To get the short command: `pipx install formwork-kit`.
+> **`command not found: formwork`?** Every command here has a second form that
+> needs nothing installed.
+> [`formwork/troubleshooting.md`](formwork/troubleshooting.md) has both.
 
 ---
 
@@ -142,9 +134,17 @@ provider as it always did, which is between you and them.
 ### Does it change my project?
 
 It adds and never removes. Install writes your settings, your hook wiring and
-your role files, plus one file in `~/.formwork/` holding a fingerprint of
-everything that enforces a rule. That one lives outside so a change to a guard
-cannot be hidden by changing the record next to it.
+your role files, and one file outside your project in `~/.formwork/`.
+[`formwork/first-run.md`](formwork/first-run.md) says what that last one is for.
+
+### Why did the agent ignore my style file?
+
+Because nothing makes it obey one. `docs/style.md` is a document, and documents
+are advice. The only thing a check can prove is that every role points at the
+page, which it does.
+
+If it keeps happening, say so in the turn. A style file is a default, not a
+rule that refuses.
 
 ### Why does it keep asking me to run `formwork record`?
 
@@ -162,9 +162,8 @@ It was pulled out of two real projects that were already being run this way.
 Nothing here is theoretical. Every rule is in the kit because something went
 wrong without it.
 
-When the kit failed on its own author, that went into
-[`docs/dogfood.md`](docs/dogfood.md) instead of being quietly patched. Read
-that log before you decide what you think.
+Its failures are written down in [`docs/dogfood.md`](docs/dogfood.md). Read that
+before you decide what you think of the rest.
 
 ### Is it stable?
 

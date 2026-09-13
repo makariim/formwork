@@ -10,9 +10,8 @@ about a second. Your share is step 4, which is real work on your own project,
 and nobody can time that for you.
 
 > [!TIP]
-> **`command not found: formwork`?** Everything here also works as
-> `formwork/fw check`, `formwork/fw record` and so on, from the top of your
-> project. To get the short command: `pipx install formwork-kit`.
+> **`command not found: formwork`?** Every command here has a second form that
+> needs nothing installed. [`troubleshooting.md`](troubleshooting.md) has both.
 
 ---
 
@@ -49,6 +48,20 @@ which agent when it cannot tell.
 
 **Read the exit code.** `0` finished. `1` got as far as it could and prints a
 `NOT FINISHED` list. `2` could not run.
+
+Then answer some questions, once:
+
+```
+formwork setup
+```
+
+It asks how long you want replies, in which language, what you are building,
+where it is now, and how hard the guards should bite. Enter takes the default
+on every one. From your answers it writes `docs/style.md`, starts
+`docs/standing.md`, and makes the folders for decisions, briefs and reports.
+
+**It shows you everything before it writes anything**, and it never overwrites
+a file you already have.
 
 **On Claude Code the gate is green straight away.** On the other three it
 writes your config and roles but cannot wire the hooks, because the kit ships
@@ -113,7 +126,13 @@ Rename `foo` to `bar` in the parser. Nothing else.
 
 That is a complete brief: a goal, a scope, and a fence.
 
-Let the agent do it. Then read what comes back:
+Now hand it over. This is the whole first turn, typed at your agent:
+
+> Read `FORMWORK.md`. Then do this brief, and nothing else:
+> **Rename `foo` to `bar` in the parser.**
+> Run `formwork check` when you are finished, then report and stop.
+
+Then read what comes back:
 
 ```
 Renamed foo -> bar in parser.py and its two tests.
@@ -145,24 +164,24 @@ Everything on it now refers to something you have already seen.
 Nothing else is required today. These are the pages for when the situation
 arrives:
 
-| | |
+| When | Open |
 |---|---|
-| [`loop.md`](loop.md) | the working loop in full: brief, work, check, report, stop |
-| [`threads.md`](threads.md) | how work starts, and where the plan lives between conversations |
-| [`style.md`](style.md) | how the agents talk to you, and how to change it |
-| [`round.md`](round.md) | how to run a round, and when one is worth the money |
-| [`templates/`](templates/) | the brief, the report, the decision record, the round, the standing brief |
-| [`roles/HOW-TO-ADD-A-ROLE.md`](roles/HOW-TO-ADD-A-ROLE.md) | adding your own |
-| [`COSTS.md`](COSTS.md) | what this costs, and the number nobody has |
-| [`limits.md`](limits.md) | what the guards cannot do. Read before trusting them |
-| [`glossary.md`](glossary.md) | any word here you did not recognise |
-| [`troubleshooting.md`](troubleshooting.md) | when something goes wrong |
+| the job is bigger than one sitting | [`loop.md`](loop.md) |
+| you close the window and lose where you were | [`threads.md`](threads.md) |
+| the replies are too long, too short, or in the wrong language | [`style.md`](style.md) |
+| the answer is unclear and getting it wrong is expensive | [`round.md`](round.md) |
+| you are staring at a blank file | [`templates/`](templates/) |
+| a job nobody here owns | [`roles/HOW-TO-ADD-A-ROLE.md`](roles/HOW-TO-ADD-A-ROLE.md) |
+| somebody asks what this costs | [`COSTS.md`](COSTS.md) |
+| you are about to trust a guard with something that matters | [`limits.md`](limits.md) |
+| a word here meant nothing to you | [`glossary.md`](glossary.md) |
+| a red message you have not seen before | [`troubleshooting.md`](troubleshooting.md) |
 
 ---
 
 ## What you have not been told
 
-Forty-six rules exist, in [`rules/`](rules/). Thirteen you meet daily,
+Forty-seven rules exist, in [`rules/`](rules/). Thirteen you meet daily,
 thirty-four for particular situations. You have seen three of them, by
 watching them catch something.
 
@@ -173,13 +192,10 @@ remember none.
 
 It will. Several of these rules came from failures you have not had.
 
-Each one says what it catches. **If you never hit that, delete it** from
-`formwork/rules/core.md`, so that losing a rule is a line in your version
-control with your name on it. There is no switch for this in `.formwork.toml`
-on purpose. What that file tunes is how hard the guards bite: `block`, `warn`
-or `off`.
-
-A rule followed without understanding gets dropped quietly later anyway.
+Every rule says what it catches, so you can judge each one against your own
+project and throw out the ones that do not apply. Deleting is the only way to
+drop a rule, and [`../FORMWORK.md`](../FORMWORK.md) explains why there is no
+switch for it.
 
 ## If your agent cannot block
 

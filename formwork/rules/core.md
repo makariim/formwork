@@ -138,9 +138,9 @@ Then the three that matter:
 - work in the request you left undone, with the reason
 - anywhere the brief turned out to be inaccurate
 
-**Catches:** work that followed the request exactly needs no defence. What you
-are scanning for happens at the margins of an instruction, and only these three
-bring it into view.
+**Catches:** a report shaped to whatever happened, which cannot be compared
+with the last one. The same headings every time are what let you notice that
+the third line is missing again.
 
 ---
 

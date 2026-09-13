@@ -70,6 +70,41 @@ If yes, it is two pieces of work. Split it there.
 *That test comes from a published engineering-process kit, not from this
 method. A file count is arbitrary and this is not.*
 
+**One brief can still be too big for one sitting.** Then it goes to the `lead`
+role, which cuts it up, hands the pieces to other roles, and gives you back one
+report. You still say go once, and read one report.
+
+---
+
+## Where the brief and the report live
+
+Both are files, numbered in pairs:
+
+```
+docs/briefs/0007-slow-login.md      status: open, done or dropped
+docs/reports/0007-slow-login.md     the same number, written when work stops
+```
+
+A round takes a number too. Its argument lives in `docs/rounds/<name>/` and its
+line in the list is a short brief and a short report, like everything else.
+
+`formwork check` fails when a brief says done and no report exists. Work that
+happened and left nothing behind cannot be reconstructed later, and that is the
+only thing the check is watching for.
+
+Take the next number from the check, never by counting:
+
+```
+formwork/check/checks/work-paired --next .
+```
+
+---
+
+## How a report is written
+
+What it contains is [`templates/report.md`](templates/report.md). How it reads
+is [`style.md`](style.md), and your own `docs/style.md` overrides that.
+
 ---
 
 ## What STOP means

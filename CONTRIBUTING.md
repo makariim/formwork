@@ -26,7 +26,7 @@ both answers help.
 ```
 formwork check    must say green
 formwork demo     must reject every broken test case
-formwork test     all 295 must pass
+formwork test     all 328 must pass
 ```
 
 ---
@@ -37,8 +37,8 @@ These are taken from the kit itself.
 
 > [!IMPORTANT]
 > **Change a guard or a check, and add the test that would have caught the
-> bug.** Show it failing without your fix. A check nobody has seen fail proves
-> nothing.
+> bug.** Show it failing without your fix, then passing with it. Both halves,
+> or the test is decoration.
 >
 > **Write down a number, and write down the command that made it.**
 
