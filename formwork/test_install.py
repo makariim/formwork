@@ -43,14 +43,25 @@ STATE = tempfile.mkdtemp(prefix="fw-test-state-")
 def install(project, *args):
     env = dict(os.environ)
     env["FORMWORK_STATE_DIR"] = os.path.join(STATE, os.path.basename(project))
-    p = subprocess.run([sys.executable, INSTALL] + list(args),
+    # The copy of the kit inside this throwaway project, never the one in the
+    # repository. The installer works on the project that holds it, so running
+    # the repository's own copy here would write into the repository.
+    p = subprocess.run([sys.executable,
+                        os.path.join(project, "formwork", "install")]
+                       + list(args),
                        capture_output=True, text=True, cwd=project, env=env)
     return p.returncode, p.stdout + p.stderr
 
 
 def project(**dirs):
-    """A throwaway project. dirs maps a path to its contents, or None for a dir."""
+    """A throwaway project with a copy of the kit in it.
+
+    dirs maps a path to its contents, or None for a directory.
+    """
     d = tempfile.mkdtemp(prefix="fw-install-")
+    shutil.copytree(HERE, os.path.join(d, "formwork"),
+                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc",
+                                                  "fixtures"))
     for rel, content in dirs.items():
         full = os.path.join(d, rel)
         if content is None:
@@ -62,8 +73,17 @@ def project(**dirs):
 
 
 def tree(root):
+    """Everything in the project except the kit itself.
+
+    The kit is copied in when the project is made, and it is not something the
+    installer wrote, so counting it would make every "wrote nothing" test wrong
+    by two hundred files.
+    """
     out = {}
     for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [d for d in dirnames
+                       if os.path.join(dirpath, d) != os.path.join(root,
+                                                                   "formwork")]
         for fn in filenames:
             full = os.path.join(dirpath, fn)
             out[os.path.relpath(full, root)] = open(full, encoding="utf-8").read()
@@ -114,12 +134,45 @@ check("kept a copy of the original",
       os.path.exists(os.path.join(p, ".claude", "settings.json.before-formwork")),
       True)
 
-print("It demands no document")
+print("It demands no document, and writes only what it said it would")
 p = project(**{".claude/": None})
 code, out = install(p)
 files = set(tree(p))
-check("wrote only the two things it said it would",
-      files, {".formwork.toml", ".claude/settings.json"}, out)
+# The configuration, the wiring, and the generated roles. Nothing else: no
+# documents demanded, no folders invented, nothing touched in src/.
+#
+# This used to assert two files and pass, because the throwaway project had no
+# kit in it and the generator had nothing to generate from. The harness was
+# wrong, not the installer.
+check("wrote the configuration and the wiring",
+      {".formwork.toml", ".claude/settings.json"} <= files, True, out)
+strays = {f for f in files
+          if f not in (".formwork.toml", ".claude/settings.json")
+          and not f.startswith(os.path.join(".claude", "agents") + os.sep)}
+check("and nothing else at all", strays, set(), out)
+check("the roles it generated are all it generated",
+      len(files) - 2, 28, out)
+
+print("Run from a subfolder, it still means the project")
+p = project(**{".claude/": None, "src/main.py": "pass\n"})
+sub = os.path.join(p, "src")
+env = dict(os.environ)
+env["FORMWORK_STATE_DIR"] = os.path.join(STATE, "subfolder")
+run = subprocess.run([sys.executable,
+                      os.path.join(p, "formwork", "install")],
+                     capture_output=True, text=True, cwd=sub, env=env)
+out = run.stdout + run.stderr
+# It used to take the working directory as the project. From a subfolder that
+# meant looking for the agent's folder in the wrong place and refusing, or,
+# with --runtime given, writing a second configuration into the subfolder and
+# calling it a success while the real project stayed unwired.
+check("finds the runtime one level up", run.returncode, 0, out)
+check("wrote the configuration in the project",
+      os.path.exists(os.path.join(p, ".formwork.toml")), True, out)
+check("and nothing into the subfolder",
+      sorted(os.listdir(sub)), ["main.py"], out)
+check("and says which project it chose", "which is where this kit lives" in out,
+      True, out)
 
 print("When it cannot tell")
 p = project(**{"src/main.py": "pass\n"})

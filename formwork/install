@@ -318,7 +318,19 @@ def generate_roles(root, runtime, dry_run):
 def main(argv):
     args = argv[1:]
     dry_run = "--dry-run" in args
-    root = os.getcwd()
+    # The project is the folder holding this kit, never the folder somebody
+    # happened to be standing in. Using the working directory meant that
+    # running this from a subfolder wrote a second configuration and a second
+    # settings file into that subfolder, reported success, and left the real
+    # project unwired. It also looked for the agent's folder in the wrong
+    # place and refused, saying no runtime was set up, while one sat one level
+    # above.
+    root = ROOT
+    here = os.getcwd()
+    if os.path.realpath(here) != os.path.realpath(root):
+        print("Installing into %s, which is where this kit lives." % root)
+        print("You are standing in %s." % here)
+        print("")
 
     if "--runtime" in args:
         i = args.index("--runtime")
