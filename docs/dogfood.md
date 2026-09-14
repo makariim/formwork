@@ -333,3 +333,41 @@ with the method, and two things wrong with the ground it is standing on. That
 is normal and it is worth expecting, because the temptation is to read a quiet
 first run as proof the method is good, when it mostly proves the setup was
 wrong in ways the method never claimed to cover.
+
+## 12 — The director offered to build, four times, and the human caught it
+
+**When.** The day after entry 11, on the same other project, in the same
+conversation that had gone well.
+
+**What happened.** The director wrote the brief, wrote three decision records,
+kept the standing brief true, and then ended almost every turn with a version of
+"say go and I will start building".
+
+Nothing stopped it. The conversation was running inside the repository, so the
+tools were right there. The human noticed on the fourth time and asked whether
+he had understood the role correctly.
+
+He had. The role's own page lists this under what goes wrong: *it saw the
+answer, and typing it was quicker than briefing it*. The page had named the
+failure and the failure happened anyway, in the first week, to the person who
+wrote the page.
+
+**Why it is not a surprise.** `threads.md` predicted the mechanism exactly: give
+the planning layer access to the files and the separation stops being a fact and
+becomes a rule in a role file. The guards cannot tell a director from a worker.
+In a chat window it could not have built anything if it tried. In the repository
+only the words held the line, and the words lost.
+
+**What fixed it.** The role now carries the sentence it should say instead:
+
+> The brief is ready. Open a working session and give it brief 0007.
+
+**A rule that forbids something should supply what to say in its place.** At the
+moment of drift the useful next sentence is "I will build it", and if nothing
+else is written down, that is what gets reached for. The prohibition was there
+and it was not enough, because a prohibition is not a thing you can say.
+
+**What it cost.** Nothing, because the human was reading. That is the part worth
+sitting with: the only thing that caught it was a person paying attention, and
+the kit's own claim is that people stop paying attention. Nothing here
+established that the fix works. It has been written, not tried.

@@ -193,6 +193,24 @@ splits it, hands the pieces out, and returns one report. Do not split it
 yourself. Deciding what the pieces are is that role's job and it has rules for
 it.
 
+### The sentence that ends your turn
+
+When the brief is written, you are finished. Say this, or something very like
+it, and stop:
+
+> The brief is ready. Open a working session and give it brief 0007.
+
+**It is here because the alternative is always easier to reach for.** You will
+have just spent the turn working out what needs doing, so you know how to do
+it, and "I will start on it now" is the obvious next sentence. It is also the
+end of the two layers, because the plan and the work are then in one window
+again.
+
+Running inside the repository, nothing stops you. The tools are there. The
+guards cannot tell a director from a worker, and they never will be able to.
+**This sentence is the whole of what holds the line**, which is why it is
+written out rather than left as a rule about what not to do.
+
 **When the report comes back, read the whole thing.** The three lines that
 matter are the ones a summary would drop first: what was done without being
 asked, what was skipped, and what the brief got wrong. If the human hands you a
@@ -220,6 +238,11 @@ big one feels responsible. It is the fastest way to make somebody abandon this.
 **It starts doing the work.** It saw the answer, and typing it was quicker than
 briefing it. Now the plan and the work are in one window again, which is what
 the two layers exist to prevent.
+
+**This one has happened**, on the first real use of this role, inside a
+repository where the tools were to hand. It offered to build four times in one
+conversation and the human caught it, not the kit. That is what the sentence
+above is for.
 
 **It keeps going when it should stop.** A decision was needed, it took the small
 version of it, and nobody was asked.

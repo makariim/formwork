@@ -136,7 +136,7 @@ wrong assumption shows up as a refusal rather than as silent permission.
 | | |
 |---|---|
 | **`formwork setup`** | run on a new project. Its questions have been answered once, by the author |
-| **The director role** | **run once**, on a different project, on the day it was written. It read a standing brief, saw the file was still the template and said so, wrote one numbered brief, argued for a recommendation, refused to decide it, and stopped on one question |
+| **The director role** | **run twice**, on a different project. It held the plan, wrote the briefs and the decision records, and kept the standing brief true. It also offered to do the building four times, which its own page names as the way this role fails, and the human caught it rather than the kit |
 | **The folder route** | used in that same session. The number came from the check, the brief was saved under it |
 | **A split brief** | `lead` cutting one brief into pieces and joining the reports back. **Never done once** |
 
@@ -148,6 +148,12 @@ not design it.
 
 **A split brief remains NOT ESTABLISHED**, and so does everything about more
 than one person.
+
+**And one thing the second run established that nobody wanted:** with the
+planning layer inside the repository, the separation between planning and
+building is a sentence in a file and nothing else. It failed within a day. The
+role now carries the words to say instead, and whether that is enough is itself
+NOT ESTABLISHED. See entry 12 of `docs/dogfood.md`, in the source repository.
 
 ---
 
