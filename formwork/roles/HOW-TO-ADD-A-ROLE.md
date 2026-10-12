@@ -35,6 +35,13 @@ Converting one takes about five minutes:
 4. **Set the tool grant deliberately.** Most imported roles assume they can do
    anything. Decide what this one actually needs.
 5. **Give it an `owns` slug** nobody else has.
+6. **Keep its `description`, `model`, `skills` and `color`** if it had them.
+   All four are optional frontmatter keys. A `description` replaces the Owns
+   sentence as the text the agent is picked by, on every runtime. `model`,
+   `skills` and `color` bind on Claude Code only; on the other runtimes the
+   generated file says the role asked for them and writes none of them. A key
+   written with nothing after it stops `formwork roles`, so a role that asked
+   for a model never runs on the default without anybody being told.
 
 An unconverted role does not load. That is on purpose: a role with no stated
 boundary is a role that will wander into somebody else's work.

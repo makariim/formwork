@@ -357,7 +357,7 @@ in your own words, which beats it. Every role points at both.
 | **12 checks** | small programs that read your project and say green or red | `ls formwork/check/checks \| wc -l` |
 | **28 roles** | one file each, saying what that job does and where it stops | `ls formwork/roles/*/*.md \| wc -l` |
 | **47 rules** | 13 you meet daily, 34 for when you need them | `grep -c '^### ' formwork/rules/*.md` |
-| **356 tests** | every guard and check, proved able to fail | `formwork test` |
+| **382 tests** | every guard and check, proved able to fail | `formwork test` |
 
 It is all text files and small programs. You can read every line. Nothing is
 hidden. Nothing is sent anywhere.
@@ -403,7 +403,7 @@ today:
 | | |
 |---|---|
 | **Skills** | one word for a common job, instead of a paragraph. Considered, not started |
-| **A model per role** | pick the model and effort level for each role. Only Claude Code is known to allow it. Nobody has checked the other three, so this would be one agent out of four until somebody does |
+| **A model per role** | not a kit feature. What is built is narrower: a role may carry `model`, `skills` and `color`, and the generator passes them to Claude Code as written instead of dropping them. On the other three it writes a note, not a key. Effort level is not carried. Whether the other three have an equivalent is NOT ESTABLISHED |
 | **Teams** | more than one person on the same standing brief. Today the method says one director at a time, and nobody has tried two |
 | **Roles invented on the fly** | asked for by somebody who tried the kit. It cuts across the check that stops two roles owning one job, so it stays a question we have not settled |
 

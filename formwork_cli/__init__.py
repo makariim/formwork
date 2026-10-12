@@ -66,6 +66,7 @@ TESTS = [
     os.path.join("check", "test_gate.py"),
     "test_install.py",
     "test_setup.py",
+    "test_build.py",
 ]
 
 

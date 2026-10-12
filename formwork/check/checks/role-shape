@@ -5,7 +5,8 @@
 
 Over every role in formwork/roles/:
 
-  1. it declares name, pack, owns and tools
+  1. it declares name, pack, owns and tools. It may also declare
+     description, model, skills and color, which are optional
   2. it has all five sections
   3. no other role claims the same `owns` slug
   4. only the lead may hold `spawn`
@@ -29,6 +30,10 @@ ROLES_SUBDIR = os.path.join("formwork", "roles")
 SKIP = {"TEMPLATE.md", "HOW-TO-ADD-A-ROLE.md", "README.md"}
 SECTIONS = ("Owns", "Does not own", "Tools", "Stops when", "Would be wrong if")
 FIELDS = ("name", "pack", "owns", "tools")
+# Allowed, never required. formwork/build passes them to Claude Code and
+# writes a note in their place everywhere else. Named here so that a check
+# tightened later to refuse unknown keys does not refuse these.
+OPTIONAL_FIELDS = ("description", "model", "skills", "color")
 MAY_SPAWN = {"lead"}
 
 SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv",
