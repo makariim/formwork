@@ -1,0 +1,26 @@
+# GENERATED FROM formwork/roles/method/sample.md — DO NOT EDIT.
+# Change the source and run formwork roles. A hand-edit here fails the gate.
+
+name = "sample"
+description = "Triage for a pull request. Use to open a review. Returns the map, not the review itself."
+
+# This runtime has a sandbox mode rather than a tool list, so
+# the grant read is not expressed here. It is advice on Codex.
+
+# This role asks for model opus and skills pr-review, fact-check and color blue, and codex has no documented way to say so, so none is written here. It is advice on this runtime.
+
+developer_instructions = """
+How to write a reply: formwork/style.md. If the project has a docs/style.md, that one wins.
+
+# Sample
+
+**Owns.** One clearly stated thing.
+
+**Does not own.** Something else.
+
+**Tools.** Reading.
+
+**Stops when.** It reaches the edge.
+
+**Would be wrong if.** It carried on.
+"""

@@ -1,5 +1,5 @@
 ---
-updated: 2026-09-13
+updated: 2026-10-12
 by: the conversation that built the standing brief
 ---
 
@@ -17,11 +17,12 @@ nothing about anybody's product. It is the shape, empty.
 
 ## Where we are now
 
-**0.1.0 is what is on PyPI. 0.2.0 is ready and not released**, and until it is,
-the README describes commands a reader cannot install.
+**0.2.1 is what is on PyPI.** In this repository, not yet released: a role's
+`description`, `model`, `skills` and `color` now reach the generated Claude
+Code agent instead of being dropped.
 
-Three guards, twelve checks, twenty eight roles, forty seven rules, 356 tests
-across six suites.
+Three guards, twelve checks, twenty eight roles, forty seven rules, 382 tests
+across seven suites.
 
 Version two added: the standing brief and its check, a `director` role holding
 the upper layer, `lead` widened to split a brief as well as run a round, briefs

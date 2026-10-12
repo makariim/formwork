@@ -24,3 +24,18 @@ you cannot answer this, you do not yet know what the role is for.
 ---
 
 All five are required. A role missing one does not load, and the gate says so.
+
+**Four more frontmatter keys are optional**, for a role that started life as a
+Claude Code agent:
+
+```
+description: the text an agent is picked by. Replaces the Owns sentence
+model: opus
+skills:
+  - a-skill-name
+color: blue
+```
+
+`description` is used on every runtime. `model`, `skills` and `color` bind on
+Claude Code only. Elsewhere the generated file says the role asked for them and
+writes nothing. Leave all four out and the generated role is what it always was.

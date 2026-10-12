@@ -371,3 +371,57 @@ and it was not enough, because a prohibition is not a thing you can say.
 sitting with: the only thing that caught it was a person paying attention, and
 the kit's own claim is that people stop paying attention. Nothing here
 established that the fix works. It has been written, not tried.
+
+## 13: The generator dropped what a role author wrote, and nothing noticed
+
+**When.** The first install on a work project, 12 October 2026. One hub
+repository for the plan, seven code repositories for the work. The first use of
+the kit across more than one repository.
+
+**What happened.** Six Claude Code agents already existed on that machine,
+written before the kit. Each named a `model`, one or two `skills` and a
+`color`, and each had a `description` written to be picked by. Converting them
+into roles was going to cost all of that. `formwork/build` read every
+frontmatter key and kept six of them. The description was rebuilt from the
+Owns sentence. A `skills:` list written the usual way, one item per line, was
+not even read: the items had no colon and the line reader passed over them.
+
+So a role that asked for opus generated an agent with no model line, and would
+have run on the default the first time anybody ran `formwork roles`. Nothing
+said so. `role-shape` tolerates extra keys and `generated-current` compares the
+generated file with what the generator makes, so both were green over a file
+that had lost the one line that mattered.
+
+**Who found it.** A person converting their own agents, by reading the
+generated file. Not a check, not a test, and not an audit. No suite covered
+the generator directly at all.
+
+**What would have found it.** A test that puts keys into a role and looks for
+them coming out. That suite now exists, `formwork/test_build.py`, and it fails
+against the 0.2.1 generator.
+
+**What changed.** `description`, `model`, `skills` and `color` are carried into
+the Claude Code agent. On Codex and Gemini CLI the generated file says what
+the role asked for and writes no key, the same way the tool grant is handled.
+A key written with nothing after it stops the generator rather than being
+treated as absent.
+
+**What still cannot be caught.**
+
+- Any other key is still read and dropped without a word. An effort level is
+  one of them, and one of the six agents asked for one.
+- A model name is passed through unchecked. A misspelt one is found by Claude
+  Code or by nobody.
+- Whether Codex or Gemini CLI has an equivalent of any of the three is NOT
+  ESTABLISHED.
+- The frontmatter reader is a line reader, not YAML. A value spread over
+  several lines is still lost.
+
+**A second thing, from the same session.** The agent doing this work changed a
+check through a Python script run from the shell. The self-protection guard
+did not see it, because the path was inside the script. `kit-integrity` did,
+on the next run of the gate, which is what it is for. The agent's next attempt,
+to put the file back with a shell redirect, was refused. The route is already
+named in `formwork/limits.md`, under the guard not covering every tool the
+same way. This is the first time it was taken by accident rather than on
+purpose, and the change is left for the human to keep or undo.

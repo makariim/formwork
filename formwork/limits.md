@@ -129,6 +129,13 @@ Codex, Cursor and Gemini CLI all document a way to block, and their adapters say
 The guards now refuse rather than allow when they cannot read a payload, so a
 wrong assumption shows up as a refusal rather than as silent permission.
 
+**A role's `model`, `skills` and `color` bind on Claude Code only.** The
+generator passes them through as written and checks only that they are not
+empty, so a model name Claude Code does not recognise is not caught here. On
+the other three the generated file says the role asked for them and sets
+nothing. Whether those runtimes have an equivalent is NOT ESTABLISHED. An
+effort level is not carried anywhere.
+
 ---
 
 ## What has been run, and what has not

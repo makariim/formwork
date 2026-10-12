@@ -42,6 +42,25 @@ generated file where it cannot**, rather than emitting something that looks
 like a restriction and is not. That was decided deliberately; the two rejected
 alternatives are recorded in docs/role-formats.md.
 
+FOUR OPTIONAL KEYS, AND WHERE THEY GO
+-------------------------------------
+A role may also carry `description`, `model`, `skills` and `color`. They are
+for a role somebody wrote as a Claude Code agent before they had this kit, and
+converting it must not cost them what they had.
+
+    description   used instead of the Owns sentence, on every runtime
+    model         Claude Code only, passed through as written
+    skills        Claude Code only, written back as a YAML list
+    color         Claude Code only, passed through as written
+
+The generator used to read all of them and keep none, so a role that asked for
+one model ran on the default, and nothing said so. On a runtime with no
+documented way to express model, skills or colour, the generated file says
+that the role asked for them, the same way it does for the tool grant. Writing
+a key there that does nothing would be the same bug facing the other way.
+
+A role with none of the four generates exactly what it did before.
+
 Python 3, standard library only, no dependencies.
 """
 import os
@@ -113,16 +132,32 @@ def read_roles():
     return out
 
 
+def unquote(s):
+    if len(s) >= 2 and s[0] == s[-1] and s[0] in "\"'":
+        return s[1:-1]
+    return s
+
+
 def parse(path):
     text = open(path, encoding="utf-8").read()
     m = re.match(r"^---\n(.*?)\n---\n(.*)$", text, re.S)
     if not m:
         return None
     meta = {}
+    items = {}
+    key = None
     for line in m.group(1).split("\n"):
+        # `skills:` followed by indented `- name` lines, the way Claude Code
+        # agents write it. Read line by line, those items had no colon and
+        # vanished, so the list came out empty.
+        item = re.match(r"^\s+-\s+(.*)$", line)
+        if item and key is not None:
+            items.setdefault(key, []).append(unquote(item.group(1).strip()))
+            continue
         if ":" in line:
             k, v = line.split(":", 1)
-            meta[k.strip()] = v.strip()
+            key = k.strip()
+            meta[key] = v.strip()
     body = m.group(2).lstrip("\n")
     # Accept both `tools: ["read", "write"]` and `tools: [read, write]`.
     # Reading only the quoted form meant an unquoted list parsed as NO grants,
@@ -134,9 +169,25 @@ def parse(path):
     description = " ".join(owns.group(1).split()) if owns else meta.get("name", "")
     if len(description) > 300:
         description = description[:297].rsplit(" ", 1)[0] + "…"
+    # The four optional keys. Present means the author wrote the key; an empty
+    # value is refused later rather than quietly treated as absent.
+    extra = {}
+    for k in ("description", "model", "color"):
+        if k in meta:
+            extra[k] = meta[k]
+    if "skills" in meta:
+        raw = meta["skills"]
+        if raw.startswith("[") and raw.endswith("]"):
+            raw = raw[1:-1]
+        listed = [unquote(s.strip()) for s in raw.split(",")]
+        extra["skills"] = [s for s in listed + items.get("skills", []) if s]
+    if extra.get("description"):
+        # The author's own trigger text. Claude Code picks an agent by it, so
+        # it is used whole rather than cut to the length of an Owns sentence.
+        description = extra["description"]
     return {"name": meta.get("name", ""), "pack": meta.get("pack", ""),
             "owns": meta.get("owns", ""), "tools": tools,
-            "description": description, "body": body,
+            "description": description, "body": body, "extra": extra,
             "source": os.path.relpath(path, ROOT)}
 
 
@@ -157,12 +208,41 @@ def resolve_tools(runtime, grants):
     return names, []
 
 
+def asked_for(role):
+    """What the role asked for beyond its tools, in words, or None.
+
+    For a runtime that cannot be told. Whether Codex or Gemini CLI has an
+    equivalent of model, skills or color is NOT ESTABLISHED, and a guessed key
+    name would be a setting that looks like it works and does not.
+    """
+    extra = role["extra"]
+    said = []
+    if extra.get("model"):
+        said.append("model `%s`" % extra["model"])
+    if extra.get("skills"):
+        said.append("skills %s" % ", ".join("`%s`" % s
+                                            for s in extra["skills"]))
+    if extra.get("color"):
+        said.append("color `%s`" % extra["color"])
+    return " and ".join(said) if said else None
+
+
+def asked_for_note(role, runtime):
+    said = asked_for(role)
+    if said is None:
+        return None
+    return ("This role asks for %s, and %s has no documented way to say so, "
+            "so none is written here. It is advice on this runtime."
+            % (said, runtime))
+
+
 def render_markdown(role, runtime):
     names, unmapped = resolve_tools(runtime, role["tools"])
     if not role["tools"]:
         # No grant could be read at all. Emitting frontmatter without a tools
         # key means "every tool" on some runtimes, so say so instead.
         unmapped = ["(the grant could not be read from the source)"]
+    extra = role["extra"]
     lines = ["---", "name: %s" % role["name"],
              "description: %s" % role["description"]]
     if runtime == "gemini-cli":
@@ -173,6 +253,14 @@ def render_markdown(role, runtime):
         else:
             lines.append("tools:")
             lines += ["  - %s" % n for n in names]
+    if runtime == "claude-code":
+        if extra.get("model"):
+            lines.append("model: %s" % extra["model"])
+        if extra.get("skills"):
+            lines.append("skills:")
+            lines += ["  - %s" % s for s in extra["skills"]]
+        if extra.get("color"):
+            lines.append("color: %s" % extra["color"])
     lines.append("---")
     lines.append("")
     for line in (BANNER % role["source"]).split("\n"):
@@ -189,6 +277,10 @@ def render_markdown(role, runtime):
                      % (", ".join("`%s`" % t for t in role["tools"]),
                         runtime, " and ".join("`%s`" % u for u in unmapped)))
         lines.append("")
+    note = None if runtime == "claude-code" else asked_for_note(role, runtime)
+    if note:
+        lines.append("> %s" % note)
+        lines.append("")
     lines.append(role["body"].rstrip())
     lines.append("")
     return "\n".join(lines)
@@ -203,12 +295,16 @@ def render_toml(role):
     out = ["# %s" % b for b in banner]
     out.append("")
     out.append('name = "%s"' % toml_escape(role["name"]))
-    out.append('description = "%s"' % toml_escape(role["description"]))
+    out.append('description = "%s"' % toml_escape(unquote(role["description"])))
     out.append("")
     out.append("# This runtime has a sandbox mode rather than a tool list, so")
     out.append("# the grant %s is not expressed here. It is advice on Codex."
                % ", ".join(role["tools"]))
     out.append("")
+    note = asked_for_note(role, "codex")
+    if note:
+        out.append("# %s" % note.replace("`", ""))
+        out.append("")
     out.append('developer_instructions = """')
     out.append(STYLE_NOTE.replace("**", "").replace("`", ""))
     out.append("")
@@ -289,6 +385,21 @@ def unsafe_names(roles):
     return bad
 
 
+def empty_keys(roles):
+    """Optional keys that were written with nothing in them.
+
+    Treating `model:` with no value as absent would run the role on the
+    default model, which is the failure these keys exist to prevent.
+    """
+    bad = []
+    for r in roles:
+        for k in ("description", "model", "skills", "color"):
+            if k in r["extra"] and not r["extra"][k]:
+                bad.append("%s declares %s: with nothing in it. Give it a "
+                           "value or remove the line." % (r["source"], k))
+    return bad
+
+
 def outputs(runtimes):
     """{path: contents} for every runtime asked for."""
     files = {}
@@ -296,7 +407,7 @@ def outputs(runtimes):
     roles = [r for r in roles if r and r["name"]]
     if not roles:
         return None
-    bad = unsafe_names(roles)
+    bad = unsafe_names(roles) + empty_keys(roles)
     if bad:
         raise ValueError("\n".join(bad))
     for runtime in runtimes:
@@ -358,8 +469,8 @@ def main(argv):
     try:
         files = outputs(runtimes)
     except ValueError as e:
-        print("ERROR: %d role name(s) cannot be used:" % len(str(e).split("\n")),
-              file=sys.stderr)
+        print("ERROR: %d problem(s) stop these roles being generated:"
+              % len(str(e).split("\n")), file=sys.stderr)
         for line in str(e).split("\n"):
             print("  %s" % line, file=sys.stderr)
         return CANNOT_RUN
