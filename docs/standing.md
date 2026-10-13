@@ -1,5 +1,5 @@
 ---
-updated: 2026-10-12
+updated: 2026-10-13
 by: the conversation that built the standing brief
 ---
 
@@ -19,10 +19,14 @@ nothing about anybody's product. It is the shape, empty.
 
 **0.2.1 is what is on PyPI.** In this repository, not yet released: a role's
 `description`, `model`, `skills` and `color` now reach the generated Claude
-Code agent instead of being dropped.
+Code agent instead of being dropped. And, from the first multi-repository use,
+the human kept in the loop: `work-paired` allows one open brief by default and
+refuses a brief marked done until its report carries the human's read-back. A
+fourteenth core rule says the human is not the courier. See entry 14 of
+`docs/dogfood.md`.
 
-Three guards, twelve checks, twenty eight roles, forty seven rules, 382 tests
-across seven suites.
+Three guards, twelve checks, twenty eight roles, forty eight rules, 400
+tests across seven suites.
 
 Version two added: the standing brief and its check, a `director` role holding
 the upper layer, `lead` widened to split a brief as well as run a round, briefs

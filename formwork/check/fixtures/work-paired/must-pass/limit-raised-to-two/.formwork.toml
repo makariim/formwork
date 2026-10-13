@@ -1,0 +1,5 @@
+[bindings]
+runtime = "claude-code"
+
+[strength]
+open_briefs = 2

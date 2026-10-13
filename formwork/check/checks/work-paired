@@ -23,14 +23,36 @@ CATCHES  A brief marked done with no report. That is work that happened and
          Also a report answering a brief that does not exist, two briefs
          sharing a number, and a status nobody can read.
 
-An open brief is not a problem. Work in progress is the normal state of a
+         More briefs open than the project allows. One by default, set with
+         `open_briefs` under [strength] in .formwork.toml, and 0 means no
+         limit. Several open at once is how the human stops holding the
+         picture and starts carrying text between windows.
+
+         A brief marked done whose report has no read-back. The report needs
+         two lines, each at the start of a line:
+
+             accepted: 2026-10-13
+             in my words: <at least five words>
+
+         The first with a real date, the second with at least five words
+         after the colon.
+
+CANNOT TELL  Whether the human wrote those words, or whether they are true.
+         An agent can type both lines, and a sentence copied from the report
+         passes. This stops the cheapest way of skipping the step, the same as
+         predictions-first, and nothing more. Reading the sentence for sense
+         was not attempted on purpose: a check that judged it would pass for
+         the wrong reason and claim more than it can see.
+
+One open brief is not a problem. Work in progress is the normal state of a
 project, and a check that complained about it would be a check people turn off.
 
 Exit status:
-    0   every finished brief has its report
-    1   at least one does not, and it is named
+    0   every finished brief has its report and its read-back
+    1   at least one does not, or too many are open, and it is named
     2   the check could not run
 """
+import datetime
 import os
 import re
 import sys
@@ -49,7 +71,63 @@ STATUS = re.compile(r"^status\s*:\s*[\"']?([a-z]+)", re.M | re.I)
 # `docs/briefs` did the same for every brief at once.
 MEANINGFUL = 20
 
+# The read-back. Anchored at the start of a line for the same reason as STATUS:
+# a quoted example of the line inside a sentence is not the line.
+ACCEPTED = re.compile(r"^accepted\s*:[ \t]*(\S*)", re.M | re.I)
+IN_MY_WORDS = re.compile(r"^in my words\s*:(.*)$", re.M | re.I)
+DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+READ_BACK_WORDS = 5
+
+DEFAULT_OPEN = 1
+
 OPEN, DONE, DROPPED = "open", "done", "dropped"
+
+
+# The same shape as setting() in formwork/guard/quality-gate, which reads
+# gate_budget. A second parser for the same file would drift from the first.
+def setting(root, key, allowed, default):
+    config = os.path.join(root, ".formwork.toml")
+    if not os.path.exists(config):
+        return default
+    try:
+        text = open(config, encoding="utf-8", errors="ignore").read()
+    except OSError:
+        return default
+    m = re.search(r'^\s*%s\s*=\s*["\']?([A-Za-z0-9_]+)["\']?' % key, text, re.M)
+    if not m:
+        return default
+    v = m.group(1).strip().lower()
+    return v if (allowed is None or v in allowed) else default
+
+
+def open_limit(root):
+    v = setting(root, "open_briefs", None, str(DEFAULT_OPEN))
+    return int(v) if str(v).isdigit() else DEFAULT_OPEN
+
+
+def read_back_missing(body):
+    """What the report lacks of the read-back, as a list of sentences."""
+    missing = []
+    m = ACCEPTED.search(body)
+    if not m:
+        missing.append("no 'accepted:' line")
+    else:
+        when = m.group(1)
+        try:
+            ok = bool(DATE.match(when)) and bool(
+                datetime.date.fromisoformat(when))
+        except ValueError:
+            ok = False
+        if not ok:
+            missing.append("'accepted:' is followed by '%s', which is not a "
+                           "date written YYYY-MM-DD" % when)
+    m = IN_MY_WORDS.search(body)
+    if not m:
+        missing.append("no 'in my words:' line")
+    elif len(m.group(1).split()) < READ_BACK_WORDS:
+        missing.append("'in my words:' has %d word(s), and needs at least %d"
+                       % (len(m.group(1).split()), READ_BACK_WORDS))
+    return missing
 
 # Paths the runner has told this check to stay out of. The kit's own fixtures
 # are wrong on purpose. Resolved against the directory being checked, not
@@ -123,6 +201,7 @@ def main(argv):
 
     problems = []
     seen_status = []
+    open_names = []
     reports = reports or {}
 
     for fn in briefs.get(None, []):
@@ -152,6 +231,8 @@ def main(argv):
             continue
         status = m.group(1).lower()
         seen_status.append(status)
+        if status == OPEN:
+            open_names.append("%s/%s" % (BRIEFS, fn))
         if status not in ALLOWED:
             problems.append("%s/%s — status '%s' is not one of: %s"
                             % (BRIEFS, fn, m.group(1), ", ".join(ALLOWED)))
@@ -176,6 +257,19 @@ def main(argv):
                 problems.append("%s/%s — is empty, or close enough. A report "
                                 "that says nothing is the state this check "
                                 "exists to catch" % (REPORTS, rn))
+                continue
+            for gap in read_back_missing(body):
+                problems.append("%s/%s: brief %04d says done, and the report "
+                                "has %s. The human writes the read-back, see "
+                                "formwork/templates/report.md"
+                                % (REPORTS, rn, n, gap))
+
+    limit = open_limit(root)
+    if limit and len(open_names) > limit:
+        problems.append("%d briefs are open and the limit is %d: %s. Finish "
+                        "or drop one, or raise open_briefs under [strength] "
+                        "in .formwork.toml"
+                        % (len(open_names), limit, ", ".join(open_names)))
 
     for n, names in sorted((k, v) for k, v in reports.items() if k is not None):
         if len(names) > 1:
@@ -194,7 +288,7 @@ def main(argv):
 
     total = len([k for k in briefs if k is not None])
     still_open = seen_status.count(OPEN)
-    print("%d brief(s), every finished one has its report%s"
+    print("%d brief(s), every finished one has its report and its read-back%s"
           % (total, (", %d still open" % still_open) if still_open > 0 else ""))
     return 0
 
