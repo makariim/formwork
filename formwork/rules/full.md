@@ -4,7 +4,7 @@ Thirty-four. Not for reading end to end. Find the one that matches the
 situation you are in.
 
 Advice, except one that names a check. What else is blocked is in
-`FORMWORK.md`. The thirteen you meet daily are in `core.md`.
+`FORMWORK.md`. The fourteen you meet daily are in `core.md`.
 
 Some carry a **warning**. That means the rule costs something real, or stops
 working outside the conditions it was learned in. The warning is part of the

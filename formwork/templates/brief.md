@@ -32,6 +32,9 @@ nobody can reconstruct later.
 
 Even a one line brief gets saved. One line plus those two is a complete file.
 
+**Done also needs the read-back**, two lines you write yourself in the report,
+described under Accepted in [`report.md`](report.md), or the gate is red.
+
 **A round takes a number too.** Its `docs/briefs/` file is short: this is a
 round, and the argument is in `docs/rounds/<name>/`. The full brief lives in
 that folder. See [`../round.md`](../round.md).

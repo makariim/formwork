@@ -55,6 +55,12 @@ Both work. Use whichever fits where your director is running.
 **The clipboard.** Copy the brief down, copy the report up. Works everywhere,
 including a chat window with no access to your files. Nothing to set up.
 
+**What the clipboard costs: it makes you the transport, and transport is where
+the picture is lost.** Carrying text between windows feels like being in the
+loop and is not. After a few hours of pasting reports up and commands down, you
+are moving words you have not read, and nobody can say where the project is.
+That happened on the first day this kit ran across several repositories.
+
 **The folder.** The brief and the report are files:
 
 ```
@@ -78,8 +84,10 @@ files. In a chat window it has none, and cannot touch your code even if it
 decided to. Give it access and that safety stops being a fact and becomes a
 rule in its role file. The guards cannot tell a director from a worker.
 
-Neither is more correct. Paste when the director is in a chat window, read the
-folder when it is not.
+**Prefer the folder whenever the director can reach it.** Paste only when it is
+in a chat window and cannot. Either way, the report does not turn done until
+you have written the read-back in it, in your own words: see
+[`templates/report.md`](templates/report.md).
 
 ---
 

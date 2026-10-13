@@ -146,6 +146,17 @@ Nothing unasked, nothing skipped, brief was accurate.
 Four lines, answering the three questions that matter: what was done beyond the
 request, what was skipped, and whether the brief was right.
 
+Then add two lines of your own, once you have read it:
+
+```
+accepted: 2026-10-13
+in my words: foo is bar now, and I kept the old name out.
+```
+
+**These are yours, not the agent's.** If you cannot write the second line, you
+have not read the report yet. A brief saved as a file cannot be marked done
+without them.
+
 > [!IMPORTANT]
 > **Then it stops.** It does not start the next thing. That is the loop, and
 > `STOP` is the part worth keeping if you keep nothing else.
@@ -183,7 +194,7 @@ arrives:
 
 ## What you have not been told
 
-Forty-seven rules exist, in [`rules/`](rules/). Thirteen you meet daily,
+Forty-eight rules exist, in [`rules/`](rules/). Fourteen you meet daily,
 thirty-four for particular situations. You have seen three of them, by
 watching them catch something.
 

@@ -73,6 +73,17 @@ contents was tried and broke the checks that read names legitimately.
 **What this means in practice:** the pair of fixtures proves a check can tell
 two inputs apart. It does not prove the check looked at what is in them.
 
+**`work-paired`** refuses a brief marked done whose report lacks the two
+read-back lines, `accepted:` with a date and `in my words:` with at least five
+words. **It cannot tell whether the human wrote them, or whether they are
+true.** An agent can type both, and a sentence lifted from the report passes.
+It stops the cheapest way of skipping the step, as `predictions-first` does,
+and nothing more. Whether the line keeps anybody in the loop, or becomes a line
+people type without reading, is NOT ESTABLISHED.
+
+It also counts open briefs against `open_briefs`. It cannot see briefs that
+were never saved, or work going on in a window with no brief at all.
+
 **`rule-labels`** checks that a rule naming a check names one that exists. It
 matches on the name only.
 

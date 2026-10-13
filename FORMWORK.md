@@ -38,6 +38,8 @@ These do not ask you. They refuse.
 | A turn does not end while the aggregate is red | `formwork/guard/quality-gate` |
 | The standing brief is not older than the newest decision | `formwork/check/checks/standing-current` |
 | Work marked finished left a report behind | `formwork/check/checks/work-paired` |
+| Work marked finished carries the human's read-back, dated | `formwork/check/checks/work-paired` |
+| One brief is open at a time, unless you raise the limit | `formwork/check/checks/work-paired` |
 | Every generated role names the style page | `formwork/check/checks/style-pointed` |
 
 > [!NOTE]
@@ -61,9 +63,9 @@ instead: `formwork/fw check`, `formwork/fw demo`, `formwork/fw roles`. Run
 
 ## What is advice
 
-Everything else. **47 rules**, in two files.
+Everything else. **48 rules**, in two files.
 
-- `formwork/rules/core.md` holds 13. You meet these every day.
+- `formwork/rules/core.md` holds 14. You meet these every day.
 - `formwork/rules/full.md` holds 34. Read one when you hit the situation.
 
 > [!TIP]
@@ -101,12 +103,13 @@ git_boundary = "block"           # block | warn | off
 protect_files = "block"          # block | warn | off
 aggregate_gate = "block"         # the turn-end gate
 gate_budget = 3                  # refusals before it stands aside
+open_briefs = 1                  # briefs open at once, 0 for no limit
 ```
 
 `[bindings]` is your setup. `[strength]` tunes how hard the enforced guards
 bite. There is no third section: see above.
 
-**The last two lines appear only once you change them.** They have working
+**The last three lines appear only once you change them.** They have working
 defaults, so a fresh file is shorter than this.
 
 **You do not have to write any of it by hand.** `formwork setup` asks a few

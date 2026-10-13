@@ -425,3 +425,55 @@ to put the file back with a shell redirect, was refused. The route is already
 named in `formwork/limits.md`, under the guard not covering every tool the
 same way. This is the first time it was taken by accident rather than on
 purpose, and the change is left for the human to keep or undo.
+
+## 14: The human became the courier, and the kit had no word for it
+
+**When.** 12 and 13 October 2026, the second day of the first use across
+several repositories. The same work setup as entry 13: one hub for the plan,
+several code repositories for the work, a director in one window and working
+sessions in others.
+
+**What happened.** The method ran as written, and the person running it turned
+into the transport between windows. Reports were pasted up to the director
+without being read. The director's replies were skimmed for the next command,
+which was pasted down into another window. After a few hours there was no picture of the project in any repository, and
+none in the human either. Everything stopped while the human asked the
+director how they had got here.
+
+**Who found it.** The human, by noticing they could no longer say where the
+project was. Not a check, not a test, and not the director. Nothing in the kit
+named this failure, so nothing was watching for it.
+
+**Why it is not a surprise.** It is the out-of-the-loop performance problem
+(Endsley and Kiris, 1995), and Bainbridge's irony of automation (1983): the
+person left only to monitor stops understanding what they monitor.
+`threads.md` said "you move the work between them, nothing moves on its own,
+and that is the point". It is the point, and it is also exactly the role that
+turns into passive forwarding. Entry 12 wrote a sentence to stop the director
+drifting into building. Nobody considered the human drifting into carrying.
+Same separation, the other side of it.
+
+**What changed.** Three habits, two of them now checked.
+
+- Never paste. The director reads and writes the folder, and a working session
+  that needs something from elsewhere means a wrong brief, not a relay. Advice
+  only: a new core rule and a section in the director's page.
+- One brief open at a time. `work-paired` is red when more briefs say open than
+  `open_briefs` allows, one by default.
+- A read-back before done. `work-paired` is red when a done brief's report has
+  no `accepted:` line with a real date and no `in my words:` line of at least
+  five words. The human writes it. The director may transcribe it, never
+  author it.
+
+**What the check cannot tell.** Whose words those are, or whether they are
+true. An agent can type both lines. It stops the cheapest way of skipping the
+step and nothing more, the same as `predictions-first`.
+
+**NOT ESTABLISHED.**
+
+- Whether the read-back keeps anybody in the loop, or becomes one more line
+  people type without reading. It has been written, not tried.
+- Whether one open brief is the right limit for work spread over several
+  repositories, or just the limit that is easiest to defend.
+- Whether a person who no longer pastes still reads. Removing the transport
+  removes one way to stop reading. It does not add a reason to read.

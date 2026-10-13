@@ -44,6 +44,27 @@ Everything above is routine. These are what you are actually reading for.
 Work that followed the brief exactly needs no defence. What you are scanning
 for happens at the edges of an instruction, and only these three show it.
 
+## Accepted
+
+Two lines, written by you, the human, after you have read the report:
+
+```
+accepted: 2026-10-13
+in my words: <what changed and what you decided, in your own words>
+```
+
+Each starts its own line. The date is the day you accepted it. The second line
+is at least five words. **Without both, the brief cannot be marked done**, and
+`formwork check` goes red until they are there.
+
+You write them, or you dictate them word for word. **The director may type
+them for you. It never writes them for you.** That is the same rule as a
+decision: drafting yours is not allowed, transcribing yours is.
+
+The check sees only that the lines exist. It cannot tell whose words they are,
+or whether they are true. They are for you: if you cannot write the second
+line, you did not read the report, and that is the moment to read it.
+
 ---
 
 ## The task version
@@ -53,6 +74,8 @@ Renamed foo -> bar in parser.py and its two tests.
 Gate green.
 Nothing staged.
 Nothing unasked, nothing skipped, brief was accurate.
+accepted: 2026-10-13
+in my words: foo is bar now, and I kept the old name out.
 ```
 
-Four lines. Still answers all three.
+Four lines from the agent, two from you. Still answers all three.

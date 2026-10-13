@@ -1,6 +1,6 @@
 # Core rules
 
-Thirteen. These come up in almost every piece of work.
+Fourteen. These come up in almost every piece of work.
 
 Each says what it catches. None tells you a story. The stories belong to
 somebody else's project, and a class of failure is more useful than one
@@ -141,6 +141,26 @@ Then the three that matter:
 **Catches:** a report shaped to whatever happened, which cannot be compared
 with the last one. The same headings every time are what let you notice that
 the third line is missing again.
+
+---
+
+### The human is not the courier
+
+**Advice.**
+
+Never paste a report up or a reply down. The director reads the folder and
+writes the brief there. Keep one brief open at a time, and before a brief turns
+done, write in the report, in your own words, what changed and what you
+decided.
+
+Two parts of this are checked by `work-paired`: the open limit, and that the
+two read-back lines exist. Whether the words are yours, or true, nothing can
+check.
+
+**Catches:** a person who has become the transport between windows. They carry
+every report and every command, read none of it closely, and after a few hours
+cannot say where the project is. The method then runs with nobody holding the
+picture, which is the state the two layers were built to prevent.
 
 ---
 

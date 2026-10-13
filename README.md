@@ -356,8 +356,8 @@ in your own words, which beats it. Every role points at both.
 | **3 guards** | small programs that refuse. Two stop a command, one stops a turn ending | `ls formwork/guard \| grep -v test_` |
 | **12 checks** | small programs that read your project and say green or red | `ls formwork/check/checks \| wc -l` |
 | **28 roles** | one file each, saying what that job does and where it stops | `ls formwork/roles/*/*.md \| wc -l` |
-| **47 rules** | 13 you meet daily, 34 for when you need them | `grep -c '^### ' formwork/rules/*.md` |
-| **382 tests** | every guard and check, proved able to fail | `formwork test` |
+| **48 rules** | 14 you meet daily, 34 for when you need them | `grep -c '^### ' formwork/rules/*.md` |
+| **400 tests** | every guard and check, proved able to fail | `formwork test` |
 
 It is all text files and small programs. You can read every line. Nothing is
 hidden. Nothing is sent anywhere.
