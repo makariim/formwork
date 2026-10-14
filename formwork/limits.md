@@ -84,6 +84,13 @@ people type without reading, is NOT ESTABLISHED.
 It also counts open briefs against `open_briefs`. It cannot see briefs that
 were never saved, or work going on in a window with no brief at all.
 
+**`report-shape`** refuses a report with no `## For you`, one where another
+heading comes first, one over 1,000 words, and one holding a fenced code
+block. **It cannot tell a story from a findings list rewritten as
+sentences**, and it does not require `## For the director`, because reports
+written before the rule carry a dated bridge above their old headings. Whether
+a part the human can finish keeps them in the loop is NOT ESTABLISHED.
+
 **`rule-labels`** checks that a rule naming a check names one that exists. It
 matches on the name only.
 

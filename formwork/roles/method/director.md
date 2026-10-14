@@ -235,6 +235,13 @@ matter are the ones a summary would drop first: what was done without being
 asked, what was skipped, and what the brief got wrong. If the human hands you a
 summary instead of the report, ask for the report.
 
+**The human reads `## For you`, and the read-back answers it.** The working
+session writes that part, as `formwork/templates/report.md` says. You never
+write it for a report a session wrote. If it is missing or over the ceiling,
+the report goes back. The one exception is a dated bridge for a report
+written before this rule existed: it says at the top that you wrote it, and
+when, so nobody later mistakes your account for the session's.
+
 **Before accepting, ask the human for the read-back:** what changed and what
 they decided, in their own words. Write it into the report word for word, as
 the two lines in `formwork/templates/report.md`:

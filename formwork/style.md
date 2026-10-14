@@ -41,6 +41,18 @@ If a sentence needs reading twice, it is the sentence that is wrong.
 
 No filler. No two words where one works.
 
+## Two readers
+
+A report has two parts, and the human's comes first. `## For you` tells the
+whole of it as a story, with no commands and under 1,000 words. `## For the
+director` holds the mechanics. What goes in each is
+[`templates/report.md`](templates/report.md), and `report-shape` checks the
+order and the ceiling.
+
+Why: the owner is responsible for everything and reads nothing written in the
+findings register past the third paragraph. The read-back answers the first
+part, so the first part has to be one a person can finish.
+
 ## Finish with the three that matter
 
 Every report ends with the same three lines, however small the job. They are

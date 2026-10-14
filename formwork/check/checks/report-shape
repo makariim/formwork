@@ -1,0 +1,200 @@
+#!/usr/bin/env python3
+"""Check: every report opens with a part written for the human, and keeps it short.
+
+    report-shape <directory>
+
+A report in docs/reports/ is read by two people who need different things.
+The human who owns the work wants the whole of it, told as a story they can
+follow from one point to the next. The director wants the mechanics. One
+register serves neither. Three reports of about 3,000 words came back on one
+day, all in the findings register, and the human stopped reading after a few
+paragraphs. The read-back that closes a brief answers a part nobody finished.
+
+So a report has two parts, in this order, and the first is the human's:
+
+    ## For you              narrated, no commands, at most 1,000 words
+    ## For the director     everything else
+
+CATCHES  A report with no `## For you`.
+
+         A `## For you` that is not the first level-two heading in the file,
+         so the human has to read past the mechanics to reach their part.
+         `## For the director` coming first is the case it was written for.
+
+         A `## For you` over 1,000 words. The ceiling is a check and not
+         advice, because a ceiling that is advice is 3,000 words again by the
+         third report.
+
+         A fenced code block inside `## For you`. Commands and output belong
+         under `## For the director`.
+
+CANNOT TELL  Whether the part is a story, or a findings list rewritten as
+         sentences. A file list in prose passes. The ceiling and the fence
+         rule stop the two cheapest ways of writing the wrong part, and
+         nothing more.
+
+         Whether `## For the director` exists. Reports written before this
+         rule carry a dated `## For you` bridge above their old headings, and
+         a check that refused them would need every old report rewritten.
+         When the heading is there it has to come after `## For you`, and
+         that much is checked.
+
+The part runs from its heading to the next heading of level one or two.
+Level-three headings inside it are part of it, and their words count.
+
+Exit status:
+    0   every report has its part for the human, first and within the ceiling
+    1   at least one does not, and the file and the reason are named
+    2   the check could not run
+
+Python 3, standard library only, no dependencies.
+"""
+import os
+import re
+import sys
+
+REPORTS = os.path.join("docs", "reports")
+CEILING = 1000
+
+# A heading outside a fenced block. Up to three leading spaces is still a
+# heading in markdown; four is a code block.
+HEADING = re.compile(r"^ {0,3}(#{1,6})\s+(.*?)\s*#*\s*$")
+FENCE = re.compile(r"^ {0,3}(```|~~~)")
+FOR_YOU = "for you"
+FOR_THE_DIRECTOR = "for the director"
+
+
+# Paths the runner has told this check to stay out of. The kit's own fixtures
+# are wrong on purpose. The same shape as work-paired, for the same reason.
+def excluded_paths(root):
+    out = []
+    for p in os.environ.get("FORMWORK_EXCLUDE", "").split(os.pathsep):
+        if not p:
+            continue
+        out.append(os.path.realpath(p if os.path.isabs(p)
+                                    else os.path.join(root, p)))
+    return out
+
+
+def is_excluded(path, excludes):
+    a = os.path.realpath(path)
+    return any(a == e or a.startswith(e + os.sep) for e in excludes)
+
+
+def outline(text):
+    """Every heading outside a fence, and every fence opener, in file order.
+
+    Yields (line_no, kind, level, title). kind is "heading" or "fence".
+    A `## For you` quoted inside a code block is an example, not the heading,
+    and the first version of this check counted it.
+    """
+    fenced = None
+    for n, line in enumerate(text.split("\n"), 1):
+        m = FENCE.match(line)
+        if m:
+            marker = m.group(1)
+            if fenced is None:
+                fenced = marker
+                yield n, "fence", 0, ""
+            elif marker == fenced:
+                fenced = None
+            continue
+        if fenced:
+            continue
+        m = HEADING.match(line)
+        if m:
+            yield n, "heading", len(m.group(1)), m.group(2).strip().lower()
+
+
+def problems_in(text):
+    """Why this report fails, as a list of sentences. Empty when it passes."""
+    items = list(outline(text))
+    level_two = [(n, t) for n, k, lv, t in items if k == "heading" and lv == 2]
+    for_you = [n for n, t in level_two if t == FOR_YOU]
+
+    if not for_you:
+        return ["has no '## For you'. The human's part comes first, see "
+                "formwork/templates/report.md"]
+    out = []
+    if len(for_you) > 1:
+        out.append("has %d '## For you' headings, and a report has one"
+                   % len(for_you))
+    start = for_you[0]
+
+    first_n, first_t = level_two[0]
+    if first_n != start:
+        if first_t == FOR_THE_DIRECTOR:
+            out.append("'## For the director' (line %d) comes before "
+                       "'## For you' (line %d). The human's part is first"
+                       % (first_n, start))
+        else:
+            out.append("'## %s' (line %d) comes before '## For you' (line "
+                       "%d). The human's part is first"
+                       % (first_t, first_n, start))
+
+    # The part ends at the next heading of level one or two.
+    end = None
+    for n, k, lv, _t in items:
+        if n > start and k == "heading" and lv <= 2:
+            end = n
+            break
+    fences = [n for n, k, _lv, _t in items
+              if k == "fence" and n > start and (end is None or n < end)]
+    if fences:
+        out.append("'## For you' has a fenced code block at line %d. Commands "
+                   "and output belong under '## For the director'" % fences[0])
+
+    lines = text.split("\n")
+    body = lines[start:(end - 1) if end else len(lines)]
+    words = len(" ".join(body).split())
+    if words > CEILING:
+        out.append("'## For you' has %d words and the ceiling is %d. The "
+                   "ceiling is not a target" % (words, CEILING))
+    return out
+
+
+def main(argv):
+    if len(argv) < 2:
+        print("usage: report-shape <directory>", file=sys.stderr)
+        return 2
+    root = argv[1]
+    if not os.path.isdir(root):
+        print("ERROR: not a directory: %s" % root, file=sys.stderr)
+        return 2
+
+    d = os.path.join(root, REPORTS)
+    if not os.path.isdir(d) or is_excluded(d, excluded_paths(root)):
+        print("no %s directory, nothing to check" % REPORTS)
+        return 0
+
+    problems = []
+    seen = 0
+    for fn in sorted(os.listdir(d)):
+        if not fn.endswith(".md") or fn.upper().startswith("README"):
+            continue
+        full = os.path.join(d, fn)
+        if not os.path.isfile(full):
+            continue
+        try:
+            text = open(full, encoding="utf-8", errors="replace").read()
+        except OSError as e:
+            print("ERROR: cannot read %s/%s: %s" % (REPORTS, fn, e),
+                  file=sys.stderr)
+            return 2
+        seen += 1
+        for why in problems_in(text):
+            problems.append("%s/%s %s" % (REPORTS, fn, why))
+
+    if problems:
+        print("%d problem(s) across %d report(s)" % (len(problems), seen))
+        for p in problems:
+            print("  %s" % p)
+        return 1
+
+    print("%d report(s), each with its part for the human first and within "
+          "%d words" % (seen, CEILING))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

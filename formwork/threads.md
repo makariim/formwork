@@ -32,9 +32,10 @@ stops.
 point: the two stops in the loop are yours.
 
 - It is slow, and the slowness is what makes you read both.
-- **The whole report travels, not your summary of it.** The three lines that
-  matter are the ones a summary drops first: what was done without being asked,
-  what was skipped, and what the brief got wrong.
+- **The whole report travels, not your summary of it.** It has two parts:
+  `## For you`, which you read and answer with the read-back, and `## For the
+  director`, which holds the three lines a summary drops first: what was done
+  without being asked, what was skipped, and what the brief got wrong.
 
 ---
 
@@ -162,8 +163,9 @@ second one. It is the same one, rebuilt from the standing brief.
 5. **It works, checks, reports, stops.** It does not start the next thing.
    The report is saved as `docs/reports/0007-short-name.md` and the brief
    becomes `status: done`.
-6. **The report goes back up, whole.** The director accepts it, or sends it
-   back with a reason.
+6. **The report goes back up, whole.** You read `## For you` and write the
+   read-back. The director reads `## For the director`, then accepts it, or
+   sends it back with a reason.
 7. **`docs/standing.md` is updated** if anything moved. Then go again.
 
 Anything that turns out to be a real decision gets its own record in
