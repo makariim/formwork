@@ -102,8 +102,10 @@ formwork/check/checks/work-paired --next .
 
 ## How a report is written
 
-What it contains is [`templates/report.md`](templates/report.md). How it reads
-is [`style.md`](style.md), and your own `docs/style.md` overrides that.
+Two parts, in this order: `## For you`, the whole of it as a story for the
+person responsible, and `## For the director`, the mechanics. What goes in
+each is [`templates/report.md`](templates/report.md). How it reads is
+[`style.md`](style.md), and your own `docs/style.md` overrides that.
 
 ---
 

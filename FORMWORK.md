@@ -41,6 +41,7 @@ These do not ask you. They refuse.
 | Work marked finished carries the human's read-back, dated | `formwork/check/checks/work-paired` |
 | One brief is open at a time, unless you raise the limit | `formwork/check/checks/work-paired` |
 | Every generated role names the style page | `formwork/check/checks/style-pointed` |
+| A report opens with a part for the human, under 1,000 words, no commands | `formwork/check/checks/report-shape` |
 
 > [!NOTE]
 > **The turn-end gate refuses three times in a session, then stands aside**, so

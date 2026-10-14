@@ -139,6 +139,37 @@ def strength(**keys):
             "[strength]\n" + "".join("%s = %s\n" % kv for kv in keys.items())}
 
 
+REPORT_SHAPE = os.path.join(HERE, "checks", "report-shape")
+FOR_YOU = ("## For you\n\nThe login page took four seconds and now takes "
+           "under one. One query left a loop. Nothing is open.\n\n")
+ACCEPTED = "## Accepted\n\naccepted:\nin my words:\n\n"
+DIRECTOR = ("## For the director\n\n### What changed\n\n- `app/login.py`, the "
+            "query left the loop.\n\n### The three that matter\n\nNothing, "
+            "nothing, nothing.\n\n")
+
+
+def for_you_of(n):
+    """A human's part holding exactly n words."""
+    return "## For you\n\n" + " ".join(["word"] * n) + "\n\n"
+
+
+def report(body):
+    return {"docs/reports/0001-slow-login.md": body}
+
+
+def report_shape(files):
+    """Run report-shape over a throwaway project holding these files."""
+    root = tempfile.mkdtemp(prefix="formwork-shape-")
+    for rel, text in files.items():
+        full = os.path.join(root, rel)
+        os.makedirs(os.path.dirname(full), exist_ok=True)
+        open(full, "w", encoding="utf-8").write(text)
+    p = subprocess.run([sys.executable, REPORT_SHAPE, root],
+                       capture_output=True, text=True)
+    shutil.rmtree(root)
+    return p.returncode, p.stdout + p.stderr
+
+
 def main():
     print("THE GATE")
 
@@ -308,6 +339,65 @@ time.sleep(600)
                                  **{"docs/reports/0001-thing.md":
                                     REPORT_BODY}))
     check("read-back: a dropped brief is not asked for one", code, 0, out)
+
+    print()
+    print("REPORT-SHAPE: THE HUMAN'S PART FIRST, AND UNDER THE CEILING")
+
+    code, out = report_shape({"README.md": "nothing finished yet\n"})
+    check("shape: no reports folder is fine", code, 0, out)
+    code, out = report_shape({"docs/reports/README.md": "what goes here\n"})
+    check("shape: a folder holding only a README is fine", code, 0, out)
+    code, out = report_shape(report(FOR_YOU + ACCEPTED + DIRECTOR))
+    check("shape: both parts, in order", code, 0, out)
+    code, out = report_shape(report("# Report 0001: slow login\n\n"
+                                    + FOR_YOU + ACCEPTED + DIRECTOR))
+    check("shape: a title above the human's part is fine", code, 0, out)
+    code, out = report_shape(report(FOR_YOU + "## What changed\n\nOne file.\n"
+                                    + ACCEPTED))
+    check("shape: a bridge with no director heading passes", code, 0, out)
+    code, out = report_shape(report(FOR_YOU.replace("## For you",
+                                                    "## For You") + DIRECTOR))
+    check("shape: the heading is read without regard to case", code, 0, out)
+    code, out = report_shape(report(DIRECTOR))
+    check("shape: no part for the human", code, 1, out)
+    check("shape: and the file is named", "0001-slow-login.md" in out, True, out)
+    code, out = report_shape(report(DIRECTOR + FOR_YOU))
+    check("shape: the director's part first", code, 1, out)
+    check("shape: and the reason names the director's heading",
+          "For the director" in out, True, out)
+    code, out = report_shape(report("## What changed\n\nOne file.\n\n"
+                                    + FOR_YOU + DIRECTOR))
+    check("shape: any other heading first", code, 1, out)
+    code, out = report_shape(report(FOR_YOU.replace("## For you",
+                                                    "### For you") + DIRECTOR))
+    check("shape: a level-three heading is not the heading", code, 1, out)
+    code, out = report_shape(report("```\n## For you\n```\n\n" + DIRECTOR))
+    check("shape: a heading quoted in a code block is not the heading",
+          code, 1, out)
+    code, out = report_shape(report(FOR_YOU + FOR_YOU + DIRECTOR))
+    check("shape: two human's parts", code, 1, out)
+    code, out = report_shape(report(for_you_of(1000) + DIRECTOR))
+    check("shape: exactly 1,000 words is inside the ceiling", code, 0, out)
+    code, out = report_shape(report(for_you_of(1001) + DIRECTOR))
+    check("shape: 1,001 words is over it", code, 1, out)
+    check("shape: and the count is in the reason", "1001 words" in out,
+          True, out)
+    code, out = report_shape(report(for_you_of(600) + "### More\n\n"
+                                    + " ".join(["word"] * 600) + "\n\n"
+                                    + DIRECTOR))
+    check("shape: a level-three heading does not end the part", code, 1, out)
+    code, out = report_shape(report(FOR_YOU + "```\nmake test\n```\n\n"
+                                    + DIRECTOR))
+    check("shape: a fenced block in the human's part", code, 1, out)
+    code, out = report_shape(report(FOR_YOU + "~~~\nmake test\n~~~\n\n"
+                                    + DIRECTOR))
+    check("shape: a tilde fence is a fence too", code, 1, out)
+    code, out = report_shape(report(FOR_YOU + ACCEPTED + DIRECTOR
+                                    + "```\nmake test\n```\n"))
+    check("shape: a fenced block in the director's part is fine", code, 0, out)
+    code, out = report_shape(dict(report(FOR_YOU + DIRECTOR),
+                                  **{"docs/reports/0002-x.md": DIRECTOR}))
+    check("shape: one good report does not cover for a bad one", code, 1, out)
     print()
     print("%d of %d behaved as specified." % (sum(results), len(results)))
     return 0 if all(results) else 1

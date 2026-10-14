@@ -30,7 +30,7 @@ own. Projects never had that. Now they do.*
 $ pipx install formwork-kit
 $ formwork init && formwork install
 $ formwork setup && formwork check
-GATE: green. 12 check(s), each shown to reject the wrong and accept the right.
+GATE: green. 13 check(s), each shown to reject the wrong and accept the right.
 ```
 
 <div align="center">
@@ -249,7 +249,7 @@ the list. `where` and `version` belong to the installed command only.
 | `init` | puts `formwork/` and `FORMWORK.md` into your project |
 | `install` | wires the guards into your agent, writes your role files. Add `--runtime <name>` when it cannot tell |
 | `setup` | asks eleven questions once, then writes your style file, your standing brief, and the folders for decisions, briefs and reports |
-| `check` | runs all twelve checks and says green or red |
+| `check` | runs all thirteen checks and says green or red |
 
 **What it touches.** It adds `formwork/` and `FORMWORK.md`, writes
 `.formwork.toml`, writes your agent's settings file keeping anything already
@@ -354,10 +354,10 @@ in your own words, which beats it. Every role points at both.
 | | | count it yourself |
 |---|---|---|
 | **3 guards** | small programs that refuse. Two stop a command, one stops a turn ending | `ls formwork/guard \| grep -v test_` |
-| **12 checks** | small programs that read your project and say green or red | `ls formwork/check/checks \| wc -l` |
+| **13 checks** | small programs that read your project and say green or red | `ls formwork/check/checks \| wc -l` |
 | **28 roles** | one file each, saying what that job does and where it stops | `ls formwork/roles/*/*.md \| wc -l` |
 | **48 rules** | 14 you meet daily, 34 for when you need them | `grep -c '^### ' formwork/rules/*.md` |
-| **400 tests** | every guard and check, proved able to fail | `formwork test` |
+| **422 tests** | every guard and check, proved able to fail | `formwork test` |
 
 It is all text files and small programs. You can read every line. Nothing is
 hidden. Nothing is sent anywhere.

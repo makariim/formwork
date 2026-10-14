@@ -153,6 +153,11 @@ brief, one report. **The pieces live inside your report**, in their own words.
 
 Wait for all of them. Read all of them. Then write one report.
 
+**It has the same two parts as any report**, `## For you` first and `## For
+the director` after, as `formwork/templates/report.md` says. The human's
+part tells the whole piece of work as one story, not one story per piece.
+The pieces live in the director's part.
+
 **Every piece keeps its own voice in that report.** What it did, what it
 skipped, what it thinks the brief got wrong. Those three lines are exactly what
 a summary drops, and they are the reason the human reads the report at all.
