@@ -9,6 +9,7 @@
     formwork/fw roles           rebuild the role files after editing one
     formwork/fw record          write down what the kit looks like now
     formwork/fw test            run every test
+    formwork/fw sync <target>   bring the kit copy in another project up to this commit
 
 WHY THIS EXISTS
 ---------------
@@ -40,6 +41,7 @@ COMMANDS = [
     ("roles",   "rebuild the role files after editing one"),
     ("record",  "write down what the kit looks like now, after you changed it"),
     ("test",    "run every test in the kit"),
+    ("sync",    "bring the kit copy in <target> up to this commit. --dry-run first"),
 ]
 
 TESTS = [
@@ -50,6 +52,7 @@ TESTS = [
     "test_install.py",
     "test_setup.py",
     "test_build.py",
+    "test_sync.py",
 ]
 
 
@@ -128,6 +131,10 @@ def main(argv):
         return run("build", rest)
     if cmd == "test":
         return run_tests()
+    if cmd == "sync":
+        # The program runs from the kit, so a relative target is made absolute here.
+        return run("sync", [a if a.startswith("-") else os.path.abspath(a)
+                            for a in rest])
     if cmd == "record":
         return run(os.path.join("check", "checks", "kit-integrity"),
                    ["--record", os.path.dirname(HERE)] + rest)

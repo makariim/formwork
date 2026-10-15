@@ -1,0 +1,252 @@
+#!/usr/bin/env python3
+"""Bring a copy of the kit in another project up to this commit.
+
+    formwork/sync <target>              copy, delete, pin
+    formwork/sync <target> --dry-run    say all of that, write nothing
+
+A project that carries the kit holds its own copy of formwork/ and FORMWORK.md.
+Keeping that copy current by hand meant listing files, and the first file
+missed from the list was a copy that looked current and was not.
+
+WHAT IT DOES
+
+    1. refuses unless this kit's worktree is clean and HEAD is a commit, so a
+       project is never pinned to files nobody committed
+    2. copies every kit file into the target, and deletes from the target any
+       kit file this kit no longer has. Both lists are printed
+    3. writes formwork/SOURCE.txt in the target, naming the commit
+    4. prints the two commands that stay with you, and stops
+
+WHAT BELONGS TO THE TARGET ALONE
+
+Never written, never deleted:
+
+    formwork/roles/project/     the target's own roles
+    formwork/SOURCE.txt         written by step 3, never copied
+    anything listed as local    in the target's .formwork.toml, under [bindings]:
+
+        local = ["formwork/rules/core.md"]
+
+    A path ending in / covers everything under it.
+
+WHAT IT WILL NOT DO
+
+It does not record the integrity fingerprints. Recording tells the kit that
+every current file is the intended one, which is a decision, so the program
+stops before it and names the command. It does not run the target's checks
+either, and it never touches version control in the target.
+
+Exit status:
+    0   synced, or the dry run finished
+    1   refused, and the reason is named
+    2   could not run
+"""
+import datetime
+import os
+import posixpath
+import re
+import shutil
+import subprocess
+import sys
+
+KIT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+KIT_PATHS = ("formwork", "FORMWORK.md")
+HUB_ONLY = ("formwork/roles/project/", "formwork/SOURCE.txt")
+JUNK_DIRS = {"__pycache__"}
+LOCAL = re.compile(r"^\s*local\s*=\s*\[(.*?)\]", re.M | re.S)
+QUOTED = re.compile(r"""["']([^"']+)["']""")
+
+
+def git(*args):
+    p = subprocess.run(["git", "-C", KIT] + list(args),
+                       capture_output=True, text=True)
+    return p.returncode, p.stdout
+
+
+def refuse_unclean():
+    """A reason to refuse, or None."""
+    code, _ = git("rev-parse", "--verify", "--quiet", "HEAD^{commit}")
+    if code != 0:
+        return "this kit has no commit to pin to. Commit it first"
+    code, out = git("status", "--porcelain")
+    if code != 0:
+        return "this kit is not a git worktree, so there is no commit to pin to"
+    if out.strip():
+        lines = out.rstrip("\n").split("\n")
+        shown = "\n".join("    " + l for l in lines[:10])
+        more = "\n    and %d more" % (len(lines) - 10) if len(lines) > 10 else ""
+        return ("this kit has uncommitted changes, and a project must never be "
+                "pinned to files nobody committed:\n%s%s" % (shown, more))
+    return None
+
+
+def local_paths(target):
+    """The paths the target's .formwork.toml names as its own."""
+    config = os.path.join(target, ".formwork.toml")
+    if not os.path.exists(config):
+        return []
+    text = open(config, encoding="utf-8", errors="ignore").read()
+    m = LOCAL.search(text)
+    if not m:
+        return []
+    out = []
+    for raw in QUOTED.findall(m.group(1)):
+        p = posixpath.normpath(raw.strip())
+        if p.startswith("/") or p == ".." or p.startswith("../"):
+            raise ValueError("local path leaves the project: %s" % raw)
+        out.append(p + "/" if raw.strip().endswith("/") else p)
+    return out
+
+
+def owned(path, mine):
+    for p in mine:
+        if p.endswith("/"):
+            if path.startswith(p) or path == p.rstrip("/"):
+                return True
+        elif path == p or path.startswith(p + "/"):
+            return True
+    return False
+
+
+def kit_files():
+    code, out = git("ls-files", "-z", "--", *KIT_PATHS)
+    if code != 0:
+        raise OSError("git ls-files failed in %s" % KIT)
+    return sorted(f for f in out.split("\0") if f)
+
+
+def target_files(target):
+    """Every file under the target's kit paths, minus bytecode caches."""
+    found = []
+    front = os.path.join(target, "FORMWORK.md")
+    if os.path.isfile(front):
+        found.append("FORMWORK.md")
+    base = os.path.join(target, "formwork")
+    for dp, dn, fns in os.walk(base):
+        dn[:] = [d for d in dn if d not in JUNK_DIRS]
+        for f in fns:
+            if f.endswith(".pyc"):
+                continue
+            rel = os.path.relpath(os.path.join(dp, f), target)
+            found.append(rel.replace(os.sep, "/"))
+    return sorted(found)
+
+
+def same(src, dst):
+    if not os.path.isfile(dst) or os.path.islink(dst):
+        return False
+    if (os.stat(src).st_mode & 0o111) != (os.stat(dst).st_mode & 0o111):
+        return False
+    with open(src, "rb") as a, open(dst, "rb") as b:
+        return a.read() == b.read()
+
+
+def origin_name():
+    code, out = git("remote", "get-url", "origin")
+    if code != 0 or not out.strip():
+        return "no origin"
+    url = out.strip()
+    if url.endswith(".git"):
+        url = url[:-4]
+    parts = [p for p in re.split(r"[/:]", url) if p]
+    return "/".join(parts[-2:]) if len(parts) >= 2 else url
+
+
+def prune_empty(target, mine):
+    base = os.path.join(target, "formwork")
+    for dp, dn, fns in os.walk(base, topdown=False):
+        rel = os.path.relpath(dp, target).replace(os.sep, "/")
+        if dp == base or owned(rel + "/", mine):
+            continue
+        try:
+            if not os.listdir(dp):
+                os.rmdir(dp)
+        except OSError:
+            pass
+
+
+def main(argv):
+    args = [a for a in argv[1:] if a != "--dry-run"]
+    dry = "--dry-run" in argv[1:]
+    if len(args) != 1 or args[0].startswith("-"):
+        print("usage: formwork/sync <target> [--dry-run]", file=sys.stderr)
+        return 2
+    target = os.path.abspath(args[0])
+    if not os.path.isdir(target):
+        print("ERROR: not a directory: %s" % target, file=sys.stderr)
+        return 2
+    if os.path.realpath(target) == os.path.realpath(KIT):
+        print("REFUSED: the target is this kit. Name another project.",
+              file=sys.stderr)
+        return 1
+
+    reason = refuse_unclean()
+    if reason:
+        print("REFUSED: %s" % reason, file=sys.stderr)
+        return 1
+
+    try:
+        mine = list(HUB_ONLY) + local_paths(target)
+        source = [f for f in kit_files() if not owned(f, mine)]
+    except (OSError, ValueError) as e:
+        print("ERROR: %s" % e, file=sys.stderr)
+        return 2
+
+    have = set(source)
+    copy = [f for f in source
+            if not same(os.path.join(KIT, f), os.path.join(target, f))]
+    remove = [f for f in target_files(target)
+              if f not in have and not owned(f, mine)]
+    _, head = git("rev-parse", "--short", "HEAD")
+    pin = "pinned: formwork %s (%s), copied %s" % (
+        head.strip(), origin_name(), datetime.date.today().isoformat())
+
+    verb = "would " if dry else ""
+    print("%ssync %s" % ("dry run: " if dry else "", target))
+    print("  kept as the target's own: %s" % ", ".join(mine))
+    print("")
+    print("%scopy %d file(s), %d already current" %
+          (verb, len(copy), len(source) - len(copy)))
+    for f in copy:
+        print("  + %s" % f)
+    print("%sremove %d file(s) this kit no longer has" % (verb, len(remove)))
+    for f in remove:
+        print("  - %s" % f)
+    print("%swrite formwork/SOURCE.txt: %s" % (verb, pin))
+
+    if not dry:
+        try:
+            for f in copy:
+                dst = os.path.join(target, f)
+                os.makedirs(os.path.dirname(dst), exist_ok=True)
+                if os.path.islink(dst):
+                    os.remove(dst)
+                shutil.copy2(os.path.join(KIT, f), dst)
+            for f in remove:
+                os.remove(os.path.join(target, f))
+            prune_empty(target, mine)
+            os.makedirs(os.path.join(target, "formwork"), exist_ok=True)
+            with open(os.path.join(target, "formwork", "SOURCE.txt"), "w",
+                      encoding="utf-8") as fh:
+                fh.write(pin + "\n")
+        except OSError as e:
+            print("ERROR: stopped part way: %s" % e, file=sys.stderr)
+            return 2
+
+    print("")
+    print("Stopped before recording, on purpose. Recording the fingerprints "
+          "says every")
+    print("current file is the intended one, and that is your decision. "
+          "Run these yourself:")
+    print("")
+    print("  %s --record %s" % (os.path.join(
+        target, "formwork", "check", "checks", "kit-integrity"), target))
+    print("  cd %s && formwork/fw roles && formwork/fw check" % target)
+    if dry:
+        print("")
+        print("Dry run. Nothing was written.")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))
