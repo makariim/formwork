@@ -60,6 +60,21 @@ formwork check --list       what exists
 instead: `formwork/fw check`, `formwork/fw demo`, `formwork/fw roles`. Run
 `formwork/fw` on its own to see the list.
 
+**To bring a project's copy of the kit up to date**, run this from a clean,
+committed kit:
+
+```
+formwork/fw sync <project> --dry-run    see what would change
+formwork/fw sync <project>              copy, delete, pin
+```
+
+It copies every kit file, deletes the ones the kit no longer has, and writes
+the commit into the project's SOURCE.txt. It never touches the project's own
+roles, the project pack, nor any path the project lists as its own in
+`.formwork.toml`, under `[bindings]`, as `local = ["formwork/rules/core.md"]`.
+It stops before recording the fingerprints, because that is your decision, and
+prints the two commands to run yourself.
+
 ---
 
 ## What is advice
