@@ -239,7 +239,7 @@ The copy is the whole kit, so you can delete `the-kit` afterwards. There is no
 `init` step here, because copying the folder in **is** the init step.
 
 `formwork check` becomes `formwork/fw check`, and the same for `install`,
-`setup`, `demo`, `roles`, `record` and `test`. Run `formwork/fw` on its own for
+`setup`, `demo`, `roles`, `record`, `test` and `sync`. Run `formwork/fw` on its own for
 the list. `where` and `version` belong to the installed command only.
 
 ### What each step does
@@ -250,6 +250,7 @@ the list. `where` and `version` belong to the installed command only.
 | `install` | wires the guards into your agent, writes your role files. Add `--runtime <name>` when it cannot tell |
 | `setup` | asks eleven questions once, then writes your style file, your standing brief, and the folders for decisions, briefs and reports |
 | `check` | runs all thirteen checks and says green or red |
+| `sync` | later, after you upgrade the command: brings the project's `formwork/` up to the new release, keeps the files the project owns, and says what it changed |
 
 **What it touches.** It adds `formwork/` and `FORMWORK.md`, writes
 `.formwork.toml`, writes your agent's settings file keeping anything already
@@ -357,7 +358,8 @@ in your own words, which beats it. Every role points at both.
 | **13 checks** | small programs that read your project and say green or red | `ls formwork/check/checks \| wc -l` |
 | **28 roles** | one file each, saying what that job does and where it stops | `ls formwork/roles/*/*.md \| wc -l` |
 | **48 rules** | 14 you meet daily, 34 for when you need them | `grep -c '^### ' formwork/rules/*.md` |
-| **422 tests** | every guard and check, proved able to fail | `formwork test` |
+| **1 skill** | `humanizer`, pinned at one upstream commit, for text the agent writes as you | `ls formwork/skills` |
+| **486 tests** | every guard and check, proved able to fail | `formwork test` |
 
 It is all text files and small programs. You can read every line. Nothing is
 hidden. Nothing is sent anywhere.
@@ -402,7 +404,7 @@ today:
 
 | | |
 |---|---|
-| **Skills** | one word for a common job, instead of a paragraph. Considered, not started |
+| **More skills** | one so far, `humanizer`, in `formwork/skills/`, placed into `.claude/skills/` by `formwork roles`. Claude Code only. Where the other three read skills from is NOT ESTABLISHED, so there `style.md` tells the agent to read the file directly |
 | **A model per role** | not a kit feature. What is built is narrower: a role may carry `model`, `skills` and `color`, and the generator passes them to Claude Code as written instead of dropping them. On the other three it writes a note, not a key. Effort level is not carried. Whether the other three have an equivalent is NOT ESTABLISHED |
 | **Teams** | more than one person on the same standing brief. Today the method says one director at a time, and nobody has tried two |
 | **Roles invented on the fly** | asked for by somebody who tried the kit. It cuts across the check that stops two roles owning one job, so it stays a question we have not settled |
@@ -438,6 +440,7 @@ better after you have run it once than before.
 | [`style.md`](formwork/style.md) | how the agents talk to you, and how to change it |
 | [`round.md`](formwork/round.md) | how to run a round, and when it is worth it |
 | [`templates/`](formwork/templates/) | brief, predictions, report, decision, round, standing brief |
+| [`skills/`](formwork/skills/) | skills the kit ships, each pinned to an upstream commit |
 | [`roles/`](formwork/roles/) | the roles, and how to write your own |
 | [`rules/`](formwork/rules/) | the rules, each saying what it catches |
 
@@ -457,6 +460,7 @@ better after you have run it once than before.
 |---|---|
 | [`docs/`](docs/) | the survey, the design, and what broke |
 | [`docs/dogfood.md`](docs/dogfood.md) | the kit failing on its own author, written down |
+| [`CHANGELOG.md`](CHANGELOG.md) | what changed in each release |
 | [`RELEASING.md`](RELEASING.md) | for the maintainer |
 
 ---

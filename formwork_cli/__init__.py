@@ -7,6 +7,7 @@
     formwork roles      rebuild the role files after editing one
     formwork record     write down what the kit looks like now
     formwork test       run every test in the kit
+    formwork sync       bring this project's kit up to the installed release
     formwork where      say which kit is being used
 
 WHY THIS EXISTS
@@ -25,6 +26,8 @@ directory above it. So the command works anywhere inside your project.
 directory. That copy is what your project uses from then on. Upgrading the
 command does not change a project you have already set up, which is
 deliberate: a rule that changes under you without a commit is not a rule.
+`formwork sync` brings the copy up to the installed release when you ask, and
+the change is then yours to read and commit.
 
 Python 3.8 or newer. No dependencies.
 """
@@ -55,6 +58,7 @@ COMMANDS = [
     ("roles",   "rebuild the role files after editing one"),
     ("test",    "run every test in the kit"),
     ("record",  "write down what the kit looks like now, after you changed it"),
+    ("sync",    "bring this project's kit up to this release. --dry-run first"),
     ("where",   "say which kit is being used"),
     ("version", "which version of the command this is"),
 ]
@@ -67,6 +71,7 @@ TESTS = [
     "test_install.py",
     "test_setup.py",
     "test_build.py",
+    "test_sync.py",
 ]
 
 
@@ -244,6 +249,36 @@ def cmd_test():
     return 0
 
 
+def cmd_sync(args):
+    """Bring a project's copy of the kit up to the release installed here.
+
+    `init` refuses a project that already has a kit, so without this an
+    upgrade meant a clone of the kit on every machine, and a clone is a second
+    place the kit can be changed.
+    """
+    program = os.path.join(BUNDLED_KIT, "sync")
+    if not os.path.isfile(program):
+        print("ERROR: this copy of the command has no kit bundled with it, "
+              "or one too old to sync.", file=sys.stderr)
+        print("       From a clone of the kit, use formwork/fw sync <target>.",
+              file=sys.stderr)
+        return 2
+    if not [a for a in args if not a.startswith("-")]:
+        kit = find_kit()
+        if kit is None:
+            print("ERROR: no formwork/ folder here, or in any folder above "
+                  "this one. Name the project: formwork sync <directory>",
+                  file=sys.stderr)
+            return 2
+        args = [os.path.dirname(kit)] + list(args)
+    args = [a if a.startswith("-") else os.path.abspath(a) for a in args]
+    try:
+        return subprocess.run([sys.executable, program] + args).returncode
+    except OSError as e:
+        print("ERROR: could not run %s: %s" % (program, e), file=sys.stderr)
+        return 2
+
+
 def cmd_version():
     """Which version this is.
 
@@ -314,6 +349,8 @@ def main(argv=None):
         return cmd_test()
     if cmd == "where":
         return cmd_where()
+    if cmd == "sync":
+        return cmd_sync(rest)
     if cmd in ("version", "--version", "-V"):
         return cmd_version()
     if cmd == "record":
