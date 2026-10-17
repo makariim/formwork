@@ -321,8 +321,8 @@ been run.
 **The friction, which is the part worth writing down.** Two things, neither of
 them the method:
 
-The commits carried a work email, because a global git identity applies to
-every repository on the machine. Nothing in this kit has an opinion about that,
+The commits carried the wrong email, because a global git identity applies
+to every repository on the machine. Nothing in this kit has an opinion about that,
 and it was caught by looking rather than by any check.
 
 The repository had no remote that existed. Again nothing to do with the kit,
@@ -374,11 +374,10 @@ established that the fix works. It has been written, not tried.
 
 ## 13: The generator dropped what a role author wrote, and nothing noticed
 
-**When.** The first install on a work project, 12 October 2026. One hub
-repository for the plan, seven code repositories for the work. The first use of
-the kit across more than one repository.
+**When.** 12 October 2026, the first use of the kit across more than one
+repository: one repository for the plan, several more for the code.
 
-**What happened.** Six Claude Code agents already existed on that machine,
+**What happened.** Six Claude Code agents already existed,
 written before the kit. Each named a `model`, one or two `skills` and a
 `color`, and each had a `description` written to be picked by. Converting them
 into roles was going to cost all of that. `formwork/build` read every
@@ -429,8 +428,8 @@ purpose, and the change is left for the human to keep or undo.
 ## 14: The human became the courier, and the kit had no word for it
 
 **When.** 12 and 13 October 2026, the second day of the first use across
-several repositories. The same work setup as entry 13: one hub for the plan,
-several code repositories for the work, a director in one window and working
+several repositories. The same setup as entry 13: one repository for the plan,
+several more for the code, a director in one window and working
 sessions in others.
 
 **What happened.** The method ran as written, and the person running it turned
