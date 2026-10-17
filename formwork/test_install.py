@@ -146,12 +146,18 @@ files = set(tree(p))
 # wrong, not the installer.
 check("wrote the configuration and the wiring",
       {".formwork.toml", ".claude/settings.json"} <= files, True, out)
+skills = {f for f in files
+          if f.startswith(os.path.join(".claude", "skills") + os.sep)}
 strays = {f for f in files
           if f not in (".formwork.toml", ".claude/settings.json")
-          and not f.startswith(os.path.join(".claude", "agents") + os.sep)}
+          and not f.startswith(os.path.join(".claude", "agents") + os.sep)
+          and f not in skills}
 check("and nothing else at all", strays, set(), out)
 check("the roles it generated are all it generated",
-      len(files) - 2, 28, out)
+      len(files) - 2 - len(skills), 28, out)
+check("and the kit's one skill, with its licence",
+      skills, {os.path.join(".claude", "skills", "humanizer", "SKILL.md"),
+               os.path.join(".claude", "skills", "humanizer", "LICENSE")}, out)
 
 def outside(project, *args, **kw):
     """Run the installer from somewhere, and see what the WHOLE tree did.
