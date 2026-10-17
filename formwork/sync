@@ -8,13 +8,23 @@ A project that carries the kit holds its own copy of formwork/ and FORMWORK.md.
 Keeping that copy current by hand meant listing files, and the first file
 missed from the list was a copy that looked current and was not.
 
+TWO PLACES IT RUNS FROM
+
+    a clone of the kit        formwork/fw sync <target>, pinned to the commit
+    the installed package     formwork sync [target], pinned to the release
+
+The second is the ordinary one. A machine that only uses the kit installs a
+released version and never holds a clone, so there is no second copy of the
+kit's history to fall behind or be committed to by mistake.
+
 WHAT IT DOES
 
-    1. refuses unless this kit's worktree is clean and HEAD is a commit, so a
-       project is never pinned to files nobody committed
+    1. from a clone: refuses unless the worktree is clean and HEAD is a
+       commit, so a project is never pinned to files nobody committed.
+       From the package: refuses unless it can tell which release it is
     2. copies every kit file into the target, and deletes from the target any
        kit file this kit no longer has. Both lists are printed
-    3. writes formwork/SOURCE.txt in the target, naming the commit
+    3. writes formwork/SOURCE.txt in the target, naming the commit or release
     4. prints the two commands that stay with you, and stops
 
 WHAT BELONGS TO THE TARGET ALONE
@@ -49,7 +59,12 @@ import shutil
 import subprocess
 import sys
 
-KIT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+HERE = os.path.dirname(os.path.abspath(__file__))
+KIT = os.path.dirname(HERE)
+# Inside the wheel the kit is formwork_cli/kit/ and the page sits beside it in
+# formwork_cli/kit-page/, so the clone's layout cannot be assumed.
+RELEASED_PAGE = os.path.join(KIT, "kit-page", "FORMWORK.md")
+RELEASED = os.path.basename(HERE) == "kit" and os.path.isfile(RELEASED_PAGE)
 KIT_PATHS = ("formwork", "FORMWORK.md")
 HUB_ONLY = ("formwork/roles/project/", "formwork/SOURCE.txt")
 JUNK_DIRS = {"__pycache__"}
@@ -109,10 +124,43 @@ def owned(path, mine):
 
 
 def kit_files():
+    """Each kit path in the target, mapped to the file it is copied from."""
+    if RELEASED:
+        found = {"FORMWORK.md": RELEASED_PAGE}
+        for dp, dn, fns in os.walk(HERE):
+            dn[:] = [d for d in dn if d not in JUNK_DIRS]
+            for f in fns:
+                if f.endswith(".pyc"):
+                    continue
+                full = os.path.join(dp, f)
+                rel = os.path.relpath(full, HERE).replace(os.sep, "/")
+                found["formwork/" + rel] = full
+        return found
     code, out = git("ls-files", "-z", "--", *KIT_PATHS)
     if code != 0:
         raise OSError("git ls-files failed in %s" % KIT)
-    return sorted(f for f in out.split("\0") if f)
+    return {f: os.path.join(KIT, f) for f in out.split("\0") if f}
+
+
+def released_version():
+    try:
+        from importlib.metadata import version
+        return version("formwork-kit")
+    except Exception:
+        return None
+
+
+def runnable(src):
+    """Whether the copy should carry the execute bit.
+
+    A clone has the bit in git. A wheel does not reliably carry file modes,
+    so there a program is anything that starts with #!, as `formwork init`
+    decides it.
+    """
+    if not RELEASED:
+        return bool(os.stat(src).st_mode & 0o111)
+    with open(src, "rb") as fh:
+        return fh.read(2) == b"#!"
 
 
 def target_files(target):
@@ -135,7 +183,7 @@ def target_files(target):
 def same(src, dst):
     if not os.path.isfile(dst) or os.path.islink(dst):
         return False
-    if (os.stat(src).st_mode & 0o111) != (os.stat(dst).st_mode & 0o111):
+    if runnable(src) != bool(os.stat(dst).st_mode & 0o111):
         return False
     with open(src, "rb") as a, open(dst, "rb") as b:
         return a.read() == b.read()
@@ -170,6 +218,8 @@ def main(argv):
     dry = "--dry-run" in argv[1:]
     if len(args) != 1 or args[0].startswith("-"):
         print("usage: formwork/sync <target> [--dry-run]", file=sys.stderr)
+        print("       formwork sync [target] [--dry-run]   from the installed "
+              "package", file=sys.stderr)
         return 2
     target = os.path.abspath(args[0])
     if not os.path.isdir(target):
@@ -180,26 +230,37 @@ def main(argv):
               file=sys.stderr)
         return 1
 
-    reason = refuse_unclean()
-    if reason:
-        print("REFUSED: %s" % reason, file=sys.stderr)
-        return 1
+    if RELEASED:
+        release = released_version()
+        if release is None:
+            print("REFUSED: this is a packaged kit, and which release it is "
+                  "cannot be read, so there is nothing to pin to",
+                  file=sys.stderr)
+            return 1
+        pinned_to = "formwork-kit %s (released)" % release
+    else:
+        reason = refuse_unclean()
+        if reason:
+            print("REFUSED: %s" % reason, file=sys.stderr)
+            return 1
+        _, head = git("rev-parse", "--short", "HEAD")
+        pinned_to = "formwork %s (%s)" % (head.strip(), origin_name())
 
     try:
         mine = list(HUB_ONLY) + local_paths(target)
-        source = [f for f in kit_files() if not owned(f, mine)]
+        src = kit_files()
+        source = sorted(f for f in src if not owned(f, mine))
     except (OSError, ValueError) as e:
         print("ERROR: %s" % e, file=sys.stderr)
         return 2
 
     have = set(source)
     copy = [f for f in source
-            if not same(os.path.join(KIT, f), os.path.join(target, f))]
+            if not same(src[f], os.path.join(target, f))]
     remove = [f for f in target_files(target)
               if f not in have and not owned(f, mine)]
-    _, head = git("rev-parse", "--short", "HEAD")
-    pin = "pinned: formwork %s (%s), copied %s" % (
-        head.strip(), origin_name(), datetime.date.today().isoformat())
+    pin = "pinned: %s, copied %s" % (
+        pinned_to, datetime.date.today().isoformat())
 
     verb = "would " if dry else ""
     print("%ssync %s" % ("dry run: " if dry else "", target))
@@ -221,7 +282,9 @@ def main(argv):
                 os.makedirs(os.path.dirname(dst), exist_ok=True)
                 if os.path.islink(dst):
                     os.remove(dst)
-                shutil.copy2(os.path.join(KIT, f), dst)
+                shutil.copy2(src[f], dst)
+                if runnable(src[f]):
+                    os.chmod(dst, os.stat(dst).st_mode | 0o111)
             for f in remove:
                 os.remove(os.path.join(target, f))
             prune_empty(target, mine)

@@ -214,6 +214,61 @@ check("the kit itself is refused", code, 1, out)
 code, out = sync(k, env=ENV)
 check("no target prints usage", code == 2 and "usage" in out, True, out)
 
+def package(version="9.9.9"):
+    """A scratch installed package: the wheel's layout, no git, no modes."""
+    d = tempfile.mkdtemp(prefix="fw-sync-pkg-")
+    root = os.path.join(d, "formwork_cli")
+    write(root, "__init__.py", "")
+    write(root, "kit-page/FORMWORK.md", "# Formwork, released\n")
+    os.makedirs(os.path.join(root, "kit"))
+    shutil.copy2(SYNC, os.path.join(root, "kit", "sync"))
+    write(root, "kit/loop.md", "the loop, released\n")
+    write(root, "kit/check/run", "#!/bin/sh\nexit 0\n")
+    write(root, "kit/__pycache__/y.cpython-310.pyc", "bytes\n")
+    for dp, dn, fns in os.walk(root):
+        for f in fns:
+            os.chmod(os.path.join(dp, f), 0o644)
+    if version:
+        write(d, "formwork_kit-%s.dist-info/METADATA" % version,
+              "Metadata-Version: 2.1\nName: formwork-kit\nVersion: %s\n" % version)
+    return d
+
+
+def sync_package(pkg, *args):
+    env = dict(ENV, PYTHONPATH=pkg)
+    p = subprocess.run([sys.executable,
+                        os.path.join(pkg, "formwork_cli", "kit", "sync")]
+                       + list(args), capture_output=True, text=True, env=env)
+    return p.returncode, p.stdout + p.stderr
+
+
+print("From the installed package, a sync pins the release")
+pkg, h = package(), hub()
+code, out = sync_package(pkg, h)
+check("it succeeds with no git", code, 0, out)
+check("a kit file is overwritten", read(h, "formwork/loop.md"),
+      "the loop, released\n", out)
+check("FORMWORK.md comes from kit-page", read(h, "FORMWORK.md"),
+      "# Formwork, released\n", out)
+check("a program arrives executable anyway",
+      os.access(os.path.join(h, "formwork", "check", "run"), os.X_OK), True, out)
+check("a file that is not a program stays plain",
+      os.access(os.path.join(h, "formwork", "loop.md"), os.X_OK), False, out)
+check("bytecode does not travel",
+      os.path.exists(os.path.join(h, "formwork", "__pycache__",
+                                  "y.cpython-310.pyc")), False, out)
+check("a project role is preserved",
+      read(h, "formwork/roles/project/mine.md"), "the hub's own role\n", out)
+check("a dropped kit file is removed", read(h, "formwork/gone.md"), None, out)
+check("SOURCE.txt names the release and date",
+      read(h, "formwork/SOURCE.txt"),
+      "pinned: formwork-kit 9.9.9 (released), copied %s\n"
+      % datetime.date.today().isoformat(), out)
+check("no fingerprints were written", os.listdir(state), [], out)
+code, out = sync_package(pkg, h)
+check("a second sync finds nothing to copy",
+      "copy 0 file(s)" in out and "remove 0 file(s)" in out, True, out)
+
 print("")
 print("%d passed, %d failed" % (results.count(True), results.count(False)))
 sys.exit(1 if False in results else 0)

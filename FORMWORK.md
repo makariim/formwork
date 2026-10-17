@@ -60,16 +60,21 @@ formwork check --list       what exists
 instead: `formwork/fw check`, `formwork/fw demo`, `formwork/fw roles`. Run
 `formwork/fw` on its own to see the list.
 
-**To bring a project's copy of the kit up to date**, run this from a clean,
-committed kit:
+**To bring a project's copy of the kit up to date**, upgrade the command, then
+run this inside the project:
 
 ```
-formwork/fw sync <project> --dry-run    see what would change
-formwork/fw sync <project>              copy, delete, pin
+pipx install --force formwork-kit==X.Y.Z
+formwork sync --dry-run                 see what would change
+formwork sync                           copy, delete, pin
 ```
+
+From a clone of the kit itself, which only the kit's maintainer needs, the
+same thing is `formwork/fw sync <project>`, and it refuses unless the clone is
+clean and committed.
 
 It copies every kit file, deletes the ones the kit no longer has, and writes
-the commit into the project's SOURCE.txt. It never touches the project's own
+the release, or the clone's commit, into the project's SOURCE.txt. It never touches the project's own
 roles, the project pack, nor any path the project lists as its own in
 `.formwork.toml`, under `[bindings]`, as `local = ["formwork/rules/core.md"]`.
 It stops before recording the fingerprints, because that is your decision, and

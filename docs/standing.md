@@ -17,7 +17,8 @@ nothing about anybody's product. It is the shape, empty.
 
 ## Where we are now
 
-**0.2.1 is what is on PyPI.** In this repository, not yet released: a role's
+**0.2.1 is what is on PyPI. 1.0.0 is built here and not published.** It
+carries everything below. In it: a role's
 `description`, `model`, `skills` and `color` now reach the generated Claude
 Code agent instead of being dropped. And, from the first multi-repository use,
 the human kept in the loop: `work-paired` allows one open brief by default and
@@ -30,8 +31,14 @@ upstream commit in `formwork/skills/humanizer/`, placed into
 `.claude/skills/` by `formwork roles`. `formwork/style.md` says text sent as
 the human goes through it. Decision 0001, proposed.
 
-Three guards, twelve checks, twenty eight roles, forty eight rules, one
-skill, 415 tests across seven suites.
+Also in 1.0.0, from a clone on another machine, brought home as patches:
+reports for two readers, `## For you` first, with a `report-shape` check; and
+`sync`, which brings a project's kit copy up to date. `sync` now also runs
+from the installed package, as `formwork sync`, pinned to the release, so no
+other machine needs a clone. Decision 0002, proposed.
+
+Three guards, thirteen checks, twenty eight roles, forty eight rules, one
+skill, 486 tests across eight suites.
 
 Version two added: the standing brief and its check, a `director` role holding
 the upper layer, `lead` widened to split a brief as well as run a round, briefs
@@ -49,8 +56,9 @@ without it.
 
 ## What is decided
 
-One record in `docs/decisions/`: 0001, humanizer for text sent as the human,
-`proposed`, waiting for him. The decisions before it live in the design pages
+Two records in `docs/decisions/`, both `proposed`, waiting for him: 0001,
+humanizer for text sent as the human; 0002, formwork is changed only here and
+installed everywhere else. The decisions before it live in the design pages
 in this folder, which are history and are not maintained.
 
 Two people outside the project have now run it. One reported that the guards
@@ -73,8 +81,8 @@ and it cuts across what `role-shape` is for.
 
 ## What is next
 
-One aggressive audit pass over everything version two added, then release
-0.2.0.
+Publish 1.0.0. Then other machines install it and drop their clones, as
+decision 0002 proposes.
 
 ## What we tried and stopped
 

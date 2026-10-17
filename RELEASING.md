@@ -84,11 +84,12 @@ better than looking at the first twenty lines:
 
 ```
 unzip -l dist/formwork_kit-*.whl | grep -c 'formwork_cli/kit/guard/'     # 6
-unzip -l dist/formwork_kit-*.whl | grep -c 'formwork_cli/kit/check/checks/'  # 9
-unzip -l dist/formwork_kit-*.whl | grep -c 'formwork_cli/kit/roles/'     # 29
+unzip -l dist/formwork_kit-*.whl | grep -c 'formwork_cli/kit/check/checks/'  # 13
+unzip -l dist/formwork_kit-*.whl | grep -c 'formwork_cli/kit/roles/'     # 30
+unzip -l dist/formwork_kit-*.whl | grep -c 'formwork_cli/kit/skills/'    # 4
 
-tar tzf dist/formwork_kit-*.tar.gz | grep -c 'formwork/guard/'           # 6
-tar tzf dist/formwork_kit-*.tar.gz | grep -c 'formwork/roles/'           # 29
+tar tzf dist/formwork_kit-*.tar.gz | grep -c 'formwork/guard/'           # 8
+tar tzf dist/formwork_kit-*.tar.gz | grep -c 'formwork/roles/'           # 41
 ```
 
 **If any of those is zero, stop.** `formwork init` would put an empty folder

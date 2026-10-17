@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "formwork-kit"
-version = "0.2.1"
+version = "1.0.0"
 description = "You bring the idea. It brings the whole team. Rules your coding agent cannot ignore."
 readme = "README.md"
 requires-python = ">=3.8"
@@ -53,5 +53,5 @@ packages = ["formwork_cli"]
 [tool.hatch.build.targets.sdist]
 # Anchored. Unanchored "README.md" matched at any depth and quietly pulled in
 # docs/README.md and docs/decisions/README.md.
-include = ["/formwork_cli", "/formwork", "/FORMWORK.md", "/README.md",
+include = ["/formwork_cli", "/formwork", "/FORMWORK.md", "/README.md", "/CHANGELOG.md",
            "/LICENSE", "/pyproject.toml"]
