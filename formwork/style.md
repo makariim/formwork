@@ -97,6 +97,28 @@ Name files by path, so they can be opened.
 
 ---
 
+## Text you write as the human
+
+Everything above is about replies to the human. Text you write for the human
+to send or publish under their own name is different. That means emails,
+messages, GitHub and pull request comments, pull request descriptions, commit
+messages, and docs or wiki pages other people read.
+
+**Run that text through the `humanizer` skill, in embedded mode, before the
+human sees it.** On Claude Code it is `.claude/skills/humanizer/`. Elsewhere,
+read [`skills/humanizer/SKILL.md`](skills/humanizer/SKILL.md) and then
+[`skills/humanizer/local.md`](skills/humanizer/local.md), which overrides it.
+
+It is not for your own reports, briefs, the standing brief, or replies to the
+human. Those follow this page, and `docs/style.md` if the project has one.
+
+A message shorter than about three sentences may skip it. The skill costs about
+8,000 tokens each time it loads.
+
+Nothing checks that this is done.
+
+---
+
 ## Your own preferences
 
 This page is the kit's default. Yours goes in `docs/style.md`, in your own

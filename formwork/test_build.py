@@ -187,6 +187,71 @@ check("the TOML carries it once",
                                                   "quoted.toml") or ""),
       True, read(p, ".codex/agents/quoted.toml") or out)
 
+SKILL = "---\nname: sample\ndescription: A sample.\n---\n\n# Sample\n\nUpstream.\n"
+LOCAL = "## Local change\n\nOurs.\n"
+
+
+def with_skill(p, local=True):
+    d = os.path.join(p, "formwork", "skills", "sample")
+    os.makedirs(d)
+    open(os.path.join(d, "SKILL.md"), "w", encoding="utf-8").write(SKILL)
+    open(os.path.join(d, "LICENSE"), "w", encoding="utf-8").write("MIT\n")
+    if local:
+        open(os.path.join(d, "local.md"), "w", encoding="utf-8").write(LOCAL)
+    return p
+
+
+print("A shipped skill reaches Claude Code, upstream first, local change after")
+p = with_skill(project(plain=role("plain", owns=PLAIN_OWNS)))
+code, out = build(p, "--runtime", "claude-code")
+check("the generator runs", code, 0, out)
+got = read(p, ".claude/skills/sample/SKILL.md") or ""
+check("the frontmatter is still first",
+      got.startswith("---\nname: sample\ndescription: A sample.\n---\n"),
+      True, got)
+check("it carries the banner", "GENERATED FROM formwork/skills/sample/SKILL.md"
+      " and local.md" in got, True, got)
+check("upstream text is whole", "# Sample\n\nUpstream.\n" in got, True, got)
+check("the local change comes after it",
+      got.endswith("Upstream.\n\n" + LOCAL), True, got)
+check("the licence is copied as is",
+      read(p, ".claude/skills/sample/LICENSE"), "MIT\n")
+check("the source is left alone",
+      read(p, "formwork/skills/sample/SKILL.md"), SKILL)
+
+print("--check catches a hand-edit to a generated skill")
+code, out = build(p, "--runtime", "claude-code", "--check")
+check("current after a build", code, 0, out)
+open(os.path.join(p, ".claude", "skills", "sample", "SKILL.md"), "a",
+     encoding="utf-8").write("\nedited\n")
+code, out = build(p, "--runtime", "claude-code", "--check")
+check("stale after a hand-edit", code, 1, out)
+check("and names the file", "skills/sample/SKILL.md" in out, True, out)
+
+print("A skill folder of the same name the kit did not write is left alone")
+p = with_skill(project(plain=role("plain", owns=PLAIN_OWNS)))
+mine = os.path.join(p, ".claude", "skills", "sample")
+os.makedirs(mine)
+open(os.path.join(mine, "SKILL.md"), "w", encoding="utf-8").write("mine\n")
+open(os.path.join(mine, "LICENSE"), "w", encoding="utf-8").write("mine\n")
+code, out = build(p, "--runtime", "claude-code")
+check("SKILL.md is untouched", read(p, ".claude/skills/sample/SKILL.md"),
+      "mine\n", out)
+check("LICENSE is untouched", read(p, ".claude/skills/sample/LICENSE"),
+      "mine\n", out)
+check("and it says so", "NOT WRITTEN" in out, True, out)
+
+print("No skill is written for a runtime with no documented place for one")
+p = with_skill(project(plain=role("plain", owns=PLAIN_OWNS)))
+code, out = build(p, "--all")
+written = [os.path.join(dp, f) for dp, _, fs in os.walk(p) for f in fs
+           if "skills" in os.path.relpath(dp, p).split(os.sep)
+           and not os.path.relpath(dp, p).startswith("formwork")]
+check("only under .claude/skills/",
+      sorted(os.path.relpath(w, p) for w in written),
+      [os.path.join(".claude", "skills", "sample", f)
+       for f in ("LICENSE", "SKILL.md")], out)
+
 print("")
 print("%d passed, %d failed" % (results.count(True), results.count(False)))
 sys.exit(1 if False in results else 0)

@@ -61,6 +61,18 @@ a key there that does nothing would be the same bug facing the other way.
 
 A role with none of the four generates exactly what it did before.
 
+SKILLS, CLAUDE CODE ONLY
+------------------------
+A skill the kit ships lives in formwork/skills/<name>/: the upstream SKILL.md
+and LICENSE, untouched, and an optional local.md holding the kit's own change.
+For Claude Code this writes .claude/skills/<name>/SKILL.md (upstream, then
+local.md appended) and a copy of LICENSE. Composing it here keeps the local
+change out of the upstream file, so an update is a straight copy.
+
+Where Codex, Gemini CLI or Cursor read a project's skills from is NOT
+ESTABLISHED, so nothing is written for them. An agent there reads the files in
+formwork/skills/ directly, which formwork/style.md tells it to do.
+
 Python 3, standard library only, no dependencies.
 """
 import os
@@ -72,6 +84,11 @@ CLEAN, STALE, CANNOT_RUN = 0, 1, 2
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 ROLES = os.path.join(HERE, "roles")
+SKILLS = os.path.join(HERE, "skills")
+
+# Where a runtime reads a project's skills from. Only the one that is
+# documented and has been used.
+SKILL_TARGETS = {"claude-code": os.path.join(".claude", "skills")}
 
 BANNER = ("GENERATED FROM %s — DO NOT EDIT.\n"
           "Change the source and run formwork roles. A hand-edit here fails "
@@ -400,6 +417,76 @@ def empty_keys(roles):
     return bad
 
 
+def read_skills():
+    """[(name, folder)] for every skill under formwork/skills/ with a SKILL.md."""
+    if not os.path.isdir(SKILLS):
+        return []
+    out = []
+    for name in sorted(os.listdir(SKILLS)):
+        folder = os.path.join(SKILLS, name)
+        if os.path.isfile(os.path.join(folder, "SKILL.md")):
+            out.append((name, folder))
+    return out
+
+
+def render_skill(name, folder):
+    """{filename: contents} for one skill: SKILL.md composed, LICENSE copied."""
+    upstream = open(os.path.join(folder, "SKILL.md"), encoding="utf-8").read()
+    source = "formwork/skills/%s/SKILL.md" % name
+    local = os.path.join(folder, "local.md")
+    has_local = os.path.isfile(local)
+    if has_local:
+        source += " and local.md"
+    banner = "\n".join("<!-- %s -->" % line
+                       for line in (BANNER % source).split("\n"))
+    # The banner goes after the frontmatter. Before it, Claude Code would not
+    # find the frontmatter, and the skill would have no name.
+    m = re.match(r"^(---\n.*?\n---\n)(.*)$", upstream, re.S)
+    if m:
+        text = m.group(1) + "\n" + banner + "\n" + m.group(2)
+    else:
+        text = banner + "\n\n" + upstream
+    if has_local:
+        text = text.rstrip("\n") + "\n\n" + open(
+            local, encoding="utf-8").read().rstrip("\n") + "\n"
+    files = {"SKILL.md": text}
+    licence = os.path.join(folder, "LICENSE")
+    if os.path.isfile(licence):
+        files["LICENSE"] = open(licence, encoding="utf-8").read()
+    return files
+
+
+def skill_outputs(runtime):
+    """{path: contents} for the kit's skills on one runtime."""
+    target = SKILL_TARGETS.get(runtime)
+    if target is None:
+        return {}
+    files = {}
+    for name, folder in read_skills():
+        if not SAFE_NAME.match(name):
+            raise ValueError("formwork/skills/%s: a skill folder name must be "
+                             "lower case letters, digits and hyphens." % name)
+        for fn, text in render_skill(name, folder).items():
+            files[os.path.join(target, name, fn)] = text
+    return files
+
+
+def ours(rel, existing):
+    """Whether a file already on disk is one this generator wrote.
+
+    A skill's LICENSE carries no banner, since it is the upstream text. It is
+    ours when the SKILL.md beside it is.
+    """
+    marker = BANNER.split(" ")[0]
+    if marker in existing:
+        return True
+    if os.path.basename(rel) == "LICENSE":
+        skill = os.path.join(ROOT, os.path.dirname(rel), "SKILL.md")
+        return (os.path.isfile(skill)
+                and marker in open(skill, encoding="utf-8").read())
+    return False
+
+
 def outputs(runtimes):
     """{path: contents} for every runtime asked for."""
     files = {}
@@ -420,6 +507,7 @@ def outputs(runtimes):
                 files[rel] = render_toml(role)
             else:
                 files[rel] = render_markdown(role, runtime)
+        files.update(skill_outputs(runtime))
     return files
 
 
@@ -508,7 +596,8 @@ def main(argv):
         # Somebody else's agent file, with the same name as one of ours.
         # Overwriting it destroyed hand-written work with no backup and no
         # message, in a program whose own promise is that it never deletes.
-        if existing is not None and BANNER.split(" ")[0] not in existing:
+        if existing is not None and existing != content \
+                and not ours(rel, existing):
             kept.append(rel)
             continue
         if existing != content:
@@ -521,8 +610,11 @@ def main(argv):
             print("  %s" % rel)
         print("  Your file is untouched. Rename yours, or rename the role in "
               "formwork/roles/, then run this again.")
-    print("%d role file(s) considered, %d written, for: %s"
-          % (len(files), written, ", ".join(runtimes)))
+    skill_files = sum(1 for rel in files
+                      if rel.split(os.sep)[1:2] == ["skills"])
+    print("%d generated file(s) considered (%d role, %d skill), %d written, "
+          "for: %s" % (len(files), len(files) - skill_files, skill_files,
+                       written, ", ".join(runtimes)))
     return CLEAN
 
 

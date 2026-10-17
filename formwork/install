@@ -12,11 +12,12 @@ Exit status:
 
 WHAT IT ADDS, AND ITS THREE LIMITS
 ----------------------------------
-It adds three things:
+It adds four things:
 
     .formwork.toml                  which runtime this project uses
     the hook wiring for your runtime    so the guards are called at all
     the role files for that runtime     generated from formwork/roles/
+    the kit's skills, on Claude Code    generated from formwork/skills/
 
 The third one used to be a separate program nobody was told about. A fresh
 install passed, and then the very next command — the one this installer
@@ -420,7 +421,7 @@ def main(argv):
               % ("would keep" if dry_run else "kept",
                  os.path.relpath(copy, root)))
     if generated is not None:
-        print("  %s  %d role file(s) for %s"
+        print("  %s  %d role and skill file(s) for %s"
               % ("would generate" if dry_run else "generated", generated,
                  runtime))
     if recorded == "done":

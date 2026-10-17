@@ -1,5 +1,5 @@
 ---
-updated: 2026-10-13
+updated: 2026-10-17
 by: the conversation that built the standing brief
 ---
 
@@ -25,8 +25,13 @@ refuses a brief marked done until its report carries the human's read-back. A
 fourteenth core rule says the human is not the courier. See entry 14 of
 `docs/dogfood.md`.
 
-Three guards, twelve checks, twenty eight roles, forty eight rules, 400
-tests across seven suites.
+Also unreleased: the kit ships its first skill, `humanizer`, pinned at one
+upstream commit in `formwork/skills/humanizer/`, placed into
+`.claude/skills/` by `formwork roles`. `formwork/style.md` says text sent as
+the human goes through it. Decision 0001, proposed.
+
+Three guards, twelve checks, twenty eight roles, forty eight rules, one
+skill, 415 tests across seven suites.
 
 Version two added: the standing brief and its check, a `director` role holding
 the upper layer, `lead` widened to split a brief as well as run a round, briefs
@@ -44,8 +49,9 @@ without it.
 
 ## What is decided
 
-Nothing in `docs/decisions/`. The decisions so far live in the design pages in
-this folder, which are history and are not maintained.
+One record in `docs/decisions/`: 0001, humanizer for text sent as the human,
+`proposed`, waiting for him. The decisions before it live in the design pages
+in this folder, which are history and are not maintained.
 
 Two people outside the project have now run it. One reported that the guards
 held on the scenario in the README. That is the first evidence from anybody
