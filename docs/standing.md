@@ -1,6 +1,6 @@
 ---
-updated: 2026-10-17
-by: the conversation that built the standing brief
+updated: 2026-10-25
+by: the conversation that made the read-back minimum a setting
 ---
 
 # Standing brief
@@ -24,7 +24,9 @@ Code agent instead of being dropped. And, from the first multi-repository use,
 the human kept in the loop: `work-paired` allows one open brief by default and
 refuses a brief marked done until its report carries the human's read-back. A
 fourteenth core rule says the human is not the courier. See entry 14 of
-`docs/dogfood.md`.
+`docs/dogfood.md`. The read-back's `in my words:` line needs five words by
+default, and `read_back_words` under `[strength]` changes that: 1 lets
+"accepted" through, 0 lets the line be empty.
 
 Also unreleased: the kit ships its first skill, `humanizer`, pinned at one
 upstream commit in `formwork/skills/humanizer/`, placed into
@@ -38,7 +40,7 @@ from the installed package, as `formwork sync`, pinned to the release, so no
 other machine needs a clone. Decision 0002, proposed.
 
 Three guards, thirteen checks, twenty eight roles, forty eight rules, one
-skill, 486 tests across eight suites.
+skill, 494 tests across eight suites.
 
 Version two added: the standing brief and its check, a `director` role holding
 the upper layer, `lead` widened to split a brief as well as run a round, briefs

@@ -359,7 +359,7 @@ in your own words, which beats it. Every role points at both.
 | **28 roles** | one file each, saying what that job does and where it stops | `ls formwork/roles/*/*.md \| wc -l` |
 | **48 rules** | 14 you meet daily, 34 for when you need them | `grep -c '^### ' formwork/rules/*.md` |
 | **1 skill** | `humanizer`, pinned at one upstream commit, for text the agent writes as you | `ls formwork/skills` |
-| **486 tests** | every guard and check, proved able to fail | `formwork test` |
+| **494 tests** | every guard and check, proved able to fail | `formwork test` |
 
 It is all text files and small programs. You can read every line. Nothing is
 hidden. Nothing is sent anywhere.

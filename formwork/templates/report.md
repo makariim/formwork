@@ -54,7 +54,8 @@ in my words: <what changed and what you decided, in your own words>
 ```
 
 Each starts its own line. The date is the day you accepted it. The second line
-is at least five words. **Without both, the brief cannot be marked done**, and
+is at least five words, or what `read_back_words` in `.formwork.toml` says.
+**Without both, the brief cannot be marked done**, and
 `formwork check` goes red until they are there.
 
 You write them, or you dictate them word for word. **The director may type
