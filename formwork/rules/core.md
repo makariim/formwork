@@ -154,8 +154,9 @@ done, write in the report, in your own words, what changed and what you
 decided.
 
 Two parts of this are checked by `work-paired`: the open limit, and that the
-two read-back lines exist. Whether the words are yours, or true, nothing can
-check.
+two read-back lines exist, the second with at least five words. Both numbers
+are settings, `open_briefs` and `read_back_words`. Whether the words are yours,
+or true, nothing can check.
 
 **Catches:** a person who has become the transport between windows. They carry
 every report and every command, read none of it closely, and after a few hours

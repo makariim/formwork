@@ -1,0 +1,5 @@
+[bindings]
+runtime = "claude-code"
+
+[strength]
+read_back_words = 1

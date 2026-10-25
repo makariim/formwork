@@ -17,7 +17,9 @@ the first number moves.
 - `work-paired` allows one open brief at a time. Raise it with `open_briefs`
   under `[strength]`, and 0 means no limit.
 - `work-paired` refuses a brief marked `done` until its report carries
-  `accepted:` with a date and `in my words:` with a sentence.
+  `accepted:` with a date and `in my words:` with a sentence, five words by
+  default. Change it with `read_back_words` under `[strength]`: 1 lets a
+  single word through, and 0 lets the line be empty.
 - New check, `report-shape`: a report opens with `## For you`, a part for the
   human, under 1,000 words and with no commands, before `## For the director`.
   Reports written before the rule pass if they carry a dated `## For you`
@@ -47,4 +49,4 @@ the first number moves.
 ### Counts
 
 Three guards, thirteen checks, twenty eight roles, forty eight rules, one
-skill, 486 tests.
+skill, 494 tests.

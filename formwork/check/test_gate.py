@@ -332,6 +332,33 @@ time.sleep(600)
     code, out = work_paired(done_with(
         "accepted: 2026-10-13\nin my words: looks good to me\n"))
     check("read-back: four words is too few", code, 1, out)
+    check("read-back: and the message names the setting",
+          "read_back_words" in out, True, out)
+    code, out = work_paired(done_with(
+        "accepted: 2026-10-13\nin my words: it looks good to me\n"))
+    check("read-back: five words is enough", code, 0, out)
+    code, out = work_paired(dict(done_with(
+        "accepted: 2026-10-13\nin my words: accepted\n"),
+        **strength(read_back_words=1)))
+    check("read-back: one word, minimum lowered to one", code, 0, out)
+    code, out = work_paired(dict(done_with(
+        "accepted: 2026-10-13\nin my words:\n"),
+        **strength(read_back_words=1)))
+    check("read-back: empty, minimum lowered to one", code, 1, out)
+    code, out = work_paired(dict(done_with(
+        "accepted: 2026-10-13\nin my words:\n"),
+        **strength(read_back_words=0)))
+    check("read-back: empty, minimum of zero", code, 0, out)
+    code, out = work_paired(dict(done_with("accepted: 2026-10-13\n"),
+                                 **strength(read_back_words=0)))
+    check("read-back: zero still wants the line", code, 1, out)
+    code, out = work_paired(dict(done_with("in my words:\n"),
+                                 **strength(read_back_words=0)))
+    check("read-back: zero still wants the date", code, 1, out)
+    code, out = work_paired(dict(done_with(
+        "accepted: 2026-10-13\nin my words: accepted\n"),
+        **strength(read_back_words='"lots"')))
+    check("read-back: a minimum that is not a number is five", code, 1, out)
     code, out = work_paired(done_with(
         "  accepted: 2026-10-13\n  in my words: the query left the loop.\n"))
     check("read-back: indented lines are not the lines", code, 1, out)

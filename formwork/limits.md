@@ -75,7 +75,9 @@ two inputs apart. It does not prove the check looked at what is in them.
 
 **`work-paired`** refuses a brief marked done whose report lacks the two
 read-back lines, `accepted:` with a date and `in my words:` with at least five
-words. **It cannot tell whether the human wrote them, or whether they are
+words. Five is `read_back_words` under `[strength]`: 1 lets one word such as
+"accepted" through, and 0 lets the line be empty, so all that is left of the
+step is the date and the line itself. **It cannot tell whether the human wrote them, or whether they are
 true.** An agent can type both, and a sentence lifted from the report passes.
 It stops the cheapest way of skipping the step, as `predictions-first` does,
 and nothing more. Whether the line keeps anybody in the loop, or becomes a line

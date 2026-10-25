@@ -35,7 +35,9 @@ CATCHES  A brief marked done with no report. That is work that happened and
              in my words: <at least five words>
 
          The first with a real date, the second with at least five words
-         after the colon.
+         after the colon. Five by default, set with `read_back_words` under
+         [strength]: 1 lets a single word such as "accepted" through, and 0
+         lets the line be empty, though it must still be there.
 
 CANNOT TELL  Whether the human wrote those words, or whether they are true.
          An agent can type both lines, and a sentence copied from the report
@@ -76,7 +78,7 @@ MEANINGFUL = 20
 ACCEPTED = re.compile(r"^accepted\s*:[ \t]*(\S*)", re.M | re.I)
 IN_MY_WORDS = re.compile(r"^in my words\s*:(.*)$", re.M | re.I)
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-READ_BACK_WORDS = 5
+DEFAULT_READ_BACK_WORDS = 5
 
 DEFAULT_OPEN = 1
 
@@ -105,7 +107,12 @@ def open_limit(root):
     return int(v) if str(v).isdigit() else DEFAULT_OPEN
 
 
-def read_back_missing(body):
+def read_back_words(root):
+    v = setting(root, "read_back_words", None, str(DEFAULT_READ_BACK_WORDS))
+    return int(v) if str(v).isdigit() else DEFAULT_READ_BACK_WORDS
+
+
+def read_back_missing(body, need):
     """What the report lacks of the read-back, as a list of sentences."""
     missing = []
     m = ACCEPTED.search(body)
@@ -124,9 +131,10 @@ def read_back_missing(body):
     m = IN_MY_WORDS.search(body)
     if not m:
         missing.append("no 'in my words:' line")
-    elif len(m.group(1).split()) < READ_BACK_WORDS:
-        missing.append("'in my words:' has %d word(s), and needs at least %d"
-                       % (len(m.group(1).split()), READ_BACK_WORDS))
+    elif len(m.group(1).split()) < need:
+        missing.append("'in my words:' has %d word(s), and needs at least %d, "
+                       "set by read_back_words under [strength] in "
+                       ".formwork.toml" % (len(m.group(1).split()), need))
     return missing
 
 # Paths the runner has told this check to stay out of. The kit's own fixtures
@@ -200,6 +208,7 @@ def main(argv):
         return 0
 
     problems = []
+    need = read_back_words(root)
     seen_status = []
     open_names = []
     reports = reports or {}
@@ -258,7 +267,7 @@ def main(argv):
                                 "that says nothing is the state this check "
                                 "exists to catch" % (REPORTS, rn))
                 continue
-            for gap in read_back_missing(body):
+            for gap in read_back_missing(body, need):
                 problems.append("%s/%s: brief %04d says done, and the report "
                                 "has %s. The human writes the read-back, see "
                                 "formwork/templates/report.md"
