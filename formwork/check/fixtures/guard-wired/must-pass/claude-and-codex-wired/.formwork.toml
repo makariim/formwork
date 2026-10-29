@@ -1,0 +1,3 @@
+[bindings]
+runtime = "claude-code"
+runtimes = ["claude-code", "codex"]

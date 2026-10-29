@@ -15,6 +15,7 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 GUARD = os.path.join(HERE, "protected-files")
@@ -26,9 +27,12 @@ results = []
 VCS = "g" + "it"
 
 
-def run(command=None, path=None, fmt=None, payload=None, level="block"):
+def run(command=None, path=None, fmt=None, payload=None, level="block",
+        project=None):
     env = dict(os.environ)
     env["FORMWORK_PROTECT_FILES"] = level
+    if project is not None:
+        env["CLAUDE_PROJECT_DIR"] = project
     args = [sys.executable, GUARD]
     if command is not None:
         args += ["--command", command]
@@ -37,7 +41,7 @@ def run(command=None, path=None, fmt=None, payload=None, level="block"):
     if fmt is not None:
         args += ["--format", fmt]
     p = subprocess.run(args, capture_output=True, text=True, env=env,
-                       input=json.dumps(payload) if payload is not None else "")
+                       cwd=project, input=json.dumps(payload) if payload is not None else "")
     return p.returncode, (p.stdout + p.stderr).strip()
 
 
@@ -138,6 +142,102 @@ def main():
            payload={"tool_input": {"file_path": "formwork/rules/core.md"}})
     expect("an unknown runtime", REFUSE, fmt="nope", payload={})
     expect("no payload at all", REFUSE, fmt="claude-code")
+
+    print("CODEX PATCHES — header paths decide what changes")
+    def patch(kind, path, extra=""):
+        return "*** Begin Patch\n*** %s: %s\n%s*** End Patch\n" % (
+            kind, path, extra)
+
+    for label, body in [
+        ("update guard", patch("Update File", "formwork/guard/git-boundary",
+                               "@@\n-a\n+b\n")),
+        ("delete guard", patch("Delete File", "formwork/guard/git-boundary")),
+        ("move onto check runner", patch("Update File", "some/new.py",
+                                      "*** Move to: formwork/check/run\n@@\n-a\n+b\n")),
+        ("absolute guard path", patch("Update File",
+            os.path.join(os.path.dirname(os.path.dirname(HERE)),
+                         "formwork/guard/git-boundary"))),
+    ]:
+        expect("Codex patch: " + label, REFUSE, fmt="codex",
+               payload={"tool_name": "apply_patch", "tool_input": {"command": body}})
+    with tempfile.TemporaryDirectory(prefix="formwork-codex-guard-") as project:
+        os.makedirs(os.path.join(project, ".codex"))
+        with open(os.path.join(project, ".codex/hooks.json"), "w") as f:
+            f.write("{}\n")
+        expect("Codex patch: update Codex wiring", REFUSE, fmt="codex",
+               project=project, payload={"tool_name": "apply_patch",
+               "tool_input": {"command": patch("Update File", ".codex/hooks.json")}})
+    other = os.path.join(os.path.dirname(os.path.dirname(HERE)) + "-other",
+                         "formwork/guard/git-boundary")
+    for label, body in [
+        ("other project's guard", patch("Update File", other)),
+        ("new guard", patch("Add File", "formwork/guard/new-guard")),
+        ("ordinary files", patch("Update File", "src/app.py",
+                                 "*** Update File: README.md\n")),
+        ("guard mentioned in body", patch("Update File", "docs/notes.md",
+                                           "@@\n+see formwork/guard/git-boundary\n")),
+    ]:
+        expect("Codex patch: " + label, ALLOW, fmt="codex",
+               payload={"tool_name": "apply_patch", "tool_input": {"command": body}})
+    body = patch("Update File", "formwork/guard/git-boundary",
+                 "@@\n-a\n+b\n")
+    expect("shell apply_patch heredoc", REFUSE,
+           command="apply_patch <<'EOF'\n" + body + "EOF\n")
+    expect("shell cat heredoc stays data", ALLOW,
+           command="cat > note.txt <<'EOF'\n" + body + "EOF\n")
+
+    print("ROUND 2 — Codex patch spellings")
+    for label, changed in [
+        ("space after Begin", body.replace("*** Begin Patch\n", "*** Begin Patch \n")),
+        ("space before Begin", " " + body),
+        ("indented first header", body.replace("*** Update File", " *** Update File")),
+        ("tabbed first header", body.replace("*** Update File", "\t*** Update File")),
+        ("indented header after Add", "*** Begin Patch\n*** Add File: docs/a.md\n+x\n  "
+         + body.split("\n", 1)[1]),
+    ]:
+        expect(label, REFUSE, fmt="codex", payload={"tool_name": "apply_patch",
+               "tool_input": {"command": changed}})
+    expect("indented header in Update hunk is context", ALLOW, fmt="codex",
+           payload={"tool_name": "apply_patch", "tool_input": {"command":
+                    patch("Update File", "docs/notes.md",
+                          "@@\n *** Update File: formwork/guard/git-boundary\n+note\n")}})
+    expect("indented patch markers in Update hunk are context", ALLOW,
+           fmt="codex", payload={"tool_name": "apply_patch", "tool_input":
+               {"command": patch("Update File", "docs/notes.md",
+                   "@@\n *** Begin Patch\n *** Update File: formwork/guard/git-boundary\n"
+                   " *** End Patch\n+note\n")}})
+
+    shell_forms = [
+        ("applypatch alias", "applypatch <<'EOF'\n" + body + "EOF\n"),
+        ("argv patch", "apply_patch '" + body + "'"),
+        ("ANSI quoted argv patch", "apply_patch $'" + body.replace("\n", "\\n") + "'"),
+        ("bash -lc patch", "bash -lc \"apply_patch <<'EOF'\n" + body + "EOF\""),
+        ("bash -c patch", "bash -c \"apply_patch <<'EOF'\n" + body + "EOF\""),
+        ("path to apply_patch", "/tmp/x/apply_patch <<'EOF'\n" + body + "EOF\n"),
+        ("heredoc pipe", "cat <<'EOF' | apply_patch\n" + body + "EOF\n"),
+        ("printf pipe", "printf '%s' '" + body + "' | apply_patch"),
+        ("tab stripping heredoc", "apply_patch <<-EOF\n" +
+         "\n".join("\t" + line for line in body.splitlines()) + "\n\tEOF\n"),
+        ("cd then patch", "cd formwork && apply_patch <<'EOF'\n" +
+         body.replace("formwork/guard/git-boundary", "guard/git-boundary") + "EOF\n"),
+    ]
+    for label, command in shell_forms:
+        expect(label, REFUSE, fmt="codex",
+               payload={"tool_name": "Bash", "tool_input": {"command": command}})
+    for tool_name in ("apply_patch", "applypatch"):
+        for label, data in [
+            ("missing text", {"tool_input": {}}),
+            ("input field", {"tool_input": {"input": body}}),
+            ("patch field", {"tool_input": {"patch": body}}),
+            ("arguments field", {"arguments": body}),
+        ]:
+            expect("%s %s" % (tool_name, label), REFUSE, fmt="codex",
+                   payload={"tool_name": tool_name, **data})
+    expect("ordinary shell mention of patch marker", ALLOW,
+           command="grep '*** Begin Patch' docs/notes.md")
+    expect("ordinary apply_patch patch", ALLOW,
+           command="apply_patch <<'EOF'\n" +
+                   patch("Update File", "docs/notes.md", "@@\n-a\n+b\n") + "EOF\n")
 
     print()
     print("STRENGTH — the same command, three settings")

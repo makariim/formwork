@@ -6,6 +6,17 @@ version commit's message in git: `git show 02bd5f0` for 0.2.0 and
 
 ---
 
+## Unreleased
+
+- `protected-files` checks Codex `apply_patch` headers, including patches fed
+  through shell arguments, wrappers, pipes, and heredocs, before a guarded
+  file can be changed. It reads Codex's whitespace forms and refuses an
+  `apply_patch` call with no readable patch text.
+- `guard-wired` checks every runtime named in `[bindings].runtimes` and any
+  wiring file that names a formwork guard. Codex requires the two tool guards,
+  with a matcher whose regex reaches a Codex patch tool name; `Edit` and
+  `Write` are accepted as well as `apply_patch`.
+
 ## 1.0.0
 
 **This one can turn a green gate red.** Two checks are stricter and there is a

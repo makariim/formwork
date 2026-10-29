@@ -1,0 +1,19 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./formwork/guard/git-boundary --format codex"
+          },
+          {
+            "type": "command",
+            "command": "./formwork/guard/protected-files --format codex"
+          }
+        ]
+      }
+    ]
+  }
+}
