@@ -536,9 +536,72 @@ def _sink_runs_it(line):
     return os.path.basename(words[0].strip("'\"")) in EXECUTES_STDIN
 
 
+def patch_paths(text):
+    """Paths named by headers inside apply_patch blocks, never changed lines."""
+    paths = []
+    in_patch = False
+    update_hunk = False
+    lines = text.splitlines()
+    for index, line in enumerate(lines):
+        # Codex trims boundary lines and headers. In an Update hunk, leading
+        # whitespace is context, so only trim the right side there.
+        stripped = line.strip()
+        if not in_patch and stripped == "*** Begin Patch":
+            in_patch = True
+            update_hunk = False
+            continue
+        if in_patch and (not update_hunk or not line[:1].isspace() or
+                         index == len(lines) - 1) and \
+                (stripped == "*** End Patch" or
+                 stripped.startswith("*** End Patch'") or
+                 stripped.startswith('*** End Patch"')):
+            in_patch = False
+            update_hunk = False
+            continue
+        if in_patch:
+            header = line.rstrip() if update_hunk else stripped
+            m = re.match(r"^\*\*\* (Add File|Update File|Delete File|Move to): (.+)$", header)
+            if m:
+                paths.append((m.group(1), m.group(2)))
+                update_hunk = False
+            elif header.startswith("@@") and paths and paths[-1][0] == "Update File":
+                update_hunk = True
+    return paths
+
+
+def patch_reason(text, directory=None):
+    for kind, path in patch_paths(text):
+        if directory and not os.path.isabs(path):
+            path = os.path.join(PROJECT, directory, path)
+        hit = is_protected(path, holder=kind in ("Delete File", "Move to"))
+        if hit:
+            return "apply_patch would change %s" % hit
+    return None
+
+
+PATCH_COMMAND = re.compile(r"\b(?:apply_patch|applypatch)\b")
+
+
+def shell_patch_reason(command):
+    """Read Codex shell patch forms before a heredoc can hide their body."""
+    if not PATCH_COMMAND.search(command) or "*** Begin Patch" not in command:
+        return None
+    # Argv patches start after a shell quote; <<- removes leading tabs.
+    patch = command[command.find("*** Begin Patch"):]
+    if "$'" in command[:command.find("*** Begin Patch")]:
+        patch = patch.replace("\\n", "\n")
+    if "<<-" in command[:command.find("*** Begin Patch")]:
+        patch = "\n".join(line.lstrip("\t") for line in patch.split("\n"))
+    cd = re.match(r"^\s*cd\s+([^;&|]+?)\s*&&", command)
+    directory = cd.group(1).strip().strip("'\"") if cd else None
+    return patch_reason(patch, directory)
+
+
 def strip_heredocs(command):
-    """Remove heredoc bodies, unless the receiving program can execute them."""
+    """Remove data bodies; inspect code and patches handed to their sinks."""
+    patch_hit = None
     def keep_or_drop(m):
+        nonlocal patch_hit
         before = command[:m.start()]
         line = before.rsplit("\n", 1)[-1]
         # Split on the last separator: `x && bash <<EOF` is a shell sink.
@@ -547,8 +610,11 @@ def strip_heredocs(command):
                 line = line.rsplit(sep, 1)[-1]
         if _sink_runs_it(line):
             return m.group(0)        # it is code. Leave it to be inspected.
+        # 0019 found that treating apply_patch stdin as data hid guard edits.
+        if re.search(r"(?:^|\s)apply_patch\s*$", line):
+            patch_hit = patch_hit or patch_reason(m.group(0))
         return "<<REDACTED"
-    return HEREDOC.sub(keep_or_drop, command)
+    return HEREDOC.sub(keep_or_drop, command), patch_hit
 
 
 SUBSHELL = re.compile(r"\$\(([^()]*)\)|`([^`]*)`")
@@ -617,9 +683,14 @@ def split_all(command, depth=0):
 
 
 def decide(command):
+    patch_hit = shell_patch_reason(command)
+    if patch_hit:
+        return True, patch_hit
     # The body of a heredoc is text being written, not commands being run.
     # It is stripped so its contents are never read as a command line.
-    command = strip_heredocs(command)
+    command, patch_hit = strip_heredocs(command)
+    if patch_hit:
+        return True, patch_hit
     for segment in split_all(command):
         reason = verdict_for(segment)
         if reason:
@@ -676,6 +747,7 @@ def from_payload(payload):
 
 def main(argv):
     fmt = command = path = None
+    tool_name = None
     i = 1
     while i < len(argv):
         if argv[i] == "--format" and i + 1 < len(argv):
@@ -714,12 +786,20 @@ def main(argv):
                   file=sys.stderr)
             return REFUSE
         command, path = got
+        if isinstance(payload, dict):
+            tool_name = payload.get("tool_name")
 
     reason = None
     if path:
         hit = is_protected(path)
         if hit:
             reason = "editing %s" % hit
+    if reason is None and tool_name in ("apply_patch", "applypatch") and \
+            (not command or "*** Begin Patch" not in command):
+        reason = "apply_patch payload has no readable patch text"
+    if reason is None and command and (tool_name in ("apply_patch", "applypatch") or
+                                       command.lstrip().startswith("*** Begin Patch")):
+        reason = patch_reason(command)
     if reason is None and command:
         refuse, why = decide(command)
         reason = why if refuse else None

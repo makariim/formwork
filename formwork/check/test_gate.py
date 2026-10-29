@@ -13,6 +13,7 @@ evidence of anything, so this exercises every way it is supposed to say no.
 Python 3, standard library only, no dependencies.
 """
 import os
+import json
 import shutil
 import subprocess
 import sys
@@ -171,6 +172,33 @@ def report_shape(files):
 
 
 def main():
+    print("ROUND 2 — Codex matcher names")
+    with tempfile.TemporaryDirectory(prefix="formwork-matcher-") as root:
+        codex = os.path.join(root, ".codex")
+        os.makedirs(codex)
+        wiring = os.path.join(codex, "hooks.json")
+        guard_wired = os.path.join(HERE, "checks", "guard-wired")
+        for matcher, want in [
+            ("Bash|not_apply_patch", 1),
+            ("Bash|^apply_patchX$", 1),
+            ("Bash*", 1),
+            ("Bash|Edit|Write", 0),
+            (None, 0),
+            (".*", 0),
+            ("[", 1),
+        ]:
+            hooks = [{"hooks": [
+                {"command": "./formwork/guard/git-boundary --format codex"},
+                {"command": "./formwork/guard/protected-files --format codex"}]}]
+            if matcher is not None:
+                hooks[0]["matcher"] = matcher
+            with open(wiring, "w", encoding="utf-8") as f:
+                json.dump({"hooks": {"PreToolUse": hooks}}, f)
+            p = subprocess.run([sys.executable, guard_wired, root],
+                               capture_output=True, text=True)
+            check("Codex matcher %s" % matcher, p.returncode, want,
+                  p.stdout + p.stderr)
+
     print("THE GATE")
 
     # green - a sound project, one check, one input that does break it

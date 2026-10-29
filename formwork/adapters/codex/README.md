@@ -1,21 +1,32 @@
 # Codex adapter
 
-**Label: untested.** The publisher documents everything below. Nobody has run
-it. It stays untested until somebody watches it work.
+**Label: untested.** The hook wiring has not been watched in a live Codex task.
 
 ## Blocking
 
-Codex refuses a tool call on exit code 2, the same as the other three, so the
-same guards serve it. Wire both to `preToolUse`, pointing at:
+Codex refuses a tool call on exit code 2. Wire both guards to `PreToolUse`
+with a matcher that includes `Bash|apply_patch`, pointing at:
 
 ```
 formwork/guard/git-boundary   --format codex
 formwork/guard/protected-files --format codex
 ```
 
-Hooks go in `.codex/hooks.json`, or inline in `~/.codex/config.toml`. Its own
-source carries `PreToolUseHookResult::Blocked`, so the mechanism is real even
-though this wiring has not been exercised.
+Hooks go in `.codex/hooks.json`. `protected-files` reads the paths in Codex
+`apply_patch` headers, including padded headers and patches passed through
+shell arguments, wrappers, pipes, and heredocs. It checks `Add File`,
+`Update File`, `Delete File`, and `Move to` paths. An `apply_patch` or
+`applypatch` call with no readable patch text is refused. `guard-wired` also
+accepts a Codex matcher such as `Bash|Edit|Write`: Codex's `Edit` and `Write`
+names cover patch calls, while `Bash` covers shell calls.
+
+For a project that also uses another runtime, list them under `[bindings]`:
+
+    runtime = "claude-code"
+    runtimes = ["claude-code", "codex"]
+
+`guard-wired` checks both runtimes. Codex has no supported `Stop` hook for
+`quality-gate`, so run `formwork/check/run` by hand at the end of a Codex task.
 
 ## Roles
 
