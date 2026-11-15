@@ -8,6 +8,16 @@ version commit's message in git: `git show 02bd5f0` for 0.2.0 and
 
 ## Unreleased
 
+- Optional templates and gates for big work. Six one page templates in
+  `formwork/templates/`: spec, research lane, design round, build, review
+  round, release step (the general pattern only). A phase is a label on a run
+  of ordinary briefs, using `stream:`; no fixed order. New check `gates`: a
+  brief may carry one `starts:` line, `now`, `after <stream>` or `decision
+  NNNN`, and an open brief whose gate is not met, or whose gate is in prose,
+  is refused. The two default gates for a build (no build before the spec is
+  accepted; unproven items listed and seen before the next phase) are offered
+  in the spec and build templates. `formwork/route.md` offers the matching
+  template by kind and size, never as a sequence.
 - Specialists, cheapest first. The `lead` spawns an existing role, then a
   relabel (an existing role with a title line and optionally a skill, its
   owns, sections and tools still from its file), and only then a new project

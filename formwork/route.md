@@ -67,6 +67,25 @@ short named list is what keeps routing from drifting as the library grows.
 
 When two kinds fit, take the smaller one. When none fits, ask one question.
 
+### Templates for a phase, offered, never required
+
+When the work is a phase (above a checkpoint, inside a milestone), offer the
+template that matches what this brief does. Pick by kind and size. They are
+not a sequence: a project may use one, several, or none, in any order.
+
+| This brief does | Size | Offer |
+|---|---|---|
+| writes the spec for a new product or a big change | phase | `templates/spec.md` |
+| researches a question the spec leaves open | round | `templates/research-lane.md`, inside `templates/round.md` |
+| designs a look, screens or an architecture | phase | `templates/design-round.md` |
+| builds version 1, or one part of it | phase | `templates/build.md` |
+| reviews the running product by journey | checkpoint or phase | `templates/review-round.md` |
+| releases a version | checkpoint | `templates/release-step.md` |
+
+A brief that must wait for another stream or a decision carries one
+`starts:` line (`now`, `after <stream>`, `decision NNNN`), checked by
+`gates`. See Phases and gates in `formwork/loop.md`. A task never carries one.
+
 ---
 
 ## Size

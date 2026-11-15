@@ -133,6 +133,13 @@ was picked.** It does not read rounds held elsewhere under `docs/`, where
 notes and participant files mix, nor closed briefs, nor a team written as
 prose.
 
+**`gates`** refuses an open brief whose `starts:` line is not met, or is not
+one of `now`, `after <stream>`, `decision NNNN`. **It cannot tell whether the
+gate was the right one, or whether the person read the report** behind the
+read-back it counts. A misspelt stream in `starts: after` is a stream nobody
+names, and is refused as such. Closed briefs are not read, so a brief that
+ran before its gate opened is not caught afterwards.
+
 ---
 
 ## The gate gives up

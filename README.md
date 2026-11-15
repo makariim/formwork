@@ -249,7 +249,7 @@ the list. `where` and `version` belong to the installed command only.
 | `init` | puts `formwork/` and `FORMWORK.md` into your project |
 | `install` | wires the guards into your agent, writes your role files. Add `--runtime <name>` when it cannot tell |
 | `setup` | asks twelve questions once, then writes your style file, your standing brief, the folders for decisions, briefs and reports, and the two routing lines when your project has no instruction file |
-| `check` | runs all fifteen checks and says green or red |
+| `check` | runs all sixteen checks and says green or red |
 | `sync` | later, after you upgrade the command: brings the project's `formwork/` up to the new release, keeps the files the project owns, and says what it changed |
 
 **What it touches.** It adds `formwork/` and `FORMWORK.md`, writes
@@ -439,7 +439,7 @@ better after you have run it once than before.
 | [`threads.md`](formwork/threads.md) | how work starts, and where the plan lives between conversations |
 | [`style.md`](formwork/style.md) | how the agents talk to you, and how to change it |
 | [`round.md`](formwork/round.md) | how to run a round, and when it is worth it |
-| [`templates/`](formwork/templates/) | brief, predictions, report, decision, round, standing brief |
+| [`templates/`](formwork/templates/) | brief, predictions, report, decision, round, standing brief; optional ones for a phase: spec, research lane, design round, build, review round, release step |
 | [`skills/`](formwork/skills/) | skills the kit ships, each pinned to an upstream commit |
 | [`roles/`](formwork/roles/) | the roles, and how to write your own |
 | [`rules/`](formwork/rules/) | the rules, each saying what it catches |

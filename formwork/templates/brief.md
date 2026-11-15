@@ -30,6 +30,12 @@ date: 2026-09-13
 no report fails the gate**, because work that left nothing behind is work
 nobody can reconstruct later.
 
+**Optional, for a phase:** a `stream:` line names the run of briefs this one
+belongs to, and a `starts:` line says what must be true first (`now`, `after
+<stream>`, `decision NNNN`). The gate refuses an open brief whose `starts:` is
+not met. See Phases and gates in [`../loop.md`](../loop.md). A task needs
+neither.
+
 Even a one line brief gets saved. One line plus those two is a complete file.
 
 **Done also needs the read-back**, two lines you write yourself in the report,

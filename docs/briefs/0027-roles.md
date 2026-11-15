@@ -2,7 +2,7 @@
 brief: 0027
 stream: method
 title: Specialists cheaply
-status: open, 2026-11-15
+status: done (accepted 2026-11-15)
 ---
 
 # 0027 Specialists cheaply
