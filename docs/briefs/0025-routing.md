@@ -2,7 +2,7 @@
 brief: 0025
 stream: method
 title: Routing one plain prompt
-status: open, 2026-11-15
+status: done (accepted 2026-11-15)
 ---
 
 # 0025 Routing one plain prompt

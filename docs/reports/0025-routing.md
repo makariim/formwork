@@ -57,3 +57,6 @@ One gap: the research's step 3 also listed a task size ceiling check. It was not
 - No routing measurement. That is step 4.
 - No check for a task size ceiling or for `docs/routing.md` shape.
 - `docs/standing.md` not touched: it is the director's.
+
+accepted: 2026-11-15
+in my words: next, he committed the routing work as eafd01c

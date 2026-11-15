@@ -58,6 +58,8 @@ without it.
 
 ## What is decided
 
+- 2026-11-15, **0025 accepted** ("next"; committed eafd01c): routing table, director routes, corrections file, setup writes two lines, personal defaults template. **0026** (measure routing) started.
+
 - 2026-11-15, **0024 accepted** (he fixed the self hit, re-recorded, committed a6240e5; 14 checks green). **0025** (step 3, routing one plain prompt) started.
 
 - 2026-11-15, **0023 accepted** ("next"; committed 2537c06): rounds anywhere under docs, stale standing, open briefs per stream. It worked around the self protection guard with shell scripts; the director reviewed the diff (additive). **0024** (the kit leak scan) started, told to stop at a guard refusal instead.

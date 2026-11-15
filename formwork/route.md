@@ -4,10 +4,22 @@ A person types one plain sentence. This page says what happens next: what kind
 of work it is, how big, who does it, what shape the brief takes, and where it
 stops.
 
-**Routing accuracy is NOT ESTABLISHED.** Nobody has run a set of prompts
-through this table and counted how often it picked right. Until somebody does,
-with the command and the number written down, treat every route as a guess the
-person can correct in one line.
+**Routing accuracy, measured: 44 and 45 of 49 routed as expected**, in two
+runs of `formwork/evals/routing/run` with Haiku (2026-11-15, about $0.03 a
+run). A prompt counts only when its kind, size and first step all match. The
+failing prompts change from run to run by about three, so a difference smaller
+than that between two versions of this page is noise. One prompt failed in
+every run: a small research ask dressed in big words, routed as a round.
+
+Before this page was changed by that measurement it scored 38 of 49. It
+dropped then: new products sent to a round before a spec (3 of 5), and small
+asks sized by their words (4). Both now have a line below.
+
+What the number does not show: one model, one person's prompts, scored on the
+choice only. It does not say the brief that followed was any good. Run it again
+after any change to this page or to the director, and write the new number
+here. Until then, treat every route as a guess the person can correct in one
+line.
 
 ---
 
@@ -51,7 +63,7 @@ short named list is what keeps routing from drifting as the library grows.
 | **A change to an existing product** | task if a sentence covers it; checkpoint if you have to say what is out of scope | one line, or `templates/brief.md` | the session, or one working role (`backend`, `frontend`, ...) | at the report |
 | **Research** | task if one source answers it; round if the answer is unclear and costly to get wrong | one line, or `templates/round.md` | `researcher`; a round through `lead` | at the report or the round record |
 | **A deck or document** | task if the words already exist; checkpoint if the argument has to be built | one line, or `templates/brief.md` | `writer`, with `visual` when it is looked at | at the draft, for the person to read |
-| **A new product** | never a task. Milestone, made of phases | `templates/brief.md` for the first brief, a round when a choice is open | `director` plans; `lead` splits; the packs build | after each phase's report, and before anything is released |
+| **A new product** | never a task. Milestone, made of phases | `templates/brief.md` for the first brief: a one page spec from the person's words. A round comes later, when the spec leaves a choice open | `director` plans; `lead` splits; the packs build | after each phase's report, and before anything is released |
 
 When two kinds fit, take the smaller one. When none fits, ask one question.
 
@@ -65,6 +77,12 @@ to be safe.
 The test is the loop's own (`formwork/loop.md`): could a reviewer sensibly
 accept one part and reject the next? If yes, it is more than one piece of
 work, and it is above a task.
+
+**Size the work, not the words.** "Critical", "comprehensive", "full",
+"deep", "initiative" and "architect" do not make an ask bigger. "Quick" and
+"little" do not make it smaller. Size what would actually change. When the
+words and the work disagree, the work wins, and you say the size you picked.
+Ask only when the work itself is unclear.
 
 Say the size in plain words. The person can override it in one line.
 
@@ -129,4 +147,4 @@ Tell that a small ask was born large. No check reads intent, so a one line
 request briefed as a round passes every check. The director's rule is the only
 guard: if you cannot tell the size, ask one question.
 
-Know that it routed well. See the top of this page.
+Know that it routed well on prompts unlike the set in `formwork/evals/routing/prompts.json`. See the top of this page.

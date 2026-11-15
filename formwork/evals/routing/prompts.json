@@ -1,0 +1,442 @@
+{
+ "about": "Plain prompts for measuring formwork/route.md. Each has the kind, size and first step a correct route picks. A list means any of those values is right. \"*\" means any value is right. tag says what the prompt tests.",
+ "kinds": [
+  "question",
+  "fix",
+  "change",
+  "research",
+  "document",
+  "new-product"
+ ],
+ "sizes": [
+  "task",
+  "checkpoint",
+  "round",
+  "milestone"
+ ],
+ "firsts": {
+  "answer": "answer it, nothing changes",
+  "do": "the session that got it does it now, one line said back",
+  "brief": "the director writes a brief and stops",
+  "round": "the director writes a round brief and stops",
+  "ask": "ask one question before routing"
+ },
+ "prompts": [
+  {
+   "id": "q01",
+   "tag": "plain",
+   "kind": "question",
+   "size": "task",
+   "first": "answer",
+   "prompt": "what does the retry setting in the worker config actually do?"
+  },
+  {
+   "id": "q02",
+   "tag": "plain",
+   "kind": "question",
+   "size": "task",
+   "first": "answer",
+   "prompt": "which of our services talks to the database directly?"
+  },
+  {
+   "id": "q03",
+   "tag": "plain",
+   "kind": "question",
+   "size": "task",
+   "first": "answer",
+   "prompt": "why did we pick postgres over a document store? is it written down anywhere?"
+  },
+  {
+   "id": "q04",
+   "tag": "plain",
+   "kind": "question",
+   "size": "task",
+   "first": "answer",
+   "prompt": "how many open briefs do we have right now?"
+  },
+  {
+   "id": "q05",
+   "tag": "dressed",
+   "kind": "question",
+   "size": "task",
+   "first": "answer",
+   "prompt": "give me a full end to end architectural overview of how a search request flows through the whole system, from the browser to the index and back"
+  },
+  {
+   "id": "q06",
+   "tag": "plain",
+   "kind": "question",
+   "size": "task",
+   "first": "answer",
+   "prompt": "is the export endpoint behind auth or not?"
+  },
+  {
+   "id": "f01",
+   "tag": "plain",
+   "kind": "fix",
+   "size": "task",
+   "first": "do",
+   "prompt": "the search page shows nothing when you type a single word"
+  },
+  {
+   "id": "f02",
+   "tag": "plain",
+   "kind": "fix",
+   "size": "task",
+   "first": "do",
+   "prompt": "upload fails for files with a space in the name"
+  },
+  {
+   "id": "f03",
+   "tag": "plain",
+   "kind": "fix",
+   "size": "task",
+   "first": "do",
+   "prompt": "the date on the dashboard is one day off for users in the evening"
+  },
+  {
+   "id": "f04",
+   "tag": "plain",
+   "kind": "fix",
+   "size": "task",
+   "first": "do",
+   "prompt": "the login button does nothing on the second click after a wrong password"
+  },
+  {
+   "id": "f05",
+   "tag": "plain",
+   "kind": "fix",
+   "size": "task",
+   "first": "do",
+   "prompt": "the nightly job crashes with a key error on the empty tenant"
+  },
+  {
+   "id": "f06",
+   "tag": "dressed",
+   "kind": "fix",
+   "size": "task",
+   "first": "do",
+   "prompt": "we have a critical production incident: the OCR worker is throwing a timeout on large PDFs, I need a full investigation and a robust long term solution"
+  },
+  {
+   "id": "f07",
+   "tag": "dressed",
+   "kind": "fix",
+   "size": "task",
+   "first": "do",
+   "prompt": "the entire test suite is broken, one test in the auth module fails since this morning"
+  },
+  {
+   "id": "c01",
+   "tag": "plain",
+   "kind": "change",
+   "size": "task",
+   "first": "do",
+   "prompt": "add a created at column to the admin user list"
+  },
+  {
+   "id": "c02",
+   "tag": "plain",
+   "kind": "change",
+   "size": "task",
+   "first": "do",
+   "prompt": "rename the Submit button on the feedback form to Send"
+  },
+  {
+   "id": "c03",
+   "tag": "plain",
+   "kind": "change",
+   "size": "task",
+   "first": "do",
+   "prompt": "make the page size on the results list 50 instead of 20"
+  },
+  {
+   "id": "c04",
+   "tag": "plain",
+   "kind": "change",
+   "size": "task",
+   "first": "do",
+   "prompt": "log the request id on every error line in the API"
+  },
+  {
+   "id": "c05",
+   "tag": "plain",
+   "kind": "change",
+   "size": "checkpoint",
+   "first": "brief",
+   "prompt": "add single sign on to the app, the customer uses their own identity provider, but leave the existing password login alone for now"
+  },
+  {
+   "id": "c06",
+   "tag": "plain",
+   "kind": "change",
+   "size": "checkpoint",
+   "first": "brief",
+   "prompt": "move the document processing from the synchronous request to a background queue with status polling in the UI"
+  },
+  {
+   "id": "c07",
+   "tag": "plain",
+   "kind": "change",
+   "size": "checkpoint",
+   "first": "brief",
+   "prompt": "add Arabic and right to left support across the whole interface"
+  },
+  {
+   "id": "c08",
+   "tag": "plain",
+   "kind": "change",
+   "size": "checkpoint",
+   "first": "brief",
+   "prompt": "let admins set per tenant limits on uploads and searches, with a settings screen and enforcement in the API, but not billing"
+  },
+  {
+   "id": "c09",
+   "tag": "dressed",
+   "kind": "change",
+   "size": "task",
+   "first": "do",
+   "prompt": "I want a complete redesign of the error experience: change the 404 page text to say the page was moved"
+  },
+  {
+   "id": "c10",
+   "tag": "dressed",
+   "kind": "change",
+   "size": "task",
+   "first": "do",
+   "prompt": "please architect and implement a comprehensive configuration strategy so the request timeout can be set from an environment variable"
+  },
+  {
+   "id": "r01",
+   "tag": "plain",
+   "kind": [
+    "research",
+    "question"
+   ],
+   "size": "task",
+   "first": [
+    "do",
+    "answer"
+   ],
+   "prompt": "find out what the latest stable version of our web framework is and whether it drops support for our node version"
+  },
+  {
+   "id": "r02",
+   "tag": "plain",
+   "kind": [
+    "research",
+    "question"
+   ],
+   "size": "task",
+   "first": [
+    "do",
+    "answer"
+   ],
+   "prompt": "check the licence of the PDF parsing library we use, can we ship it on prem to a customer?"
+  },
+  {
+   "id": "r03",
+   "tag": "plain",
+   "kind": [
+    "research",
+    "question"
+   ],
+   "size": "task",
+   "first": [
+    "do",
+    "answer"
+   ],
+   "prompt": "look up what the max context length of our embedding model is"
+  },
+  {
+   "id": "r04",
+   "tag": "plain",
+   "kind": "research",
+   "size": "round",
+   "first": "round",
+   "prompt": "should we replace our search engine with a vector database? we have to commit for the next two years and the customer is watching"
+  },
+  {
+   "id": "r05",
+   "tag": "plain",
+   "kind": "research",
+   "size": "round",
+   "first": "round",
+   "prompt": "which OCR approach should we standardise on for scanned Arabic contracts? we have three candidates and nobody agrees"
+  },
+  {
+   "id": "r06",
+   "tag": "plain",
+   "kind": "research",
+   "size": "round",
+   "first": "round",
+   "prompt": "decide whether we self host the language model or call a hosted API, given air gapped customers, cost and quality"
+  },
+  {
+   "id": "r07",
+   "tag": "dressed",
+   "kind": "research",
+   "size": "task",
+   "first": "do",
+   "prompt": "run a deep multi angle research effort on whether the CSV export should use commas or semicolons by default"
+  },
+  {
+   "id": "d01",
+   "tag": "plain",
+   "kind": "document",
+   "size": "task",
+   "first": "do",
+   "prompt": "turn the release notes in the changelog into a one page summary for the customer"
+  },
+  {
+   "id": "d02",
+   "tag": "plain",
+   "kind": "document",
+   "size": "task",
+   "first": "do",
+   "prompt": "make slides from this report, the words are all there already, five slides max"
+  },
+  {
+   "id": "d03",
+   "tag": "plain",
+   "kind": [
+    "document",
+    "fix"
+   ],
+   "size": "task",
+   "first": "do",
+   "prompt": "fix the typos and the broken links in the README"
+  },
+  {
+   "id": "d04",
+   "tag": "plain",
+   "kind": "document",
+   "size": "checkpoint",
+   "first": "brief",
+   "prompt": "I need a deck for the steering committee next week arguing that we should fund a second team. I have not worked out the case yet"
+  },
+  {
+   "id": "d05",
+   "tag": "plain",
+   "kind": "document",
+   "size": "checkpoint",
+   "first": "brief",
+   "prompt": "write a proposal for the customer on how we would run the pilot, what it costs, and what they get at the end"
+  },
+  {
+   "id": "d06",
+   "tag": "plain",
+   "kind": "document",
+   "size": "checkpoint",
+   "first": "brief",
+   "prompt": "write the operator handbook for installing and running the platform on prem, nothing exists yet"
+  },
+  {
+   "id": "n01",
+   "tag": "plain",
+   "kind": "new-product",
+   "size": "milestone",
+   "first": "brief",
+   "prompt": "build me an app where field inspectors take photos, fill a checklist, and a report gets generated for the manager"
+  },
+  {
+   "id": "n02",
+   "tag": "plain",
+   "kind": "new-product",
+   "size": "milestone",
+   "first": "brief",
+   "prompt": "I want a personal finance tracker that reads my bank statements and tells me where the money went each month"
+  },
+  {
+   "id": "n03",
+   "tag": "plain",
+   "kind": "new-product",
+   "size": "milestone",
+   "first": "brief",
+   "prompt": "make a demo product for a hospital that answers staff questions from their policy documents, with citations"
+  },
+  {
+   "id": "n04",
+   "tag": "plain",
+   "kind": "new-product",
+   "size": "milestone",
+   "first": "brief",
+   "prompt": "start a new service that watches our document folders and builds a searchable timeline of every contract change"
+  },
+  {
+   "id": "n05",
+   "tag": "dressed",
+   "kind": "new-product",
+   "size": "milestone",
+   "first": "brief",
+   "prompt": "just a quick little app: a booking system for the meeting rooms with logins, calendars and email reminders"
+  },
+  {
+   "id": "s01",
+   "tag": "dressed",
+   "kind": "change",
+   "size": "task",
+   "first": "do",
+   "prompt": "launch a full initiative to modernise our tooling: bump the linter to the latest version"
+  },
+  {
+   "id": "s02",
+   "tag": "dressed",
+   "kind": "question",
+   "size": "task",
+   "first": "answer",
+   "prompt": "I need a strategic assessment: is the cache turned on in production or not?"
+  },
+  {
+   "id": "s03",
+   "tag": "dressed",
+   "kind": [
+    "document",
+    "change"
+   ],
+   "size": "task",
+   "first": "do",
+   "prompt": "kick off a documentation program: add a line to the README saying the minimum python version is 3.11"
+  },
+  {
+   "id": "a01",
+   "tag": "ambiguous",
+   "kind": "*",
+   "size": "*",
+   "first": "ask",
+   "prompt": "make search better"
+  },
+  {
+   "id": "a02",
+   "tag": "ambiguous",
+   "kind": "*",
+   "size": "*",
+   "first": "ask",
+   "prompt": "handle the customer thing from yesterday"
+  },
+  {
+   "id": "a03",
+   "tag": "ambiguous",
+   "kind": "*",
+   "size": "*",
+   "first": "ask",
+   "prompt": "we need to do something about performance"
+  },
+  {
+   "id": "a04",
+   "tag": "ambiguous",
+   "kind": "*",
+   "size": "*",
+   "first": "ask",
+   "prompt": "clean it up"
+  },
+  {
+   "id": "a05",
+   "tag": "ambiguous",
+   "kind": "*",
+   "size": "*",
+   "first": "ask",
+   "prompt": "can you look at the AI part"
+  }
+ ]
+}

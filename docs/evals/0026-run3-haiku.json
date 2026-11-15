@@ -1,0 +1,1155 @@
+{
+ "model": "haiku",
+ "passed": 44,
+ "total": 49,
+ "cost_usd": 0.035106420000000006,
+ "rows": [
+  {
+   "id": "q01",
+   "tag": "plain",
+   "prompt": "what does the retry setting in the worker config actually do?",
+   "want": {
+    "kind": "question",
+    "size": "task",
+    "first": "answer"
+   },
+   "got": {
+    "kind": "question",
+    "size": "task",
+    "first": "answer"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "This is a question, so nothing changes in the repository. I can't read files in this run, so I can't tell you what the retry setting in your worker config does. Guessing at the key name, its default, or how the worker applies it would be a made-up answer. A working session with read access would open the worker config and the code that reads it, then report what the setting controls, its default, and whether it retries on every failure or only some.\n\n```json\n{\"kind\": \"question\", \"size\": \"task\", \"first\": \"answer\"}\n```"
+  },
+  {
+   "id": "q02",
+   "tag": "plain",
+   "prompt": "which of our services talks to the database directly?",
+   "want": {
+    "kind": "question",
+    "size": "task",
+    "first": "answer"
+   },
+   "got": {
+    "kind": "question",
+    "size": "task",
+    "first": "answer"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Routing: a question, one task, answered from here with nothing changed. I can't read the repository in this run, and `docs/standing.md` doesn't record which services touch the database, so I can't say which one does. The standing brief lists four parts that could: the web interface, the API, the background workers, and the admin screen. A session with repo access would find out by searching for database client imports and connection strings in each one.\n\n{\"kind\": \"question\", \"size\": \"task\", \"first\": \"answer\"}"
+  },
+  {
+   "id": "q03",
+   "tag": "plain",
+   "prompt": "why did we pick postgres over a document store? is it written down anywhere?",
+   "want": {
+    "kind": "question",
+    "size": "task",
+    "first": "answer"
+   },
+   "got": {
+    "kind": "question",
+    "size": "task",
+    "first": "answer"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Not in anything I can see. The standing brief doesn't mention Postgres or a document store, and its \"What is decided\" section says nothing is recorded in `docs/decisions/` yet. It was last updated 2026-01-01, so a choice made since then wouldn't show up there either. I can't read the repository in this session, so I can't check the code or old chats for the reasoning. I won't guess at it, because a guessed reason written down later would look like a real one.\n\nIf the reason exists somewhere, it's probably in the code, a commit message, or an earlier conversation. If it doesn't exist anywhere, we can draft a decision record that sets out the options and the trade-offs for you to accept or throw away. Nothing gets recorded as decided until you say so.\n\n{\"kind\": \"question\", \"size\": \"task\", \"first\": \"answer\"}"
+  },
+  {
+   "id": "q04",
+   "tag": "plain",
+   "prompt": "how many open briefs do we have right now?",
+   "want": {
+    "kind": "question",
+    "size": "task",
+    "first": "answer"
+   },
+   "got": null,
+   "match": {
+    "kind": false,
+    "size": false,
+    "first": false
+   },
+   "pass": false,
+   "error": "no JSON line",
+   "text": "The standing brief says **no open briefs**, but I can't verify that here. I can't read files in this session, so I'm going by `docs/standing.md` as I read it earlier. That file was last updated 2026-01-01, almost eleven months ago, so it may be out of date. The real count would come from `docs/briefs/` (briefs with no matching report in `docs/reports/`, or a status other than `done`). If you want a current answer, open a session that can read the repository and check that folder."
+  },
+  {
+   "id": "q05",
+   "tag": "dressed",
+   "prompt": "give me a full end to end architectural overview of how a search request flows through the whole system, from the browser to the index and back",
+   "want": {
+    "kind": "question",
+    "size": "task",
+    "first": "answer"
+   },
+   "got": {
+    "kind": "question",
+    "size": "task",
+    "first": "answer"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Question, task: a working session reads the repository and answers the search-flow question; nothing changes. The standing brief names the parts (web interface, API, background workers, index, admin screen) but not how a search moves between them, so I won't guess the path.\n\n{\"kind\": \"question\", \"size\": \"task\", \"first\": \"answer\"}"
+  },
+  {
+   "id": "q06",
+   "tag": "plain",
+   "prompt": "is the export endpoint behind auth or not?",
+   "want": {
+    "kind": "question",
+    "size": "task",
+    "first": "answer"
+   },
+   "got": {
+    "kind": "question",
+    "size": "task",
+    "first": "answer"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "This is a question, so nothing changes. I can't read the repository from here, so I can't say whether the export endpoint is behind auth. A working session should find the route definition and check whether it passes through the auth middleware.\n\n{\"kind\": \"question\", \"size\": \"task\", \"first\": \"answer\"}"
+  },
+  {
+   "id": "f01",
+   "tag": "plain",
+   "prompt": "the search page shows nothing when you type a single word",
+   "want": {
+    "kind": "fix",
+    "size": "task",
+    "first": "do"
+   },
+   "got": {
+    "kind": "fix",
+    "size": "task",
+    "first": "do"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Fix, task: reproduce the empty result for a single-word search, fix it, and add a test. The session that picks this up does it directly, then runs the test and `formwork check`.\n\n{\"kind\": \"fix\", \"size\": \"task\", \"first\": \"do\"}"
+  },
+  {
+   "id": "f02",
+   "tag": "plain",
+   "prompt": "upload fails for files with a space in the name",
+   "want": {
+    "kind": "fix",
+    "size": "task",
+    "first": "do"
+   },
+   "got": {
+    "kind": "fix",
+    "size": "task",
+    "first": "do"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Fix, task: reproduce an upload of a file with a space in its name, find where the name breaks (likely quoting or URL-encoding in the upload path), fix it, add a test with a spaced filename, and run `formwork check`.\n\n{\"kind\": \"fix\", \"size\": \"task\", \"first\": \"do\"}"
+  },
+  {
+   "id": "f03",
+   "tag": "plain",
+   "prompt": "the date on the dashboard is one day off for users in the evening",
+   "want": {
+    "kind": "fix",
+    "size": "task",
+    "first": "do"
+   },
+   "got": {
+    "kind": "fix",
+    "size": "task",
+    "first": "do"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Fix, task: reproduce the evening date shift for a user in a non-UTC zone, find where the date is converted, fix it, and add a test that covers the evening case. The working session does this directly. I can't read the repository from here, so the file and the exact cause come after routing.\n\n{\"kind\": \"fix\", \"size\": \"task\", \"first\": \"do\"}"
+  },
+  {
+   "id": "f04",
+   "tag": "plain",
+   "prompt": "the login button does nothing on the second click after a wrong password",
+   "want": {
+    "kind": "fix",
+    "size": "task",
+    "first": "do"
+   },
+   "got": {
+    "kind": "fix",
+    "size": "task",
+    "first": "do"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Task, fix: reproduce the dead login button after a second wrong password, find why the handler stops firing, fix it, and add a test that fails before the fix. Done when a second wrong password still gets a response, and `formwork check` passes.\n\n{\"kind\": \"fix\", \"size\": \"task\", \"first\": \"do\"}"
+  },
+  {
+   "id": "f05",
+   "tag": "plain",
+   "prompt": "the nightly job crashes with a key error on the empty tenant",
+   "want": {
+    "kind": "fix",
+    "size": "task",
+    "first": "do"
+   },
+   "got": {
+    "kind": "fix",
+    "size": "task",
+    "first": "do"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Task, fix: reproduce the KeyError on the empty tenant in the nightly job, fix it, and add a test. One line brief.\n\n{\"kind\": \"fix\", \"size\": \"task\", \"first\": \"do\"}"
+  },
+  {
+   "id": "f06",
+   "tag": "dressed",
+   "prompt": "we have a critical production incident: the OCR worker is throwing a timeout on large PDFs, I need a full investigation and a robust long term solution",
+   "want": {
+    "kind": "fix",
+    "size": "task",
+    "first": "do"
+   },
+   "got": {
+    "kind": "fix",
+    "size": "task",
+    "first": "do"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Fix, task: reproduce the timeout on a large PDF, find where the time goes, and fix that with a test, then run `formwork check`. \"Critical\" and \"full\" don't make it bigger. If the reproduction shows the fix spans more than one piece, I'll say so and hand it up as a change.\n\n{\"kind\": \"fix\", \"size\": \"task\", \"first\": \"do\"}"
+  },
+  {
+   "id": "f07",
+   "tag": "dressed",
+   "prompt": "the entire test suite is broken, one test in the auth module fails since this morning",
+   "want": {
+    "kind": "fix",
+    "size": "task",
+    "first": "do"
+   },
+   "got": {
+    "kind": "fix",
+    "size": "task",
+    "first": "do"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Fix, task: reproduce the failing auth test first, and check whether the rest of the suite is failing for the same reason before assuming it is broken more widely. Fix the cause, add or keep the test, and run `formwork check`.\n\n{\"kind\": \"fix\", \"size\": \"task\", \"first\": \"do\"}"
+  },
+  {
+   "id": "c01",
+   "tag": "plain",
+   "prompt": "add a created at column to the admin user list",
+   "want": {
+    "kind": "change",
+    "size": "task",
+    "first": "do"
+   },
+   "got": {
+    "kind": "change",
+    "size": "task",
+    "first": "do"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Task, change: add a created-at column to the admin user list, showing each user's creation date, with a test and `formwork check` passing. I can't open the repository in this run, so the session that has it makes the edit.\n\n{\"kind\": \"change\", \"size\": \"task\", \"first\": \"do\"}"
+  },
+  {
+   "id": "c02",
+   "tag": "plain",
+   "prompt": "rename the Submit button on the feedback form to Send",
+   "want": {
+    "kind": "change",
+    "size": "task",
+    "first": "do"
+   },
+   "got": {
+    "kind": "change",
+    "size": "task",
+    "first": "do"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Task, change: rename the feedback form's Submit button label to Send, in the session that has the repository open. It is one label in one file, so it needs no brief.\n\n{\"kind\": \"change\", \"size\": \"task\", \"first\": \"do\"}"
+  },
+  {
+   "id": "c03",
+   "tag": "plain",
+   "prompt": "make the page size on the results list 50 instead of 20",
+   "want": {
+    "kind": "change",
+    "size": "task",
+    "first": "do"
+   },
+   "got": {
+    "kind": "change",
+    "size": "task",
+    "first": "do"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Task, change: set the results list page size from 20 to 50, then check that the list shows 50 per page. One-line brief, and the session that got it does it.\n\n{\"kind\": \"change\", \"size\": \"task\", \"first\": \"do\"}"
+  },
+  {
+   "id": "c04",
+   "tag": "plain",
+   "prompt": "log the request id on every error line in the API",
+   "want": {
+    "kind": "change",
+    "size": "task",
+    "first": "do"
+   },
+   "got": {
+    "kind": "change",
+    "size": "task",
+    "first": "do"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Change, task: add the request id to every error log line in the API, then a test for one error path, then `formwork check`. Done when no error line in the API is logged without it.\n\n{\"kind\": \"change\", \"size\": \"task\", \"first\": \"do\"}"
+  },
+  {
+   "id": "c05",
+   "tag": "plain",
+   "prompt": "add single sign on to the app, the customer uses their own identity provider, but leave the existing password login alone for now",
+   "want": {
+    "kind": "change",
+    "size": "checkpoint",
+    "first": "brief"
+   },
+   "got": {
+    "kind": "change",
+    "size": "checkpoint",
+    "first": "brief"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Change to an existing product, checkpoint: add SSO for the customer's own identity provider and leave password login as it is. The brief should name that exclusion, the protocol to use, and what would show it failed.\n\n{\"kind\": \"change\", \"size\": \"checkpoint\", \"first\": \"brief\"}"
+  },
+  {
+   "id": "c06",
+   "tag": "plain",
+   "prompt": "move the document processing from the synchronous request to a background queue with status polling in the UI",
+   "want": {
+    "kind": "change",
+    "size": "checkpoint",
+    "first": "brief"
+   },
+   "got": {
+    "kind": "change",
+    "size": "checkpoint",
+    "first": "brief"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Change to an existing product, checkpoint size: the queue and the UI polling are separable pieces, so one reviewer could accept one and reject the other. Next is a brief, not work. I can't write files in this run, so the brief will go in `docs/briefs/` in a session that can. Whether to use the existing workers or a new queue is left open for you to decide in that brief.\n\n{\"kind\": \"change\", \"size\": \"checkpoint\", \"first\": \"brief\"}"
+  },
+  {
+   "id": "c07",
+   "tag": "plain",
+   "prompt": "add Arabic and right to left support across the whole interface",
+   "want": {
+    "kind": "change",
+    "size": "checkpoint",
+    "first": "brief"
+   },
+   "got": {
+    "kind": "change",
+    "size": "checkpoint",
+    "first": "brief"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Change to an existing product, checkpoint: this touches every screen, so it is more than one piece of work, and the out-of-scope lines below need your decision. I'll write the brief now and stop there.\n\nI can't write files in this session, so here is the brief to save as `docs/briefs/NNNN-arabic-rtl.md`, with the number you choose:\n\n```\n# Arabic and right-to-left support\n\nGoal: the web interface and admin screen can be used in Arabic, with the\nlayout mirrored right to left when Arabic is active.\n\nIn scope:\n- Arabic translation of all web and admin interface strings, marked\n  \"draft, needs review\" until a native reader signs off.\n- Language switch, remembered per user.\n- Right-to-left layout using logical CSS properties, so no screen is\n  built twice.\n- An Arabic-capable font, loaded locally so it works on prem.\n\nOut of scope (say yes or no before the brief runs):\n- Arabic OCR and search tuning. This is a separate, larger piece.\n- API error messages and machine-readable codes, which stay in English.\n- Translating customers' uploaded documents.\n\nMust not happen: English layout breaks; any string shown without a\ntranslation key; any network font or translation service call.\n\nDone when: every web and admin screen renders in Arabic with mirrored\nlayout; a check for missing keys passes; and `formwork check` passes.\n\nFails if: a screen still shows English strings in Arabic mode, or the\nlayout breaks at a 320px width in either direction.\n```\n\nDecisions for you before this runs:\n1. **Out of scope.** I recommend leaving Arabic OCR and search out of this brief. Document search for Arabic needs its own brief.\n2. **Who writes the Arabic.** A native reader should review it. A machine draft is acceptable only if it is marked as a draft.\n3. **Stream.** `docs/standing.md` says no stream is declared. A new language is a feature, so you may want to declare one first.\n\nThe brief is ready. Open a working session and give it the brief under the number you pick.\n\n{\"kind\": \"change\", \"size\": \"checkpoint\", \"first\": \"brief\"}"
+  },
+  {
+   "id": "c08",
+   "tag": "plain",
+   "prompt": "let admins set per tenant limits on uploads and searches, with a settings screen and enforcement in the API, but not billing",
+   "want": {
+    "kind": "change",
+    "size": "checkpoint",
+    "first": "brief"
+   },
+   "got": {
+    "kind": "change",
+    "size": "checkpoint",
+    "first": "brief"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Change to an existing product, checkpoint: per-tenant upload and search limits, an admin settings screen, enforcement in the API, with billing out of scope. The first brief is the one to write next. Before it goes out, you need to choose the limit units (per day or per month, file count or bytes, queries per minute or per day), since each choice changes the brief.\n\n{\"kind\": \"change\", \"size\": \"checkpoint\", \"first\": \"brief\"}"
+  },
+  {
+   "id": "c09",
+   "tag": "dressed",
+   "prompt": "I want a complete redesign of the error experience: change the 404 page text to say the page was moved",
+   "want": {
+    "kind": "change",
+    "size": "task",
+    "first": "do"
+   },
+   "got": {
+    "kind": "none",
+    "size": "none",
+    "first": "ask"
+   },
+   "match": {
+    "kind": false,
+    "size": false,
+    "first": false
+   },
+   "pass": false,
+   "error": null,
+   "text": "This is a change to an existing product, but \"complete redesign\" is bigger than the sentence you gave me. I can't tell from here whether you mean the 404 text alone or every error page, so I'd ask before sizing it. If you only want the 404 wording changed, it's a one-line task for the session that picks it up.\n\nWhich do you mean: only the 404 text saying the page was moved, or a redesign of all the error pages (404, 500, and the rest), with that text change as one part?\n\n{\"kind\": \"none\", \"size\": \"none\", \"first\": \"ask\"}"
+  },
+  {
+   "id": "c10",
+   "tag": "dressed",
+   "prompt": "please architect and implement a comprehensive configuration strategy so the request timeout can be set from an environment variable",
+   "want": {
+    "kind": "change",
+    "size": "task",
+    "first": "do"
+   },
+   "got": {
+    "kind": "change",
+    "size": "task",
+    "first": "do"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Task, change: make the request timeout read from one environment variable, falling back to the current value when it is unset, with a test for both cases. The word \"comprehensive\" doesn't make it bigger, and I'm not writing a brief for it. The session that picks it up will read the repository to find the timeout and its current config path.\n\n{\"kind\": \"change\", \"size\": \"task\", \"first\": \"do\"}"
+  },
+  {
+   "id": "r01",
+   "tag": "plain",
+   "prompt": "find out what the latest stable version of our web framework is and whether it drops support for our node version",
+   "want": {
+    "kind": [
+     "research",
+     "question"
+    ],
+    "size": "task",
+    "first": [
+     "do",
+     "answer"
+    ]
+   },
+   "got": {
+    "kind": "question",
+    "size": "task",
+    "first": "answer"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Question, task: a working session reads the framework and Node versions from the repository, checks the framework's current stable release and its Node support notes, and answers. Nothing in the repository changes. I can't check release data from here, so I'm not giving a version.\n\n{\"kind\": \"question\", \"size\": \"task\", \"first\": \"answer\"}"
+  },
+  {
+   "id": "r02",
+   "tag": "plain",
+   "prompt": "check the licence of the PDF parsing library we use, can we ship it on prem to a customer?",
+   "want": {
+    "kind": [
+     "research",
+     "question"
+    ],
+    "size": "task",
+    "first": [
+     "do",
+     "answer"
+    ]
+   },
+   "got": {
+    "kind": "research",
+    "size": "task",
+    "first": "do"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Research, task: the working session reads the PDF library's licence and its dependencies' licences, then reports whether shipping it on prem to a customer is permitted and what obligations come with it (notices, source offers, copyleft). Whether we ship is your decision, and a lawyer should check the conclusion before it goes to a customer.\n\n{\"kind\": \"research\", \"size\": \"task\", \"first\": \"do\"}"
+  },
+  {
+   "id": "r03",
+   "tag": "plain",
+   "prompt": "look up what the max context length of our embedding model is",
+   "want": {
+    "kind": [
+     "research",
+     "question"
+    ],
+    "size": "task",
+    "first": [
+     "do",
+     "answer"
+    ]
+   },
+   "got": {
+    "kind": "question",
+    "size": "task",
+    "first": "answer"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "This is a question, so nothing changes in the repository. I can't give the number from here: this run has no file or web access, and `docs/standing.md` doesn't name the embedding model. A session that can read the config will need to find which model is set, then check that model's documented context limit.\n\n{\"kind\": \"question\", \"size\": \"task\", \"first\": \"answer\"}"
+  },
+  {
+   "id": "r04",
+   "tag": "plain",
+   "prompt": "should we replace our search engine with a vector database? we have to commit for the next two years and the customer is watching",
+   "want": {
+    "kind": "research",
+    "size": "round",
+    "first": "round"
+   },
+   "got": {
+    "kind": "research",
+    "size": "round",
+    "first": "round"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Plan: this is a research question about a two-year decision, so I'd run a round to measure before anything is replaced. I wouldn't swap the engine yet.\n\nDon't replace the search engine. Add vector retrieval next to it and combine the two. Keyword search is still strong for exact names, IDs, and quoted phrases, and for scanned documents with OCR errors, which are common in your product. Vectors help with paraphrased questions. Hybrid usually beats either alone, and it means you can roll back.\n\nBefore committing for two years, measure:\n\n- **Build a test set** of 50 to 100 real questions from your two customers, each with the document and passage that should answer it. Without this, you can't tell whether vectors would help.\n- **Score the current engine and a hybrid prototype** on that set: did the right passage appear in the top 5 or 10 results? Check scanned documents separately.\n- **Check where the current engine fails.** If the failures are OCR errors or bad chunking, a vector database won't fix them.\n\nOn the choice itself: on-prem, you may not need a new vector database at all. If your current engine or your Postgres can store vectors, use that first, because one fewer system is one fewer thing to run for two years. Whatever you pick, keep the raw text and chunk metadata, so you can re-embed when you change embedding models. Models will change within two years.\n\nFor the customer, don't switch the engine under them. Ship hybrid behind a flag, run both side by side on one customer's real queries, and show them the comparison.\n\nOne thing I need answered before the round: what complaint is the customer actually making? \"Search misses things\" and \"search misses paraphrased questions\" lead to different answers.\n\nNothing is decided yet. The standing brief records no decision on this, so if you choose, I'll draft a decision record for you to accept or discard.\n\n{\"kind\": \"research\", \"size\": \"round\", \"first\": \"round\"}"
+  },
+  {
+   "id": "r05",
+   "tag": "plain",
+   "prompt": "which OCR approach should we standardise on for scanned Arabic contracts? we have three candidates and nobody agrees",
+   "want": {
+    "kind": "research",
+    "size": "round",
+    "first": "round"
+   },
+   "got": {
+    "kind": "research",
+    "size": "round",
+    "first": "ask"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": false
+   },
+   "pass": false,
+   "error": null,
+   "text": "Kind: research. Size: round, because this choice is costly to get wrong and the answer is unclear. I'll brief it once you name the three candidates.\n\nWhich three are they? I can't see them from here, and I'd rather not guess and brief the wrong ones.\n\nTwo things will narrow it before we compare accuracy. Your product ships on prem, so any hosted-only service is out unless it can run locally. And Arabic contracts often mix diacritics, handwritten margins, stamps, and Latin numerals, so a benchmark on your own scanned contracts will tell you more than published scores.\n\n{\"kind\": \"research\", \"size\": \"round\", \"first\": \"ask\"}"
+  },
+  {
+   "id": "r06",
+   "tag": "plain",
+   "prompt": "decide whether we self host the language model or call a hosted API, given air gapped customers, cost and quality",
+   "want": {
+    "kind": "research",
+    "size": "round",
+    "first": "round"
+   },
+   "got": {
+    "kind": "research",
+    "size": "round",
+    "first": "round"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Round, research: we need evidence on quality, cost, and what air-gapped customers can run before this is decided. I'll write the round brief for you to save, and the decision stays with you.\n\n**My recommendation, which you can overrule:** air-gapped customers force self-hosting for them, so the model layer has to run on their hardware anyway. Make the self-hosted model the default for every customer. That gives one quality bar, one support path, and one thing to test. A hosted API can be an optional path for connected customers later, behind the same interface. Two model paths from the start would double the testing and the support load for a two-customer product.\n\n**What is not established:**\n- **Quality:** the gap between hosted and open-weight models on your documents is unknown. Public benchmarks won't tell you how they do on scanned contracts with OCR errors. The round should measure this on a fixed set of your own questions with citations.\n- **Cost:** per-token cost is near zero when self-hosted, but GPU hardware, power, and ops labour are real. The round should price a query on the hardware an air-gapped customer would actually own, and compare it with hosted pricing at your expected volume.\n- **Hardware floor:** the smallest machine a customer can buy that still meets your quality bar. Unknown until tested.\n\n**Proposed round, for you to save as `docs/briefs/0007-model-hosting.md` (pointing at `docs/rounds/model-hosting/`):**\n1. Build a 100 to 200 question eval from real documents, with the expected cited answer for each.\n2. Run the same set through two or three candidate self-hostable models and one hosted model, on the smallest hardware you would sell.\n3. Report quality, latency, and cost per 1000 queries, and the hardware floor.\n4. Give a recommendation with grounds. Do not record a decision in `docs/decisions/`; that is yours.\n\nThe brief is ready. Open a working session and give it brief 0007.\n\n{\"kind\": \"research\", \"size\": \"round\", \"first\": \"round\"}"
+  },
+  {
+   "id": "r07",
+   "tag": "dressed",
+   "prompt": "run a deep multi angle research effort on whether the CSV export should use commas or semicolons by default",
+   "want": {
+    "kind": "research",
+    "size": "task",
+    "first": "do"
+   },
+   "got": {
+    "kind": "research",
+    "size": "round",
+    "first": "round"
+   },
+   "match": {
+    "kind": true,
+    "size": false,
+    "first": false
+   },
+   "pass": false,
+   "error": null,
+   "text": "Research, round: the default delimiter is a product choice that customer import scripts will depend on, and the answer turns on the existing export, the spreadsheet tools our two customers use, and locale behaviour, none of which I can see from here. I'll write the round brief next, for the working session to run against the repository, and stop there.\n\n{\"kind\": \"research\", \"size\": \"round\", \"first\": \"round\"}"
+  },
+  {
+   "id": "d01",
+   "tag": "plain",
+   "prompt": "turn the release notes in the changelog into a one page summary for the customer",
+   "want": {
+    "kind": "document",
+    "size": "task",
+    "first": "do"
+   },
+   "got": {
+    "kind": "document",
+    "size": "task",
+    "first": "do"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Document, task: the release notes already exist, so the session that got this turns the changelog into a one-page customer summary in plain language. I'm assuming the summary is for a customer, not the internal team, and that it reads the changelog before writing.\n\n{\"kind\": \"document\", \"size\": \"task\", \"first\": \"do\"}"
+  },
+  {
+   "id": "d02",
+   "tag": "plain",
+   "prompt": "make slides from this report, the words are all there already, five slides max",
+   "want": {
+    "kind": "document",
+    "size": "task",
+    "first": "do"
+   },
+   "got": {
+    "kind": "document",
+    "size": "task",
+    "first": "do"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Task, deck: I'll turn the existing report into at most five slides, using its words and adding no new claims.\n\n{\"kind\": \"document\", \"size\": \"task\", \"first\": \"do\"}"
+  },
+  {
+   "id": "d03",
+   "tag": "plain",
+   "prompt": "fix the typos and the broken links in the README",
+   "want": {
+    "kind": [
+     "document",
+     "fix"
+    ],
+    "size": "task",
+    "first": "do"
+   },
+   "got": {
+    "kind": "fix",
+    "size": "task",
+    "first": "do"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Fix, task: find the typos and broken links in the README, correct them in that one file, and check that each link resolves. One line, then the session does it.\n\n{\"kind\": \"fix\", \"size\": \"task\", \"first\": \"do\"}"
+  },
+  {
+   "id": "d04",
+   "tag": "plain",
+   "prompt": "I need a deck for the steering committee next week arguing that we should fund a second team. I have not worked out the case yet",
+   "want": {
+    "kind": "document",
+    "size": "checkpoint",
+    "first": "brief"
+   },
+   "got": {
+    "kind": "document",
+    "size": "checkpoint",
+    "first": "brief"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Document, checkpoint: a steering committee deck on funding a second team. The case has to be built from our own numbers first, and the deck may come out against the second team, so the first step is an argument you can read before any slides exist.\n\nThe brief is ready to save as `docs/briefs/NNNN-second-team-deck.md`. Pick the number when you save it, since I can't see the folder from here.\n\n- **Goal:** a one-page argument for or against a second team, with the evidence for each claim, then a short deck built from it.\n- **Must not happen:** slides before the argument is agreed, or any claim the numbers don't support.\n- **Done when:** you have read the argument, it names what would change the answer, and the deck has been checked against it.\n\nOpen a working session and give it that brief. Before it starts, pull together the last few months of backlog, team capacity, and customer requests, because the standing brief doesn't contain them.\n\n{\"kind\": \"document\", \"size\": \"checkpoint\", \"first\": \"brief\"}"
+  },
+  {
+   "id": "d05",
+   "tag": "plain",
+   "prompt": "write a proposal for the customer on how we would run the pilot, what it costs, and what they get at the end",
+   "want": {
+    "kind": "document",
+    "size": "checkpoint",
+    "first": "brief"
+   },
+   "got": {
+    "kind": "document",
+    "size": "checkpoint",
+    "first": "brief"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Document, checkpoint: I'll write a brief for the pilot proposal (how it runs, cost, what the customer gets at the end). Price, pilot length, and customer name stay as blanks for you to decide, since I won't invent them.\n\n{\"kind\": \"document\", \"size\": \"checkpoint\", \"first\": \"brief\"}"
+  },
+  {
+   "id": "d06",
+   "tag": "plain",
+   "prompt": "write the operator handbook for installing and running the platform on prem, nothing exists yet",
+   "want": {
+    "kind": "document",
+    "size": "checkpoint",
+    "first": "brief"
+   },
+   "got": {
+    "kind": "document",
+    "size": "checkpoint",
+    "first": "brief"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Document, checkpoint: the handbook needs the install steps, service list, and config read from the repository, not guessed. I'll write a brief for a working session to read the code first, mark anything it can't find NOT ESTABLISHED, and draft the handbook from that.\n\n{\"kind\": \"document\", \"size\": \"checkpoint\", \"first\": \"brief\"}"
+  },
+  {
+   "id": "n01",
+   "tag": "plain",
+   "prompt": "build me an app where field inspectors take photos, fill a checklist, and a report gets generated for the manager",
+   "want": {
+    "kind": "new-product",
+    "size": "milestone",
+    "first": "brief"
+   },
+   "got": {
+    "kind": "new-product",
+    "size": "milestone",
+    "first": "brief"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "This is a new product, not a change to the document search platform, so it's a milestone made of phases. I'll start with a one-page spec from your words, for you to read, before any research or build.\n\nI can't write files in this session, so here is the spec to save as `docs/briefs/0001-inspection-app.md`:\n\n**Goal:** Field inspectors take photos, fill a checklist on site, and the app generates a report for the manager.\n\n**Who:** Field inspectors (create inspections), a manager (receives reports).\n\n**Must have:** Photo capture per inspection. A checklist the inspector completes. A generated report combining checklist answers and photos, delivered to the manager.\n\n**Not in this phase:** Anything from the document search product, unless you decide otherwise.\n\n**Done when:** An inspector completes a checklist with photos on a phone, and the manager receives a report that matches what was recorded.\n\n**Open questions for you:**\n1. Is this its own app, or a feature inside the search product? The standing brief has nothing on it yet.\n2. Do inspectors need to work offline on site?\n3. What form should the report take (PDF, emailed, viewable in a browser)?\n\nThe brief is ready. Answer the questions above, then open a working session and give it brief 0001.\n\n{\"kind\": \"new-product\", \"size\": \"milestone\", \"first\": \"brief\"}"
+  },
+  {
+   "id": "n02",
+   "tag": "plain",
+   "prompt": "I want a personal finance tracker that reads my bank statements and tells me where the money went each month",
+   "want": {
+    "kind": "new-product",
+    "size": "milestone",
+    "first": "brief"
+   },
+   "got": {
+    "kind": "new-product",
+    "size": "milestone",
+    "first": "brief"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "New product, milestone. The first brief is a one-page spec drawn from your words, covering which banks and formats, which categories, and how you'll look at the monthly view. This is separate from the document search product in `docs/standing.md`, so it probably needs its own repository or folder. I can't write files in this run, so once the spec is saved, open a working session and give it that brief.\n\n{\"kind\": \"new-product\", \"size\": \"milestone\", \"first\": \"brief\"}"
+  },
+  {
+   "id": "n03",
+   "tag": "plain",
+   "prompt": "make a demo product for a hospital that answers staff questions from their policy documents, with citations",
+   "want": {
+    "kind": "new-product",
+    "size": "milestone",
+    "first": "brief"
+   },
+   "got": {
+    "kind": "new-product",
+    "size": "milestone",
+    "first": "brief"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "**Plan:** This is a new product, so it is a milestone, not a task. First I'll write a one-page spec from your words, for you to read before anything is built. Before a build, the spec needs answers to three open choices: which policy documents the demo uses, whether it runs on prem or in the cloud, and which model answers the questions.\n\nI can't write files in this run, so here is the brief to save as `docs/briefs/` under a name you choose (I'd suggest `policy-qa-demo`). The number is yours to pick.\n\n---\n\n# Brief: Policy Q&A demo for a hospital\n\n**Goal.** A demo where a hospital staff member asks a question in plain language and gets an answer taken from the hospital's policy documents, with a citation to the document, section, and page it came from.\n\n**Context.** This is a demo, not a deployment. It is for showing the hospital what the product would do, so it uses synthetic policy documents, not real hospital ones.\n\n**Scope.**\n- Upload or load a set of policy documents (PDF and Word), index them, and answer questions against them.\n- Every answer carries citations: document name, section heading, page.\n- If the policies do not answer the question, say so. Do not guess.\n- A small web interface for asking questions and reading the citations.\n\n**Out of scope.** Real patient data, real hospital documents, authentication beyond a demo login, integration with any hospital system, and production hosting.\n\n**Must not happen.**\n- An answer with no citation.\n- A citation that points to text that does not support the answer.\n- An answer given when the policies are silent on the question.\n- Any real patient information entered or stored.\n\n**Done when.**\n- Ten synthetic policy documents are indexed.\n- A fixed set of 20 test questions runs, including 5 the policies cannot answer. Each answer cites the right passage, or correctly says the policy is silent.\n- A reviewer, reading only the citations, can find the source passage in under 30 seconds for each answer.\n\n**What would tell us it failed.** Citations that look right but point to the wrong passage. Confident answers to the five unanswerable questions. Any answer a reviewer cannot trace.\n\n**Open choices for you to decide.**\n1. On prem or cloud for the demo. On prem matches how a hospital would likely buy it, but takes longer.\n2. Which model answers the questions, and whether patient-adjacent data may ever reach an outside model.\n3. Who writes the ten synthetic policies. I can draft them, but a clinician should check them before the demo.\n\n---\n\nThe brief is ready. Open a working session and give it the brief under the name you saved it as, then decide the three choices above before it starts building.\n\n{\"kind\": \"new-product\", \"size\": \"milestone\", \"first\": \"brief\"}"
+  },
+  {
+   "id": "n04",
+   "tag": "plain",
+   "prompt": "start a new service that watches our document folders and builds a searchable timeline of every contract change",
+   "want": {
+    "kind": "new-product",
+    "size": "milestone",
+    "first": "brief"
+   },
+   "got": {
+    "kind": "change",
+    "size": "checkpoint",
+    "first": "brief"
+   },
+   "match": {
+    "kind": false,
+    "size": false,
+    "first": true
+   },
+   "pass": false,
+   "error": null,
+   "text": "Kind: a change to the existing product, since this adds a service to the document search platform. Size: checkpoint, because it has several separable parts (watching the folders, detecting and storing changes, the timeline search) and the out-of-scope lines have to be drawn. I'll write the brief, with the open choice of what counts as a \"contract change\" flagged for you to decide. I can't write files in this session, so the brief isn't saved yet.\n\nThe brief is ready. Open a working session and give it brief 0007, to be saved as `docs/briefs/0007-contract-timeline.md`.\n\n{\"kind\": \"change\", \"size\": \"checkpoint\", \"first\": \"brief\"}"
+  },
+  {
+   "id": "n05",
+   "tag": "dressed",
+   "prompt": "just a quick little app: a booking system for the meeting rooms with logins, calendars and email reminders",
+   "want": {
+    "kind": "new-product",
+    "size": "milestone",
+    "first": "brief"
+   },
+   "got": {
+    "kind": "new-product",
+    "size": "milestone",
+    "first": "brief"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "New product, milestone. \"Quick\" doesn't shrink it: logins, calendars, and reminders are separate pieces a reviewer could accept or reject one at a time. I'd write a one-page spec from your words first, for you to read, and stop there. It's separate from the document-search product in `docs/standing.md`, so I'd treat it as its own project.\n\n{\"kind\": \"new-product\", \"size\": \"milestone\", \"first\": \"brief\"}"
+  },
+  {
+   "id": "s01",
+   "tag": "dressed",
+   "prompt": "launch a full initiative to modernise our tooling: bump the linter to the latest version",
+   "want": {
+    "kind": "change",
+    "size": "task",
+    "first": "do"
+   },
+   "got": {
+    "kind": "change",
+    "size": "task",
+    "first": "do"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Change, task: bump the linter to its latest version, fix any config or rule breaks the upgrade causes, and run the linter and `formwork check`. The \"full initiative\" wording doesn't change the size, because the work is one dependency upgrade. The session that got this prompt does it now. Say \"bigger\" if you meant the other tools too, and I'll route that as its own piece.\n\n{\"kind\": \"change\", \"size\": \"task\", \"first\": \"do\"}"
+  },
+  {
+   "id": "s02",
+   "tag": "dressed",
+   "prompt": "I need a strategic assessment: is the cache turned on in production or not?",
+   "want": {
+    "kind": "question",
+    "size": "task",
+    "first": "answer"
+   },
+   "got": {
+    "kind": "question",
+    "size": "task",
+    "first": "answer"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Question, task: I answer from what I have read, and nothing changes. I can't establish whether the cache is on in production. `docs/standing.md` says nothing about caching or deployment config, and I can't read the repository or any running system in this session. Since the product ships on prem, \"production\" may also mean several customer installs with different settings, so the working session would need to check each one. Say which one you mean and a working session can read the config and report.\n\n{\"kind\": \"question\", \"size\": \"task\", \"first\": \"answer\"}"
+  },
+  {
+   "id": "s03",
+   "tag": "dressed",
+   "prompt": "kick off a documentation program: add a line to the README saying the minimum python version is 3.11",
+   "want": {
+    "kind": [
+     "document",
+     "change"
+    ],
+    "size": "task",
+    "first": "do"
+   },
+   "got": {
+    "kind": "change",
+    "size": "task",
+    "first": "do"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Change, task: add one line to the README stating the minimum Python version is 3.11. \"Documentation program\" is more than this work, so I'm sizing it as one line. The session that got the prompt makes the edit, and I'll say which README line it changed.\n\n{\"kind\": \"change\", \"size\": \"task\", \"first\": \"do\"}"
+  },
+  {
+   "id": "a01",
+   "tag": "ambiguous",
+   "prompt": "make search better",
+   "want": {
+    "kind": "*",
+    "size": "*",
+    "first": "ask"
+   },
+   "got": {
+    "kind": "none",
+    "size": "none",
+    "first": "ask"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Route: not yet sized. \"Better\" could mean relevance ranking, speed, OCR accuracy on scans, or the citations in answers, and those are different sizes of work. Which one do you mean, and is it a sentence's worth or does it need a scoped list?\n\n{\"kind\": \"none\", \"size\": \"none\", \"first\": \"ask\"}"
+  },
+  {
+   "id": "a02",
+   "tag": "ambiguous",
+   "prompt": "handle the customer thing from yesterday",
+   "want": {
+    "kind": "*",
+    "size": "*",
+    "first": "ask"
+   },
+   "got": {
+    "kind": "none",
+    "size": "none",
+    "first": "ask"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Routing: I can't tell what \"the customer thing\" is. The standing brief lists no open briefs, and I can't see yesterday's conversation, so I'm not guessing the kind or size.\n\nWhich customer thing was it: a bug report, a feature request, a question, or something else, and which of the two customers raised it?\n\n{\"kind\": \"none\", \"size\": \"none\", \"first\": \"ask\"}"
+  },
+  {
+   "id": "a03",
+   "tag": "ambiguous",
+   "prompt": "we need to do something about performance",
+   "want": {
+    "kind": "*",
+    "size": "*",
+    "first": "ask"
+   },
+   "got": {
+    "kind": "none",
+    "size": "none",
+    "first": "ask"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Performance could mean search latency, indexing or OCR throughput, page load, or a worker queue backing up, and each routes differently. Which part is slow, and what did you see: a number, a screen, or a complaint from one of the two customers?\n\n{\"kind\": \"none\", \"size\": \"none\", \"first\": \"ask\"}"
+  },
+  {
+   "id": "a04",
+   "tag": "ambiguous",
+   "prompt": "clean it up",
+   "want": {
+    "kind": "*",
+    "size": "*",
+    "first": "ask"
+   },
+   "got": {
+    "kind": "none",
+    "size": "none",
+    "first": "ask"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "Routing needs one answer first: which thing should I clean up? The standing brief (`docs/standing.md`), the routing page, a folder, or a particular file? Once you say, I'll size it and write the brief or do the task.\n\n{\"kind\": \"none\", \"size\": \"none\", \"first\": \"ask\"}"
+  },
+  {
+   "id": "a05",
+   "tag": "ambiguous",
+   "prompt": "can you look at the AI part",
+   "want": {
+    "kind": "*",
+    "size": "*",
+    "first": "ask"
+   },
+   "got": {
+    "kind": "none",
+    "size": "none",
+    "first": "ask"
+   },
+   "match": {
+    "kind": true,
+    "size": true,
+    "first": true
+   },
+   "pass": true,
+   "error": null,
+   "text": "I can't read or change files in this session, so I can't look at the AI part yet. The project has several parts that could count as AI: OCR for scanned uploads, indexing, and the answer step that cites sources. Which one do you mean?\n\n{\"kind\": \"none\", \"size\": \"none\", \"first\": \"ask\"}"
+  }
+ ]
+}
