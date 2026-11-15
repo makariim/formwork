@@ -1,6 +1,7 @@
 # Taste pack: web
 
-For web pages and web apps. Use it with [`screens`](screens.md).
+For web pages and web apps. Use it with [`screens`](screens.md). Where the
+page moves, add [`motion`](motion.md).
 
 **Sources.**
 - gstack design checklist, the "AI slop" and typography sections:
@@ -57,6 +58,10 @@ interaction must also be possible to turn off (WCAG 2.2, 2.3.3).
 animation names with "bounce"), medium for the rest (`:hover` with
 `transform: scale`, `animation: ... infinite` on small round elements).
 Check that `prefers-reduced-motion` is honoured.
+The [`motion`](motion.md) pack goes further: loops that pause off screen
+(motion-13), a designed reduced version (motion-15), and the rest of what
+motion says. A loop is fine only when it pauses unseen and stops with
+reduced motion on.
 
 ### web-6 Everything centred
 **Catches** every block of text centred, so the page has no edge to read

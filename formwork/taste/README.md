@@ -6,7 +6,7 @@ packs it wants. Nothing here is a default for the look. Colours, fonts,
 spacing and mood belong to the project.
 
 **Taste is never a check.** No program in this kit judges a look. Taste is
-judged by people and roles looking at pictures, in a review round
+judged by people and roles looking at pictures and recordings, in a review round
 (`formwork/templates/review-round.md`). Some items below say a pattern can be
 found with a search. That search is a hint for the reviewer, never a gate.
 
@@ -73,8 +73,10 @@ Even a high item stays a hint: it says where to look, and a person decides.
 | [`web`](web.md) | web pages and web apps | gstack design checklist, Anthropic's `frontend-design` skill, WCAG 2.2 |
 | [`deck`](deck.md) | slides | assertion-evidence, Edward Tufte |
 | [`ios`](ios.md) | iPhone and iPad apps | Apple's Human Interface Guidelines, as far as they were read |
+| [`motion`](motion.md) | anything that moves, on the web or a device | two small studios' public sites and reels, WCAG 2.2 |
 
-`web` and `ios` assume `screens`. A writing pack already exists as the
+`web` and `ios` assume `screens`. `motion` assumes `screens` and is used
+beside `web` or `ios`; it is judged on recordings, not stills. A writing pack already exists as the
 `humanizer` skill in `formwork/skills/humanizer/`.
 
 ---

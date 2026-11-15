@@ -2,7 +2,7 @@
 brief: 0031
 stream: method
 title: Three gaps from the catalogue check
-status: open, 2026-11-15
+status: done (accepted 2026-11-15)
 starts: now
 ---
 

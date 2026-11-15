@@ -26,6 +26,8 @@ The parts of the spec, in the order the story meets them.
 ## Taste packs
 The packs the samples are looked at with, from `formwork/taste/`, and the
 project's design file, which wins: `Taste packs: screens, web`.
+If the samples move, add `motion` and give the reviewers recordings, not
+only stills.
 The three kit items in `formwork/taste/README.md` always apply.
 
 ## The sample stop

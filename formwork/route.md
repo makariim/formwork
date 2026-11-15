@@ -84,9 +84,11 @@ not a sequence: a project may use one, several, or none, in any order.
 
 When the brief designs or reviews something people look at (screens, pages,
 slides), it also names the taste packs to look with, from
-`formwork/taste/README.md`: `screens`, `web`, `deck`, `ios`, or none. The
-project's design file wins over any pack. The three kit items there always
-apply. Taste is a review round on pictures, never a check.
+`formwork/taste/README.md`: `screens`, `web`, `deck`, `ios`, `motion`, or
+none. `motion` is for anything that moves, and is looked at on recordings.
+The project's design file wins over any pack. The three kit items there
+always apply. Taste is a review round on pictures and recordings, never a
+check.
 
 A brief that must wait for another stream or a decision carries one
 `starts:` line (`now`, `after <stream>`, `decision NNNN`), checked by

@@ -102,3 +102,6 @@ formwork/fw record
 - Where Codex, Gemini CLI or Cursor read a project's skills from. The page says so and tells the role to read the file by path.
 - The gate timing with eighteen checks. It was not measured. The COSTS line still gives the seventeen check numbers.
 - Whether the fifteen skills copied by hand in his two projects are licensed. That is its own job, as the research says.
+
+accepted: 2026-11-15
+in my words: queue 1 to 3 / 1. Done (he applied the patch and committed 137c273)
