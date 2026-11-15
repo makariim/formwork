@@ -66,6 +66,8 @@ without it.
 
 ## What is decided
 
+- 2026-11-15, **Glide Studio study** (`docs/research/glide-studio.md`): his choice "lets add the motion pack, and apply the principles but to be considered with the next version". **0032** (the motion taste pack) started; for his apps the principles are noted for their next versions only.
+
 - 2026-11-15, **0030 accepted** (he applied the patch, committed f82feb0, 17 checks green): edits through links to protected files refused; hidden unicode check. The warn setting never reached the hook, so the guard stayed on block and the session staged a patch, which was the right outcome. **0031** (the three gaps from `docs/research/ecc-gaps.md`, his words "queue 1 to 3") started.
 
 - 2026-11-15, **0030 resumed with the protected files guard on warn, for this brief only** (his words: "warn for 0030"), after it stopped at the guard: the hidden unicode check was built; the linked file fix to the guard, its tests and the docs remained. Every protected change still shows in kit-integrity for his review before he re-records.

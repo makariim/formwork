@@ -31,7 +31,9 @@ look dead? Clean is not the same as alive.
 Look with the taste packs the project names (`formwork/taste/`), and report
 a pack finding by its id: `screens-2, checkout: three glowing buttons`. The
 project's design file wins over any pack. Taste is judged here, on the
-pictures, never by a check.
+pictures, never by a check. Where the product moves, the `motion` pack is
+judged on recordings, watched at full and half speed and with reduced motion
+on (`formwork/taste/motion.md`).
 
 ## Part B: fix
 Fix the person's notes and the team's findings together, in one pass.

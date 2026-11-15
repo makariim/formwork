@@ -1,6 +1,7 @@
 # Taste pack: iOS
 
-For iPhone and iPad apps. Use it with [`screens`](screens.md).
+For iPhone and iPad apps. Use it with [`screens`](screens.md). Where the
+app moves, add [`motion`](motion.md).
 
 **Source.** Apple's Human Interface Guidelines, read on 2026-11-15 through the
 JSON behind each page (`https://developer.apple.com/tutorials/data/design/human-interface-guidelines/<page>.json`).
@@ -10,7 +11,9 @@ writing, charts. The page for each item is linked.
 **This pack is short on purpose.** Only what was read is here. Layout,
 navigation bars, toolbars, icons and SF Symbols, motion, app icons,
 accessibility as a whole, and the rest of each long page beyond what was read:
-NOT ESTABLISHED. Read those pages before adding an item for them.
+NOT ESTABLISHED. Read those pages before adding an item for them. Until
+Apple's motion page is read, the general [`motion`](motion.md) pack applies;
+it is not Apple's guidance, and where the two disagree, Apple wins.
 
 The HIG is Apple's guidance for its platforms, and changes with each release.
 Where a project targets an older system, its design file says so and wins.

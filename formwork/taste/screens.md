@@ -1,7 +1,9 @@
 # Taste pack: screens
 
 For any rendered screen: a web page, a phone app, a desktop app. The `web` and
-`ios` packs build on this one.
+`ios` packs build on this one. Where the screen moves, the
+[`motion`](motion.md) pack does too: the first and last frame of every
+animation must pass this pack as stills.
 
 **Source.** Adapted from one project's director check of ten design samples,
 done after the person said the samples still felt machine made. Each point
@@ -29,6 +31,8 @@ one soft light per screen, on the one thing that is happening now.
 with no offset (`box-shadow: 0 0 ...`). The gstack checklist calls this
 "glowing edges on dark surfaces".
 **Source** also https://raw.githubusercontent.com/garrytan/gstack/main/review/design-checklist.md
+In motion, the same rule is one mover and one accent: see motion-2 and
+motion-3 in [`motion`](motion.md).
 
 ### screens-3 Solid colours, unless a gradient means something
 **Catches** gradients by default: gradient buttons, gradient bars, gradient
