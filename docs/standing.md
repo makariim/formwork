@@ -1,6 +1,6 @@
 ---
 updated: 2026-11-15
-by: the working session for brief 0022
+by: the working session for brief 0031
 ---
 
 # Standing brief
@@ -39,6 +39,14 @@ reports for two readers, `## For you` first, with a `report-shape` check; and
 from the installed package, as `formwork sync`, pinned to the release, so no
 other machine needs a clone. Decision 0002, proposed.
 
+**0031 is built and waiting for his read-back.** In the tree: a page and a
+template for bringing in somebody else's skill (`formwork/bring-a-skill.md`,
+`formwork/templates/upstream.md`), two lines in a builder's report (touched
+outside my files, packages added) in the build template and `lead`, and
+localisation and right to left layout named in `writer`, `visual`,
+`frontend` and `mobile`. A new check, `skill-provenance`, is staged as
+`docs/reports/0031-three-gaps.patch` because the guard refused it.
+
 Three guards, thirteen checks, twenty eight roles, forty eight rules, one
 skill, 494 tests across eight suites.
 
@@ -57,6 +65,8 @@ while examining nothing. Every fix carries a test or a fixture that fails
 without it.
 
 ## What is decided
+
+- 2026-11-15, **0030 accepted** (he applied the patch, committed f82feb0, 17 checks green): edits through links to protected files refused; hidden unicode check. The warn setting never reached the hook, so the guard stayed on block and the session staged a patch, which was the right outcome. **0031** (the three gaps from `docs/research/ecc-gaps.md`, his words "queue 1 to 3") started.
 
 - 2026-11-15, **0030 resumed with the protected files guard on warn, for this brief only** (his words: "warn for 0030"), after it stopped at the guard: the hidden unicode check was built; the linked file fix to the guard, its tests and the docs remained. Every protected change still shows in kit-integrity for his review before he re-records.
 

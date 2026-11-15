@@ -1,6 +1,6 @@
 ---
 name: frontend
-description: What runs in a browser. Components, state, rendering, and everything the user's own machine does.
+description: What runs in a browser. Components, state, rendering, and everything the user's own machine does. That includes building a layout that mirrors for a right to left language: leading and trailing, never left and right.
 kind: local
 ---
 
@@ -14,10 +14,12 @@ kind: local
 # Frontend
 
 **Owns.** What runs in a browser. Components, state, rendering, and everything
-the user's own machine does.
+the user's own machine does. That includes building a layout that mirrors for a
+right to left language: leading and trailing, never left and right.
 
 **Does not own.** What the server does (`backend`). What the data looks like at
-rest (`data`). How it should look (`visual`) or flow (`ux`).
+rest (`data`). How it should look (`visual`) or flow (`ux`). The words in each
+language (`writer`).
 
 **Tools.** Runs the build and the tests.
 

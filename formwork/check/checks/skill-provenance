@@ -1,0 +1,142 @@
+#!/usr/bin/env python3
+"""Check: every skill folder says where it came from, and still matches.
+
+    skill-provenance <directory>
+
+Reads each folder with a SKILL.md in formwork/skills/ (the kit's own) and
+.claude/skills/ (the project's). A folder whose SKILL.md carries the banner
+`formwork roles` writes is generated from the first place and is skipped.
+
+Every other folder must hold an UPSTREAM.md that either
+
+  1. says `written here, no upstream` on its first line, or
+  2. names a full 40 character `commit`, has a licence file beside it
+     (LICENSE, LICENCE or COPYING, any ending), and gives a sha256 line for
+     SKILL.md and for that licence file, each matching the file on disk.
+
+The shape is formwork/templates/upstream.md; the reasons are in
+formwork/bring-a-skill.md.
+
+CATCHES  A third party skill copied in by hand with no licence and no record of
+         where it came from. A copied file changed after it was recorded.
+
+CANNOT TELL  Whether the licence allows the use made of the skill, or whether
+         the skill is any good. Whether the repository and commit named are
+         real: nothing is fetched. A folder that says `written here` when it
+         was not.
+
+Exit status:
+    0   every skill folder carries its record, and the hashes match
+    1   a folder has no record, no licence, or a file that no longer matches
+    2   the check could not run
+"""
+import hashlib
+import os
+import re
+import sys
+
+PLACES = (os.path.join("formwork", "skills"), os.path.join(".claude", "skills"))
+GENERATED = "GENERATED FROM "
+WRITTEN_HERE = "written here, no upstream"
+COMMIT = re.compile(r"^\s*commit\s+([0-9a-f]{40})\b", re.M)
+HASH = re.compile(r"\b([0-9a-f]{64})\s+(\S+)")
+LICENCE = re.compile(r"^(licen[cs]e|copying)(\.[a-z]+)?$", re.I)
+
+
+def excluded(root):
+    raw = os.environ.get("FORMWORK_EXCLUDE", "")
+    return [os.path.normpath(os.path.join(root, p))
+            for p in raw.split(os.pathsep) if p]
+
+
+def read(path):
+    return open(path, encoding="utf-8", errors="replace").read()
+
+
+def sha256(path):
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for block in iter(lambda: f.read(65536), b""):
+            h.update(block)
+    return h.hexdigest()
+
+
+def skill_folders(root):
+    skip = excluded(root)
+    out = []
+    for place in PLACES:
+        base = os.path.join(root, place)
+        if not os.path.isdir(base):
+            continue
+        for name in sorted(os.listdir(base)):
+            d = os.path.join(base, name)
+            nd = os.path.normpath(d)
+            if any(nd == s or nd.startswith(s + os.sep) for s in skip):
+                continue
+            if os.path.isfile(os.path.join(d, "SKILL.md")):
+                out.append((os.path.join(place, name), d))
+    return out
+
+
+def problems_in(rel, d):
+    if GENERATED in read(os.path.join(d, "SKILL.md"))[:4000]:
+        return []
+    record = os.path.join(d, "UPSTREAM.md")
+    if not os.path.isfile(record):
+        return ["%s: no UPSTREAM.md. Say where it came from "
+                "(formwork/templates/upstream.md), or write '%s'"
+                % (rel, WRITTEN_HERE)]
+    text = read(record)
+    lines = [l.strip() for l in text.split("\n") if l.strip()]
+    if lines and lines[0].lower() == WRITTEN_HERE:
+        return []
+    out = []
+    if not COMMIT.search(text):
+        out.append("%s/UPSTREAM.md: no full 40 character commit. A branch name "
+                   "moves; a commit does not" % rel)
+    licences = sorted(f for f in os.listdir(d) if LICENCE.match(f))
+    if not licences:
+        out.append("%s: no licence file beside the skill. A file with no "
+                   "licence is not free to use" % rel)
+    recorded = {name: digest for digest, name in HASH.findall(text)}
+    for fn in ["SKILL.md"] + licences[:1]:
+        if fn not in recorded:
+            out.append("%s/UPSTREAM.md: no sha256 line for %s" % (rel, fn))
+        elif recorded[fn] != sha256(os.path.join(d, fn)):
+            out.append("%s/%s: does not match the sha256 in UPSTREAM.md. It "
+                       "changed after it was recorded" % (rel, fn))
+    return out
+
+
+def main(argv):
+    if len(argv) < 2:
+        print("usage: skill-provenance <directory>", file=sys.stderr)
+        return 2
+    root = argv[1]
+    if not os.path.isdir(root):
+        print("ERROR: not a directory: %s" % root, file=sys.stderr)
+        return 2
+
+    folders = skill_folders(root)
+    if not folders:
+        print("no skill folders, nothing to trace")
+        return 0
+    try:
+        problems = [p for rel, d in folders for p in problems_in(rel, d)]
+    except OSError as e:
+        print("ERROR: %s" % e, file=sys.stderr)
+        return 2
+
+    if problems:
+        print("%d skill provenance problem(s)" % len(problems))
+        for p in problems:
+            print("  %s" % p)
+        return 1
+
+    print("%d skill folder(s) read, each generated, written here, or traced to "
+          "a commit with its licence and matching sha256" % len(folders))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

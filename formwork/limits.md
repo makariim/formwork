@@ -144,6 +144,13 @@ was picked.** It does not read rounds held elsewhere under `docs/`, where
 notes and participant files mix, nor closed briefs, nor a team written as
 prose.
 
+**`skill-provenance`** fails a skill folder in `formwork/skills/` or
+`.claude/skills/` with no `UPSTREAM.md`, no licence file, no full commit, or a
+sha256 that no longer matches. **It cannot tell whether the licence allows the
+use made of the skill**, that is `legal`, nor whether the repository and commit
+it names are real, since it fetches nothing. A folder that says `written here,
+no upstream` is believed. It does not look for skills kept anywhere else.
+
 **`gates`** refuses an open brief whose `starts:` line is not met, or is not
 one of `now`, `after <stream>`, `decision NNNN`. **It cannot tell whether the
 gate was the right one, or whether the person read the report** behind the

@@ -29,7 +29,7 @@ A small program that reads your project and says green or red. Checks look at
 what is there. Guards stop what is about to happen.
 
 **The gate**, also called **the aggregate**
-All seventeen checks, run together, with one answer at the end. Green or red.
+All eighteen checks, run together, with one answer at the end. Green or red.
 
 You will see the word aggregate in a refusal: *the aggregate is red, so this
 turn cannot conclude*. It means the same thing.
@@ -156,6 +156,12 @@ enough.
 A character that takes no space on screen, or that turns text round, so a file
 shows a person one thing and tells a model another. `hidden-unicode` refuses
 them in kit files.
+
+**Upstream record**
+The `UPSTREAM.md` beside a skill brought in from somebody else: the repository,
+the commit, the licence, and a sha256 for each file copied.
+`skill-provenance` fails a skill folder without one. How to write it:
+`formwork/bring-a-skill.md`.
 
 **Green** and **red**
 Green means every check passed. Red means at least one found something and

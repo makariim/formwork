@@ -249,7 +249,7 @@ the list. `where` and `version` belong to the installed command only.
 | `init` | puts `formwork/` and `FORMWORK.md` into your project |
 | `install` | wires the guards into your agent, writes your role files. Add `--runtime <name>` when it cannot tell |
 | `setup` | asks twelve questions once, then writes your style file, your standing brief, the folders for decisions, briefs and reports, and the two routing lines when your project has no instruction file |
-| `check` | runs all seventeen checks and says green or red |
+| `check` | runs all eighteen checks and says green or red |
 | `sync` | later, after you upgrade the command: brings the project's `formwork/` up to the new release, keeps the files the project owns, and says what it changed |
 
 **What it touches.** It adds `formwork/` and `FORMWORK.md`, writes
@@ -355,7 +355,7 @@ in your own words, which beats it. Every role points at both.
 | | | count it yourself |
 |---|---|---|
 | **3 guards** | small programs that refuse. Two stop a command, one stops a turn ending | `ls formwork/guard \| grep -v test_` |
-| **17 checks** | small programs that read your project and say green or red | `ls formwork/check/checks \| wc -l` |
+| **18 checks** | small programs that read your project and say green or red | `ls formwork/check/checks \| wc -l` |
 | **28 roles** | one file each, saying what that job does and where it stops | `ls formwork/roles/*/*.md \| wc -l` |
 | **48 rules** | 14 you meet daily, 34 for when you need them | `grep -c '^### ' formwork/rules/*.md` |
 | **1 skill** | `humanizer`, pinned at one upstream commit, for text the agent writes as you | `ls formwork/skills` |
@@ -439,9 +439,10 @@ better after you have run it once than before.
 | [`threads.md`](formwork/threads.md) | how work starts, and where the plan lives between conversations |
 | [`style.md`](formwork/style.md) | how the agents talk to you, and how to change it |
 | [`round.md`](formwork/round.md) | how to run a round, and when it is worth it |
-| [`templates/`](formwork/templates/) | brief, predictions, report, decision, round, standing brief; optional ones for a phase: spec, research lane, design round, build, review round, release step |
+| [`templates/`](formwork/templates/) | brief, predictions, report, decision, round, standing brief; optional ones for a phase: spec, research lane, design round, build, review round, release step; and the upstream record for a skill brought in |
 | [`taste/`](formwork/taste/) | optional taste packs: three kit items for every product, and packs for screens, web, deck and iOS, each item saying what it catches and how it is found. Never a check |
 | [`skills/`](formwork/skills/) | skills the kit ships, each pinned to an upstream commit |
+| [`bring-a-skill.md`](formwork/bring-a-skill.md) | how a project brings in somebody else's skill: pinned commit, licence kept, sha256, nothing updates on its own |
 | [`roles/`](formwork/roles/) | the roles, and how to write your own |
 | [`rules/`](formwork/rules/) | the rules, each saying what it catches |
 
