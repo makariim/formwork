@@ -7,14 +7,14 @@ Two of the three numbers below are measured. The most important one is not.
 ## The gate. Measured
 
 ```
-$ time formwork check
-real 3.77
-real 3.81
-real 3.92
+$ /usr/bin/time -p formwork/fw check
+real 4.76
+real 4.88
+real 5.29
 ```
 
-About four seconds on this repository, over three runs. That is one
-run of all thirteen checks over 201 files, including the fixtures each check is tried
+About five seconds on this repository, over three runs. That is one
+run of all fourteen checks over 310 files, including the fixtures each check is tried
 against. It runs at the end of
 every turn in which something changed.
 
@@ -26,10 +26,10 @@ this line.
 
 ```
 $ find formwork -type f | wc -l
-201
+310
 ```
 
-201 files. Plain text and a few small programs. Python 3, standard library only,
+310 files. Plain text and a few small programs. Python 3, standard library only,
 no dependencies of any kind. It costs nothing to carry and nothing to install.
 
 ---

@@ -41,6 +41,7 @@ These do not ask you. They refuse.
 | Work marked finished carries the human's read-back, dated | `formwork/check/checks/work-paired` |
 | One brief is open at a time, unless you raise the limit | `formwork/check/checks/work-paired` |
 | Every generated role names the style page | `formwork/check/checks/style-pointed` |
+| Kit files carry no home path, private address, local hostname, email or key | `formwork/check/checks/kit-leak-scan` |
 | A report opens with a part for the human, under 1,000 words, no commands | `formwork/check/checks/report-shape` |
 
 > [!NOTE]

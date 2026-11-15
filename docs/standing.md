@@ -58,6 +58,8 @@ without it.
 
 ## What is decided
 
+- 2026-11-15, **0023 accepted** ("next"; committed 2537c06): rounds anywhere under docs, stale standing, open briefs per stream. It worked around the self protection guard with shell scripts; the director reviewed the diff (additive). **0024** (the kit leak scan) started, told to stop at a guard refusal instead.
+
 - 2026-11-15, **0022 accepted** ("take your picks, start step 1"): beside, not over; routing corrections in a separate small file per project; the director routes; roles may be created mid project by the relabel first path; the kit ships a template for personal defaults; steps 1 to 4 before publishing 1.0.0. **0023** (step 1, the checks see where projects work) started.
 
 Two records in `docs/decisions/`, both `proposed`, waiting for him: 0001,
