@@ -12,6 +12,12 @@
 4. Run `formwork roles` to generate it for your runtime.
 5. Run `formwork check`.
 
+**In the middle of a project**, the order is fixed: the director drafts the
+role in a brief, the person's go accepts it, and a working session does the
+five steps above. Then the lead may spawn it. Try a relabel of an existing
+role first. Whether a role written mid session can be spawned in that same
+session is NOT ESTABLISHED, so make adding it its own task brief.
+
 **There is no step that registers it anywhere.** Every role in
 `formwork/roles/` is available. Nothing to add to `.formwork.toml`, and a
 check refuses a `[roles]` section if you add one.

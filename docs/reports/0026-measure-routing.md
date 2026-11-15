@@ -84,3 +84,6 @@ One sentence: a real session could read the repository, so where a detail would 
 - Not run with any other model, or against a project with real corrections in `docs/routing.md`.
 - `docs/standing.md` not touched: it is the director's.
 - r07's expected answer left as task. Whether a round is right there is his call.
+
+accepted: 2026-11-15
+in my words: b, everything is already working, no need to disrupt them now (he committed 6223baf; keep the CSV prompt's expected answer as a small task)

@@ -11,7 +11,9 @@ tools: [read, write, run]
 roles.
 
 **Does not own.** What people will wrongly bring here, and who it actually
-belongs to. Naming the owner is the useful half.
+belongs to. Naming the owner is the useful half. A role that touches plans or
+order names the `director` (what happens next, the standing brief) and the
+`lead` (running other agents) here, so it does not become a second planner.
 
 **Tools.** Which of `read`, `write`, `run`, `web`, `spawn` it may use, and why
 anything is withheld. Only the lead gets `spawn`.

@@ -1,0 +1,212 @@
+#!/usr/bin/env python3
+"""Check: every role a round or a brief names is a real role.
+
+    roles-named <directory>
+
+A real role is a file in formwork/roles/ (the project roles folder,
+formwork/roles/project/, included) with a `name:` in its frontmatter.
+
+Two places name roles:
+
+  1. A round in docs/rounds/<name>/. Each participant file there must be
+     <role>.md or <role>-<label>.md for a real role. The round's own files
+     are allowed as well: brief.md, briefing.md, predictions.md, round.md,
+     README.md, index.md.
+  2. A brief's team table. Under a heading that starts "Team" in an open
+     brief (docs/briefs/*.md, and a round's brief.md), the first cell of each
+     table row names a role. Its first word, backticks and bold stripped,
+     must be a real role. "`visual` as art director" is a relabel and passes.
+
+CATCHES  A round file or a team row for a role nobody wrote. An agent spawned
+         under that name is either a general agent given a pasted persona, or
+         nothing at all. Its boundary and tools are unchecked either way.
+
+CANNOT TELL  Whether the right role was picked. Rounds held outside
+         docs/rounds/ are not read here: those folders mix notes with
+         participant files, so a name there proves nothing. Briefs marked done
+         or dropped are history and are not read. A team written as prose
+         rather than a table is not seen.
+
+Exit status:
+    0   every role named is real
+    1   a round file or team row names a role with no file
+    2   the check could not run
+"""
+import os
+import re
+import sys
+
+ROLES_SUBDIR = os.path.join("formwork", "roles")
+ROUNDS = os.path.join("docs", "rounds")
+BRIEFS = os.path.join("docs", "briefs")
+ROLE_SKIP = {"TEMPLATE.md", "HOW-TO-ADD-A-ROLE.md", "README.md"}
+ROUND_FILES = {"brief.md", "briefing.md", "predictions.md", "round.md",
+               "README.md", "index.md"}
+TEAM_HEADING = re.compile(r"^#{1,6}\s+(?:the\s+)?team\b", re.I)
+ANY_HEADING = re.compile(r"^#{1,6}\s")
+STATUS = re.compile(r"^\s*\**status\**\s*:\s*\**\s*(\w+)", re.I | re.M)
+CLOSED = {"done", "dropped"}
+
+
+def frontmatter_name(text):
+    m = re.match(r"^---\n(.*?)\n---\n", text, re.S)
+    if not m:
+        return None
+    for line in m.group(1).split("\n"):
+        if line.startswith("name:"):
+            return line.split(":", 1)[1].strip().strip("\"'") or None
+    return None
+
+
+def real_roles(root):
+    base = os.path.join(root, ROLES_SUBDIR)
+    if not os.path.isdir(base):
+        return None
+    names = set()
+    for dirpath, dirnames, filenames in os.walk(base):
+        for fn in filenames:
+            if not fn.endswith(".md") or fn in ROLE_SKIP:
+                continue
+            try:
+                text = open(os.path.join(dirpath, fn), encoding="utf-8",
+                            errors="replace").read()
+            except OSError:
+                continue
+            name = frontmatter_name(text)
+            if name:
+                names.add(name)
+    return names
+
+
+def names_a_role(stem, roles):
+    return stem in roles or any(stem.startswith(r + "-") for r in roles)
+
+
+def round_problems(root, roles):
+    out = []
+    base = os.path.join(root, ROUNDS)
+    if not os.path.isdir(base):
+        return out
+    for name in sorted(os.listdir(base)):
+        d = os.path.join(base, name)
+        if not os.path.isdir(d):
+            continue
+        for fn in sorted(os.listdir(d)):
+            if not fn.endswith(".md") or fn in ROUND_FILES:
+                continue
+            if not os.path.isfile(os.path.join(d, fn)):
+                continue
+            if not names_a_role(fn[:-3], roles):
+                out.append("%s: a round file for no real role. Name it "
+                           "<role>.md or <role>-<label>.md"
+                           % os.path.join(ROUNDS, name, fn))
+    return out
+
+
+def is_closed(text):
+    m = STATUS.search(text[:2000])
+    return bool(m) and m.group(1).lower() in CLOSED
+
+
+def team_rows(text):
+    """(line number, first cell) for each body row of a table under Team."""
+    rows = []
+    in_team = False
+    seen_header = False
+    for i, line in enumerate(text.split("\n"), 1):
+        if ANY_HEADING.match(line):
+            in_team = bool(TEAM_HEADING.match(line))
+            seen_header = False
+            continue
+        if not in_team:
+            continue
+        s = line.strip()
+        if not s.startswith("|"):
+            if seen_header and s:
+                seen_header = False
+            continue
+        cells = [c.strip() for c in s.strip("|").split("|")]
+        if not cells:
+            continue
+        if all(re.fullmatch(r":?-{2,}:?", c) for c in cells if c):
+            continue
+        if not seen_header:
+            seen_header = True
+            continue
+        rows.append((i, cells[0]))
+    return rows
+
+
+def first_word(cell):
+    cell = cell.replace("`", " ").replace("*", " ").strip()
+    return cell.split()[0] if cell.split() else ""
+
+
+def brief_files(root):
+    out = []
+    b = os.path.join(root, BRIEFS)
+    if os.path.isdir(b):
+        out += [os.path.join(b, f) for f in sorted(os.listdir(b))
+                if f.endswith(".md")]
+    r = os.path.join(root, ROUNDS)
+    if os.path.isdir(r):
+        for name in sorted(os.listdir(r)):
+            p = os.path.join(r, name, "brief.md")
+            if os.path.isfile(p):
+                out.append(p)
+    return out
+
+
+def brief_problems(root, roles):
+    out = []
+    for path in brief_files(root):
+        try:
+            text = open(path, encoding="utf-8", errors="replace").read()
+        except OSError as e:
+            raise RuntimeError("cannot read %s: %s" % (path, e))
+        if is_closed(text):
+            continue
+        for line, cell in team_rows(text):
+            word = first_word(cell)
+            if word and word not in roles:
+                out.append("%s:%d: the team names '%s', and no role has that "
+                           "name" % (os.path.relpath(path, root), line, word))
+    return out
+
+
+def main(argv):
+    if len(argv) < 2:
+        print("usage: roles-named <directory>", file=sys.stderr)
+        return 2
+    root = argv[1]
+    if not os.path.isdir(root):
+        print("ERROR: not a directory: %s" % root, file=sys.stderr)
+        return 2
+
+    roles = real_roles(root)
+    if roles is None:
+        print("no roles directory, no role names to compare")
+        return 0
+    if not roles:
+        print("ERROR: a roles directory with no named roles", file=sys.stderr)
+        return 2
+
+    try:
+        problems = round_problems(root, roles) + brief_problems(root, roles)
+    except RuntimeError as e:
+        print("ERROR: %s" % e, file=sys.stderr)
+        return 2
+
+    if problems:
+        print("%d role name(s) with no role behind them" % len(problems))
+        for p in problems:
+            print("  %s" % p)
+        return 1
+
+    print("every role named in a round or an open brief's team is one of "
+          "%d real roles" % len(roles))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

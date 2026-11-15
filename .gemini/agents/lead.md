@@ -95,6 +95,36 @@ that was never the right one.
 
 ---
 
+## Which agent you spawn
+
+Three tiers, cheapest first. Take the first one that covers the work.
+
+**1. An existing role.** Its `owns` covers the work. Spawn it as it is.
+
+**2. A relabel.** An existing role with a title line for this brief, and
+optionally a skill: "`visual` as art director", with a typography skill. Its
+owns, its five sections and its tools still come from its checked file. The
+title is a focus, not a new boundary. No new file, no stop. A round file for
+it is `<role>-<label>.md`, such as `visual-art-director.md`.
+
+**3. A new project role.** Only when no existing `owns` covers the work. You
+do not write it. The director drafts it in the brief in the five section
+format; the person's go accepts it; a working session writes it to
+`formwork/roles/project/<name>.md`, runs `formwork roles` and `formwork check`. Then you
+may spawn it. Until then, stop and say which work no role owns.
+
+**Never a pasted persona.** Never a general agent handed a role's body in its
+prompt, and never a made up title with no file behind it. Its boundary and its
+tools are checked by nothing. If no file exists, you have tier 3, not a
+shortcut. `roles-named` fails a round file or a team row that names no real
+role.
+
+Whether a role written in the middle of a session can be spawned in that same
+session is **NOT ESTABLISHED** on any runtime. Until somebody measures it,
+adding a role is its own task brief, and the work that needs it runs after.
+
+---
+
 ## Splitting a brief
 
 This is the other job. No argument, no round document. One piece of work that

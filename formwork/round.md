@@ -33,7 +33,8 @@ docs/rounds/storage-shape/
     brief.md          what is being asked. You write this
     predictions.md    the challenger, written FIRST
                       template: formwork/templates/predictions.md
-    <role>.md         one file per participant
+    <role>.md         one file per participant, or <role>-<label>.md
+                      for a relabel. A check refuses any other name
     round.md          what came out of it. The lead writes this
 
 docs/reports/0009-storage-shape.md     short. What came out, in a few lines,

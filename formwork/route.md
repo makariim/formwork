@@ -96,6 +96,9 @@ Say the size in plain words. The person can override it in one line.
 3. A new role only when no `owns` covers it, following
    `formwork/roles/HOW-TO-ADD-A-ROLE.md`.
 
+The brief names the team in a table under `## Team`, the role's name first in
+each row. `roles-named` fails a row that names no real role.
+
 Hooks are not chosen per prompt. They are wired once by `formwork install` and
 run on everything. `formwork check` runs whole, every time.
 

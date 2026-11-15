@@ -2,7 +2,7 @@
 brief: 0026
 stream: method
 title: Measure routing
-status: open, 2026-11-15
+status: done (accepted 2026-11-15)
 ---
 
 # 0026 Measure routing
