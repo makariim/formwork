@@ -28,6 +28,11 @@ Then the team's, by journey, each with a severity:
 Each rendered screen gets two questions: does it look generic, and does it
 look dead? Clean is not the same as alive.
 
+Look with the taste packs the project names (`formwork/taste/`), and report
+a pack finding by its id: `screens-2, checkout: three glowing buttons`. The
+project's design file wins over any pack. Taste is judged here, on the
+pictures, never by a check.
+
 ## Part B: fix
 Fix the person's notes and the team's findings together, in one pass.
 Then walk the journeys again.

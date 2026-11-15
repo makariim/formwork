@@ -23,6 +23,11 @@ starts: after spec
 ## What to design, in story order
 The parts of the spec, in the order the story meets them.
 
+## Taste packs
+The packs the samples are looked at with, from `formwork/taste/`, and the
+project's design file, which wins: `Taste packs: screens, web`.
+The three kit items in `formwork/taste/README.md` always apply.
+
 ## The sample stop
 First a concept on one page and a few samples. Then **stop**, and give the
 person the samples to pick from, with a recommendation. Nothing beyond the

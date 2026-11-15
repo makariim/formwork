@@ -177,6 +177,12 @@ the web, starting other agents. Only the lead may start other agents.
 A group of related roles. The software pack, the design pack, and so on. All
 roles are available today. There is no switch yet, and the kit says so.
 
+**Taste pack**
+Not a group of roles. A list of things that make a rendered product look
+generic or dead, for one kind of product (screens, web, deck, iOS), in
+`formwork/taste/`. Optional. A project names the ones it wants, and its own
+design file wins. Never a check.
+
 ---
 
 ## Two phrases worth knowing

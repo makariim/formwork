@@ -8,6 +8,17 @@ version commit's message in git: `git show 02bd5f0` for 0.2.0 and
 
 ## Unreleased
 
+- Taste packs, optional. `formwork/taste/README.md` holds the three kit
+  items that apply to every product (decoration never poses as data; copy
+  says the thing, not the feature; every rendered screen is asked "generic
+  or machine made?" and "dead?") and the pack shape: each item says what it
+  catches and how it is found, high, medium or low. First packs: `screens`
+  (general rules adapted from one project's design review), `web` and `deck`
+  from cited public sources, and a short `ios` pack from the seven Human
+  Interface Guidelines pages that were read; the rest is NOT ESTABLISHED. A
+  project names its packs in its own design file, which always wins. Search
+  patterns are hints for the reviewer. Taste is never a check. The design and
+  review round templates and `formwork/route.md` point to the packs.
 - Optional templates and gates for big work. Six one page templates in
   `formwork/templates/`: spec, research lane, design round, build, review
   round, release step (the general pattern only). A phase is a label on a run
