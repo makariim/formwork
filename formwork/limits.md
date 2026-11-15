@@ -151,6 +151,16 @@ use made of the skill**, that is `legal`, nor whether the repository and commit
 it names are real, since it fetches nothing. A folder that says `written here,
 no upstream` is believed. It does not look for skills kept anywhere else.
 
+**`task-size`** fails an open brief with no `size:` line, which counts as a
+task, once its body runs past 12 lines (a line counted once per 80
+characters) or its report names more than 5 files changed. **It cannot tell a
+small ask that was born large**: a brief that states a size from the start
+passes, and so does a wrong size. It reads files, never time or turns, so a
+long run in a short brief with a short report is not caught. Files are counted
+from the report's "changed" sections as paths in backticks and bare file
+names, so a report that names them otherwise is undercounted. Closed briefs
+are not read.
+
 **`gates`** refuses an open brief whose `starts:` line is not met, or is not
 one of `now`, `after <stream>`, `decision NNNN`. **It cannot tell whether the
 gate was the right one, or whether the person read the report** behind the

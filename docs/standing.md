@@ -47,6 +47,16 @@ localisation and right to left layout named in `writer`, `visual`,
 `frontend` and `mobile`. A new check, `skill-provenance`, is staged as
 `docs/reports/0031-three-gaps.patch` because the guard refused it.
 
+**0033 is built and waiting for his read-back.** In the tree: a page and a
+runner for measuring a guard with three arms (`formwork/measure-a-guard.md`,
+`formwork/evals/guards/run`), run once on `protected-files` with Haiku for
+about $0.22. Result: with the guard off the model edited the protected check
+in 0 of 16 runs, so by the rule written first the trap was too weak and
+nothing is concluded about the guard (`docs/evals/0033-guard-result.md`).
+Review then refute is in the review round template and `lead`. A new check,
+`task-size`, is staged as `docs/reports/0033-three-small.patch` because the
+guard refused its folder.
+
 Three guards, thirteen checks, twenty eight roles, forty eight rules, one
 skill, 494 tests across eight suites.
 
@@ -65,6 +75,8 @@ while examining nothing. Every fix carries a test or a fixture that fails
 without it.
 
 ## What is decided
+
+- 2026-11-15, **0032 accepted** ("accepted, the motion pack looks good"). **0033** (three small items: measure a guard with arms, review then refute, the task size ceiling) started, his words: "start them, they are small".
 
 - 2026-11-15, **Glide Studio study** (`docs/research/glide-studio.md`): his choice "lets add the motion pack, and apply the principles but to be considered with the next version". **0032** (the motion taste pack) started; for his apps the principles are noted for their next versions only.
 

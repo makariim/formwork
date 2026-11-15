@@ -249,7 +249,7 @@ the list. `where` and `version` belong to the installed command only.
 | `init` | puts `formwork/` and `FORMWORK.md` into your project |
 | `install` | wires the guards into your agent, writes your role files. Add `--runtime <name>` when it cannot tell |
 | `setup` | asks twelve questions once, then writes your style file, your standing brief, the folders for decisions, briefs and reports, and the two routing lines when your project has no instruction file |
-| `check` | runs all eighteen checks and says green or red |
+| `check` | runs all nineteen checks and says green or red |
 | `sync` | later, after you upgrade the command: brings the project's `formwork/` up to the new release, keeps the files the project owns, and says what it changed |
 
 **What it touches.** It adds `formwork/` and `FORMWORK.md`, writes
@@ -355,7 +355,7 @@ in your own words, which beats it. Every role points at both.
 | | | count it yourself |
 |---|---|---|
 | **3 guards** | small programs that refuse. Two stop a command, one stops a turn ending | `ls formwork/guard \| grep -v test_` |
-| **18 checks** | small programs that read your project and say green or red | `ls formwork/check/checks \| wc -l` |
+| **19 checks** | small programs that read your project and say green or red | `ls formwork/check/checks \| wc -l` |
 | **28 roles** | one file each, saying what that job does and where it stops | `ls formwork/roles/*/*.md \| wc -l` |
 | **48 rules** | 14 you meet daily, 34 for when you need them | `grep -c '^### ' formwork/rules/*.md` |
 | **1 skill** | `humanizer`, pinned at one upstream commit, for text the agent writes as you | `ls formwork/skills` |
@@ -453,6 +453,7 @@ better after you have run it once than before.
 | [`troubleshooting.md`](formwork/troubleshooting.md) | every error message and what to do |
 | [`glossary.md`](formwork/glossary.md) | every word we use, in plain language |
 | [`limits.md`](formwork/limits.md) | what this kit cannot do |
+| [`measure-a-guard.md`](formwork/measure-a-guard.md) | how to measure what a guard changes: off, on and a placebo, the bar written first, cost beside effect |
 | [`COSTS.md`](formwork/COSTS.md) | what it costs, and the number nobody has |
 | [`FAQ.md`](FAQ.md) | questions people ask |
 

@@ -1,0 +1,225 @@
+#!/usr/bin/env python3
+"""Check: a task that has grown past a task says so.
+
+    task-size <directory>
+
+A brief with no `size:` line counts as a task. That keeps a one line brief one
+line long: it carries no extra field. But a task can grow while it runs. A
+one line brief turns into a page, or its report lists a dozen files, and the
+work carries on as if it were still the rename it started as.
+
+So while a brief is open and has no `size:` line, it fails when:
+
+  * its body, after the frontmatter, has more than 12 lines that are not
+    blank, a line counted once per 80 characters, so a page written as four
+    long paragraphs is not four lines, or
+  * its report already names more than 5 files changed.
+
+Either fix is said out loud: state the size the work has become, with
+`size: checkpoint` (or round, phase, milestone) in the frontmatter or a
+`**Size:** checkpoint` line in the body, or cut the work back to a task and
+brief the rest separately. A `size:` line names one of the five sizes in
+`formwork/loop.md`: task, checkpoint, round, phase, milestone. Anything else
+is a size nobody can read, and fails.
+
+CATCHES  A task that grew into many files or a long brief and went on
+         silently. Stepping up is a decision the person sees: the size line
+         appears in the diff and in the report.
+
+CANNOT TELL  A small ask that was born large: a one line request briefed as a
+         round from the start passes, because it states its size. Nor whether
+         the size stated is the right one: `size: checkpoint` on a phase
+         passes. Nor how long a run took: it reads files, never time or
+         turns. Files changed are counted from the report's "changed"
+         sections (or its part for the director when it has none), as path
+         like words in backticks plus bare file names with a common
+         extension. A report that names its files some other way is
+         undercounted. Closed briefs are history and are not read.
+
+Exit status:
+    0   every open task is under the ceiling, or states its size
+    1   an open task is over the ceiling with no size, or a size is unreadable
+    2   the check could not run
+"""
+import os
+import re
+import sys
+
+BRIEFS = os.path.join("docs", "briefs")
+REPORTS = os.path.join("docs", "reports")
+NUMBERED = re.compile(r"^(\d{1,6})[-_]")
+STATUS = re.compile(r"^status\s*:\s*[\"']?([a-z]+)", re.M | re.I)
+SIZE = re.compile(r"^(?:size\s*:|\*\*size\s*:\s*\*\*)[ \t]*[\"']?([A-Za-z]*)",
+                  re.M | re.I)
+SIZES = ("task", "checkpoint", "round", "phase", "milestone")
+
+LINE_CEILING = 12
+FILE_CEILING = 5
+WIDTH = 80
+
+HEADING = re.compile(r"^(#{1,6})\s+(.*)$", re.M)
+TICKED = re.compile(r"`([^`\s]+)`")
+EXT = (r"py|js|mjs|ts|tsx|jsx|go|rs|md|json|toml|ya?ml|sh|css|scss|html|java|"
+       r"kt|swift|rb|c|h|cc|cpp|sql|txt|lock|cfg|ini|xml|vue|svelte|dart")
+BARE = re.compile(r"(?<![\w/.`-])((?:[\w-]+/)*[\w-]+\.(?:%s))(?![\w`])" % EXT)
+
+
+def excluded_paths(root):
+    out = []
+    for p in os.environ.get("FORMWORK_EXCLUDE", "").split(os.pathsep):
+        if p:
+            out.append(os.path.realpath(p if os.path.isabs(p)
+                                        else os.path.join(root, p)))
+    return out
+
+
+def is_excluded(path, excludes):
+    a = os.path.realpath(path)
+    return any(a == e or a.startswith(e + os.sep) for e in excludes)
+
+
+def numbered(folder):
+    out = {}
+    if not os.path.isdir(folder):
+        return out
+    for fn in sorted(os.listdir(folder)):
+        m = NUMBERED.match(fn)
+        if m and fn.endswith(".md"):
+            out.setdefault(int(m.group(1)), []).append(fn)
+    return out
+
+
+def body_of(text):
+    """The brief without its frontmatter."""
+    if text.startswith("---"):
+        end = text.find("\n---", 3)
+        if end != -1:
+            nl = text.find("\n", end + 1)
+            return "" if nl == -1 else text[nl + 1:]
+    return text
+
+
+def sections(text, want):
+    """The text under every heading whose title matches `want`, down to the
+    next heading at the same level or above."""
+    heads = list(HEADING.finditer(text))
+    out = []
+    for i, h in enumerate(heads):
+        if not want(h.group(2)):
+            continue
+        level = len(h.group(1))
+        end = len(text)
+        for nxt in heads[i + 1:]:
+            if len(nxt.group(1)) <= level:
+                end = nxt.start()
+                break
+        out.append(text[h.end():end])
+    return out
+
+
+def path_like(word):
+    word = word.strip(".,;:()")
+    if not word or word.startswith("-") or "://" in word:
+        return None
+    if "/" in word or re.search(r"\.(?:%s)$" % EXT, word):
+        return word.rstrip("/")
+    return None
+
+
+def files_named(report):
+    parts = sections(report, lambda t: "changed" in t.lower())
+    if not parts:
+        parts = sections(report, lambda t: "for the director" in t.lower())
+    found = set()
+    for part in parts:
+        for w in TICKED.findall(part):
+            p = path_like(w)
+            if p:
+                found.add(p)
+        for w in BARE.findall(TICKED.sub(" ", part)):
+            found.add(w)
+    return found
+
+
+def main(argv):
+    args = [a for a in argv[1:] if not a.startswith("--")]
+    if not args:
+        print("usage: task-size <directory>", file=sys.stderr)
+        return 2
+    root = args[0]
+    if not os.path.isdir(root):
+        print("ERROR: not a directory: %s" % root, file=sys.stderr)
+        return 2
+    excludes = excluded_paths(root)
+    bdir = os.path.join(root, BRIEFS)
+    if not os.path.isdir(bdir) or is_excluded(bdir, excludes):
+        print("no %s directory, no briefs to size" % BRIEFS)
+        return 0
+
+    briefs = numbered(bdir)
+    reports = numbered(os.path.join(root, REPORTS))
+    problems, open_count, sized = [], 0, 0
+    for n, names in sorted(briefs.items()):
+        for fn in names:
+            try:
+                text = open(os.path.join(bdir, fn), encoding="utf-8",
+                            errors="replace").read()
+            except OSError as e:
+                print("ERROR: cannot read %s/%s: %s" % (BRIEFS, fn, e),
+                      file=sys.stderr)
+                return 2
+            m = STATUS.search(text)
+            if not m or m.group(1).lower() != "open":
+                continue
+            open_count += 1
+            where = "%s/%s" % (BRIEFS, fn)
+            s = SIZE.search(text)
+            if s:
+                size = s.group(1).lower()
+                if size not in SIZES:
+                    problems.append("%s: size '%s' is not one of: %s"
+                                    % (where, s.group(1), ", ".join(SIZES)))
+                else:
+                    sized += 1
+                continue
+            lines = sum(-(-len(l.rstrip()) // WIDTH)
+                        for l in body_of(text).splitlines() if l.strip())
+            grown = []
+            if lines > LINE_CEILING:
+                grown.append("its body has %d lines of %d characters and a "
+                             "task's ceiling is %d"
+                             % (lines, WIDTH, LINE_CEILING))
+            for rn in reports.get(n, []):
+                try:
+                    rep = open(os.path.join(root, REPORTS, rn),
+                               encoding="utf-8", errors="replace").read()
+                except OSError as e:
+                    print("ERROR: cannot read %s/%s: %s" % (REPORTS, rn, e),
+                          file=sys.stderr)
+                    return 2
+                files = files_named(rep)
+                if len(files) > FILE_CEILING:
+                    grown.append("its report %s/%s names %d files changed and "
+                                 "a task's ceiling is %d"
+                                 % (REPORTS, rn, len(files), FILE_CEILING))
+            if grown:
+                problems.append(
+                    "%s has no size, so it counts as a task, and %s. State the "
+                    "size it has become (size: checkpoint, round, phase or "
+                    "milestone) or cut it back to a task"
+                    % (where, " and ".join(grown)))
+
+    if problems:
+        print("%d problem(s) across %d open brief(s)"
+              % (len(problems), open_count))
+        for p in problems:
+            print("  %s" % p)
+        return 1
+    print("%d open brief(s): %d state their size, the rest are within a "
+          "task's ceiling (%d lines, %d files)"
+          % (open_count, sized, LINE_CEILING, FILE_CEILING))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

@@ -36,6 +36,12 @@ belongs to, and a `starts:` line says what must be true first (`now`, `after
 not met. See Phases and gates in [`../loop.md`](../loop.md). A task needs
 neither.
 
+**A size, when it is not a task:** `size: checkpoint` (or round, phase,
+milestone). A brief with no `size:` line counts as a task. While it is open,
+`task-size` fails it once its body runs past 12 lines or its report names more
+than 5 files changed. Then say the size it has become, or cut it back to a
+task and brief the rest.
+
 Even a one line brief gets saved. One line plus those two is a complete file.
 
 **Done also needs the read-back**, two lines you write yourself in the report,
