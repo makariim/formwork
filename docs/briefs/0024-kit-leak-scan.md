@@ -2,7 +2,7 @@
 brief: 0024
 stream: method
 title: The kit leak scan
-status: open, 2026-11-15
+status: done (accepted 2026-11-15)
 ---
 
 # 0024 The kit leak scan

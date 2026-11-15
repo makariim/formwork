@@ -248,7 +248,7 @@ the list. `where` and `version` belong to the installed command only.
 |---|---|
 | `init` | puts `formwork/` and `FORMWORK.md` into your project |
 | `install` | wires the guards into your agent, writes your role files. Add `--runtime <name>` when it cannot tell |
-| `setup` | asks eleven questions once, then writes your style file, your standing brief, and the folders for decisions, briefs and reports |
+| `setup` | asks twelve questions once, then writes your style file, your standing brief, the folders for decisions, briefs and reports, and the two routing lines when your project has no instruction file |
 | `check` | runs all fourteen checks and says green or red |
 | `sync` | later, after you upgrade the command: brings the project's `formwork/` up to the new release, keeps the files the project owns, and says what it changed |
 

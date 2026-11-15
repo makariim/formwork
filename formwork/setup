@@ -15,6 +15,8 @@ WHAT IT ASKS ABOUT
     strength     how hard the guards bite, and how many times the turn-end
                  gate refuses before it stands aside
     folders      whether to start docs/decisions, docs/briefs, docs/reports
+    routing      whether to add the two routing lines to the instruction file
+                 your agent reads in this project
 
 Every question has a default and enter takes it. Nothing here is required.
 
@@ -24,6 +26,11 @@ WHAT IT WRITES
     docs/standing.md     where the project is, for the director to read
     docs/*/README.md     one line each, so the folders exist and are explained
     .formwork.toml       the [strength] values, only where you asked
+    CLAUDE.md            the two lines from formwork/templates/
+                         project-instructions.md, only when the project has
+                         no such file. AGENTS.md for Codex and Cursor,
+                         GEMINI.md for Gemini. When it exists, setup shows
+                         the lines for you to paste and writes nothing there
 
 WHAT IT WILL NOT DO
 
@@ -52,6 +59,11 @@ DOCS = os.path.join(PROJECT, "docs")
 STYLE = os.path.join(DOCS, "style.md")
 STANDING = os.path.join(DOCS, "standing.md")
 TEMPLATE = os.path.join(HERE, "templates", "standing.md")
+INSTRUCTIONS = os.path.join(HERE, "templates", "project-instructions.md")
+
+# The file each runtime reads for project instructions.
+INSTRUCTION_FILES = {"claude-code": "CLAUDE.md", "codex": "AGENTS.md",
+                     "cursor": "AGENTS.md", "gemini": "GEMINI.md"}
 
 
 # ---------------------------------------------------------------- appearance
@@ -343,6 +355,29 @@ def standing_page(a):
     return body
 
 
+def instruction_lines():
+    """The two routing lines, from inside the template's fence."""
+    try:
+        raw = open(INSTRUCTIONS, encoding="utf-8").read()
+    except OSError:
+        return None
+    m = FENCE.search(raw)
+    return m.group(1).strip() if m else None
+
+
+def instruction_file():
+    """The instruction file for the runtime .formwork.toml names."""
+    runtime = ""
+    try:
+        text = open(CONFIG, encoding="utf-8").read()
+    except OSError:
+        text = ""
+    m = re.search(r'^\s*runtime\s*=\s*["\']([^"\']+)["\']', text, re.M)
+    if m:
+        runtime = m.group(1)
+    return os.path.join(PROJECT, INSTRUCTION_FILES.get(runtime, "AGENTS.md"))
+
+
 def set_strength(text, value, budget):
     """Set the [strength] values, leaving every other line alone.
 
@@ -427,6 +462,7 @@ class Plan(object):
         self.config = None
         self.already = []
         self.refused = []
+        self.paste = None          # (file, lines) when the file is theirs
 
     def add(self, path, text):
         if text is None:
@@ -464,6 +500,19 @@ class Plan(object):
         if self.empty() and not self.already and not self.refused:
             lines.append(("nothing to write", dim("nothing to write")))
         box("This is everything it would do", lines)
+        self.show_paste()
+
+    def show_paste(self):
+        if not self.paste:
+            return
+        rel, text = self.paste
+        print("")
+        print("  %s" % bold("%s is yours, so it is left alone. To route from "
+                            "one prompt, paste these" % rel))
+        print("  %s" % bold("two lines into it yourself:"))
+        print("")
+        for line in text.splitlines():
+            print("      %s" % line)
 
     def apply(self, wrote):
         for path, text in self.files:
@@ -499,13 +548,13 @@ class Plan(object):
 
 # ------------------------------------------------------------ the interview
 
-TOTAL = 11
+TOTAL = 12
 
 
 def interview():
     box("Formwork setup",
-        [("Eleven questions, once. Enter takes the default every time.",
-          dim("Eleven questions, once. Enter takes the default every time.")),
+        [("Twelve questions, once. Enter takes the default every time.",
+          dim("Twelve questions, once. Enter takes the default every time.")),
          ("Nothing is required, and nothing you say leaves this machine.",
           dim("Nothing is required, and nothing you say leaves this "
               "machine."))])
@@ -574,13 +623,21 @@ def interview():
         "One short file saying where the project is. A new conversation reads "
         "it instead of being told the whole story again.",
         {"1": "yes", "2": "no"}, "1")
+
+    section("routing")
+    a["routing"] = q.choice(
+        "Add the two routing lines to this project's instruction file?",
+        "They tell your agent to read the standing brief and the routing "
+        "table, say the plan back, and act on its size. Written only if the "
+        "file does not exist. If it does, you get the lines to paste.",
+        {"1": "yes", "2": "no"}, "1")
     return a
 
 
 def defaults():
     return {"length": "1", "knowing": "2", "language": "", "never": "",
             "building": "", "now": "", "next": "", "strength": "1",
-            "budget": 3, "folders": "1", "standing": "1"}
+            "budget": 3, "folders": "1", "standing": "1", "routing": "1"}
 
 
 def main(argv):
@@ -616,6 +673,18 @@ def main(argv):
         for name, what in FOLDERS:
             plan.add(os.path.join(DOCS, name, "README.md"),
                      "# %s\n\n%s\n" % (name, what))
+
+    if a["routing"] == "1":
+        lines = instruction_lines()
+        target = instruction_file()
+        if lines is None:
+            plan.refused.append("the project instructions template has no "
+                                "lines in it, so there is nothing to offer")
+        elif os.path.lexists(target):
+            plan.already.append(os.path.relpath(target, PROJECT))
+            plan.paste = (os.path.relpath(target, PROJECT), lines)
+        else:
+            plan.add(target, "# Instructions for agents\n\n%s\n" % lines)
 
     value = STRENGTHS[a["strength"]]
     want_value = value if value != "block" else None

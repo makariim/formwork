@@ -43,3 +43,6 @@ Your step: make the one-line fix below, review the new check, then run `formwork
 ### Not established
 
 - Whether the generic name list lets a real user name through. A real name that is not on the list is flagged, which is the intent. A real name that happens to be on it (for example "joe") passes.
+
+accepted: 2026-11-15
+in my words: he applied the one line fix himself, re-recorded the fingerprints (gate green, 14 checks) and committed a6240e5
