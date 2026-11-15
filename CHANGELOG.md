@@ -8,6 +8,15 @@ version commit's message in git: `git show 02bd5f0` for 0.2.0 and
 
 ## Unreleased
 
+- Specialists, cheapest first. The `lead` spawns an existing role, then a
+  relabel (an existing role with a title line and optionally a skill, its
+  owns, sections and tools still from its file), and only then a new project
+  role: drafted by the `director` in the brief, accepted by the person,
+  written to `formwork/roles/project/<name>.md` by a working session. Never a pasted
+  persona. New check `roles-named`: a round file must be `<role>.md` or
+  `<role>-<label>.md` for a real role, and a role in an open brief's team
+  table must exist. `TEMPLATE.md` says a role touching plans or order names
+  the director and lead under "Does not own".
 - Routing one plain prompt. `formwork/route.md` is the routing table: six
   kinds of request, each with its size test, template, team and stops.
   Default size is a task. The `director` is the only router above a task and

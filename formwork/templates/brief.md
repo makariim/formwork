@@ -59,6 +59,13 @@ This is also the fence. What is listed is what may be touched.
 that may. "Everything else" is not an answer. Name the ones somebody might
 reasonably assume were included.
 
+**When more than one role works**, add a `## Team` table, the role's name first
+in each row. A relabel is the role's name then its title: `visual as art
+director`. A role with no file fails the gate (`roles-named`). A new role is
+drafted in this brief in the five section format of
+`formwork/roles/TEMPLATE.md` and accepted by the person before anybody writes
+it.
+
 ## 3. Must not happen
 
 What is forbidden here. The standing ones always apply:

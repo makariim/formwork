@@ -46,6 +46,7 @@ These do not ask you. They refuse.
 | One brief is open at a time, unless you raise the limit | `formwork/check/checks/work-paired` |
 | Every generated role names the style page | `formwork/check/checks/style-pointed` |
 | Kit files carry no home path, private address, local hostname, email or key | `formwork/check/checks/kit-leak-scan` |
+| A round file or a brief's team row names a real role | `formwork/check/checks/roles-named` |
 | A report opens with a part for the human, under 1,000 words, no commands | `formwork/check/checks/report-shape` |
 
 > [!NOTE]
@@ -173,6 +174,18 @@ rather than describing one that does not exist.
 
 Adding your own is copying `TEMPLATE.md`, filling in five sections and four
 frontmatter fields. A role missing any of them does not load.
+
+**Specialists, cheapest first.** The lead spawns an existing role. If the work
+needs a focus, it relabels one: "`visual` as art director", optionally with a
+skill, with its owns, sections and tools still from its own file. Only when no
+existing `owns` covers the work is a new role written: the director drafts it
+in the brief in the five section format, your go accepts it, a working session
+writes it to `formwork/roles/project/<name>.md` and runs `formwork roles` and
+`formwork check`, and then the lead may spawn it. Never a pasted persona or a
+general agent given a role's text in a prompt: nothing checks its boundary or
+tools. `roles-named` fails a round file or a brief's team row that names no
+real role. Whether a role written mid session can be spawned in the same
+session is NOT ESTABLISHED, so adding one is its own task brief.
 
 **How they talk to you** is one page, [`formwork/style.md`](formwork/style.md),
 pointed at from every generated role. Your own `docs/style.md` overrides it.

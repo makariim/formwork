@@ -127,6 +127,12 @@ itself be the leak. A personal folder written as `~/<word>/` looks like any
 other folder and passes. It skips wiring files, which are partly the project's
 own, and a public address or email that is still personal.
 
+**`roles-named`** fails a round file in `docs/rounds/` or a team row in an
+open brief that names no real role. **It cannot tell whether the right role
+was picked.** It does not read rounds held elsewhere under `docs/`, where
+notes and participant files mix, nor closed briefs, nor a team written as
+prose.
+
 ---
 
 ## The gate gives up

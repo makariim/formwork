@@ -58,6 +58,8 @@ without it.
 
 ## What is decided
 
+- 2026-11-15, **0026 accepted** (committed 6223baf; routing 44 and 45 of 49 on Haiku, about $0.13). His choice ("b, everything is already working, no need to disrupt them now"): continue the kit plan, do not bring routing into his projects yet. **0027** (step 5, roles) started.
+
 - 2026-11-15, **0025 accepted** ("next"; committed eafd01c): routing table, director routes, corrections file, setup writes two lines, personal defaults template. **0026** (measure routing) started.
 
 - 2026-11-15, **0024 accepted** (he fixed the self hit, re-recorded, committed a6240e5; 14 checks green). **0025** (step 3, routing one plain prompt) started.

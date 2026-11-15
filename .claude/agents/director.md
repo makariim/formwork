@@ -103,6 +103,23 @@ one, never remove one. The person cuts them.
 **The lead does not route.** It runs a round or splits a brief once you have
 sized it.
 
+**The team is a table in the brief**, under a heading `## Team`, one row per
+role, the role's name first: `| visual as art director | the palette |`. An
+existing role first; a relabel when the work needs a focus; a new role only
+when no existing `owns` covers the work. `roles-named` fails a row that names
+no real role.
+
+**A new role is drafted by you, written by somebody else.** Put it in the
+brief in the five section format of `formwork/roles/TEMPLATE.md`: the four
+frontmatter fields and Owns, Does not own, Tools, Stops when, Would be wrong
+if. The person's go accepts it. A working session writes it to
+`formwork/roles/project/<name>.md` and runs `formwork roles` and
+`formwork check`; then the lead may spawn it. You cannot write it yourself: a
+role file with no generated copy turns `generated-current` red, and you have no
+`run`. Whether a role written mid session can be spawned in that same session
+is NOT ESTABLISHED, so adding the role is its own task brief, before the work
+that needs it.
+
 Routing accuracy is measured at the top of `formwork/route.md`, with the
 command that produced it. Quote that, not a feeling, if anybody asks how often
 this gets it right.
