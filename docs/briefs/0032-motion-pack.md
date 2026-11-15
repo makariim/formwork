@@ -2,7 +2,7 @@
 brief: 0032
 stream: method
 title: The motion taste pack
-status: open, 2026-11-15
+status: done (accepted 2026-11-15)
 starts: now
 ---
 

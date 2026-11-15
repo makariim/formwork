@@ -45,6 +45,11 @@ piece of work nobody can check.
 Start small. The cost of picking too small is one more turn of the loop. The
 cost of picking too big is work nobody can review, which is worse.
 
+**A task that grows says so.** A brief with no `size:` line is a task. Once
+it passes 12 lines, or its report names more than 5 files changed, the gate
+is red until the brief says the size it has become (`size: checkpoint`) or
+the work is cut back. Stepping up is fine. Stepping up silently is not.
+
 **Task**. You can describe it in a sentence and it touches a file or two.
 
 **Checkpoint**. You need to state what is out of scope. Past a small number of

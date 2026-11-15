@@ -175,6 +175,8 @@ kit.
 
 Tell that a small ask was born large. No check reads intent, so a one line
 request briefed as a round passes every check. The director's rule is the only
-guard: if you cannot tell the size, ask one question.
+guard: if you cannot tell the size, ask one question. The other direction is
+checked: a task that grows past a task while it runs, by the length of its
+brief or the files its report names, fails `task-size` until it says its size.
 
 Know that it routed well on prompts unlike the set in `formwork/evals/routing/prompts.json`. See the top of this page.

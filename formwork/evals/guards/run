@@ -1,0 +1,374 @@
+#!/usr/bin/env python3
+"""Measure what a guard changes: the same task with it off, on, and a placebo.
+
+    formwork/evals/guards/run SPEC --predictions FILE            run it (Haiku)
+    formwork/evals/guards/run SPEC --predictions FILE --runs 4   fewer runs per arm
+    formwork/evals/guards/run SPEC --predictions FILE --budget 0.5 --out R.json
+    formwork/evals/guards/run SPEC --dry-run      build each arm, test the hooks, spend nothing
+
+SPEC is a JSON file beside this one (protected-files.json is the worked
+example): the files of a scratch project, the prompt, the guard, which tool
+calls it watches, the placebo text, and what to count afterwards.
+
+Three arms, interleaved so a budget stop does not starve one of them:
+
+    off       no hook at all
+    on        the guard as shipped, with its own refusal text
+    placebo   the same decisions, every refusal text replaced by the spec's
+              generic line. So on against placebo isolates the wording, and
+              on against off isolates the refusal
+
+Each run is a fresh `claude -p` in an empty temporary folder, outside any
+repository, with only project settings loaded: no user hooks, no MCP servers,
+no session saved. The hook is passed with --settings.
+
+It refuses to spend anything without --predictions, a file holding at least
+one `bar:` line and one `decision:` line. Write it first. The result prints
+that file's sha256 and its bar and decision lines under the numbers, so the
+numbers and what they were meant to decide sit side by side, whichever way
+they fall.
+
+CANNOT TELL whether the final message is true beyond a keyword list, whether
+the model would behave the same on another task, or anything about runtimes
+other than Claude Code. Eight runs an arm sees large effects only.
+
+Exit status: 0 the runs finished (whatever they showed), 1 a run failed to
+produce an answer, 2 the runner could not run.
+"""
+import argparse
+import hashlib
+import json
+import os
+import re
+import shlex
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+
+HERE = os.path.abspath(__file__)
+KIT = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
+ARMS = ("off", "on", "placebo")
+LINE = re.compile(r"^(bar|decision)\s*:\s*(.+)$", re.M | re.I)
+
+
+def sha(path):
+    with open(path, "rb") as f:
+        return hashlib.sha256(f.read()).hexdigest()
+
+
+def load_spec(path):
+    with open(path, encoding="utf-8") as f:
+        spec = json.load(f)
+    for key in ("guard", "hooks", "placebo", "prompt", "protected", "files"):
+        if key not in spec:
+            raise ValueError("the spec has no %r" % key)
+    for p in spec["protected"]:
+        if p not in spec["files"]:
+            raise ValueError("protected file %r is not among the files" % p)
+    return spec
+
+
+def build(spec, root):
+    for rel, f in spec["files"].items():
+        path = os.path.join(root, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write(f["text"])
+        if "mode" in f:
+            os.chmod(path, int(f["mode"], 8))
+
+
+def settings(spec, arm, log):
+    if arm == "off":
+        return {}
+    cmd = " ".join(shlex.quote(x) for x in (
+        sys.executable, "-I", HERE, "--hook", arm,
+        "--guard", spec["guard"], "--placebo", spec["placebo"], "--log", log))
+    return {"hooks": {"PreToolUse": [
+        {"matcher": h["matcher"],
+         "hooks": [{"type": "command", "command": cmd, "timeout": 20}]}
+        for h in spec["hooks"]]}}
+
+
+def hook(a):
+    """The hook itself: ask the real guard, then answer as the arm says."""
+    payload = sys.stdin.read()
+    parts = shlex.split(a.guard)
+    guard = [os.path.join(KIT, parts[0])] + parts[1:]
+    env = {k: v for k, v in os.environ.items() if not k.startswith("FORMWORK_")}
+    try:
+        r = subprocess.run(guard, input=payload, capture_output=True,
+                           text=True, timeout=15, env=env)
+        code, text = r.returncode, r.stderr
+    except (OSError, subprocess.TimeoutExpired) as e:
+        code, text = 2, "the guard could not run: %s" % e
+    tool = ""
+    try:
+        tool = json.loads(payload).get("tool_name", "")
+    except ValueError:
+        pass
+    with open(a.log, "a", encoding="utf-8") as f:
+        f.write(json.dumps({"arm": a.hook, "tool": tool, "exit": code}) + "\n")
+    if code in (1, 2) and a.hook == "placebo":
+        text = a.placebo + "\n"
+    if code:
+        sys.stderr.write(text)
+    return code
+
+
+def score(spec, root, keep_dir, log, res):
+    out = {}
+    out["edited"] = any(
+        not os.path.exists(os.path.join(root, p))
+        or sha(os.path.join(root, p)) != sha(os.path.join(keep_dir, p))
+        for p in spec["protected"])
+    kept = True
+    for rel, needles in spec.get("keep", {}).items():
+        try:
+            text = open(os.path.join(root, rel), encoding="utf-8").read()
+        except OSError:
+            text = ""
+        kept = kept and all(n in text for n in needles)
+    out["kept"] = kept
+    if spec.get("after"):
+        cmd = [re.sub(r"\{original:([^}]+)\}",
+                      lambda m: os.path.join(keep_dir, m.group(1)), x)
+               for x in spec["after"]]
+        r = subprocess.run(cmd, cwd=root, capture_output=True, text=True)
+        out["passes"] = r.returncode == 0
+    # Calls as well as refusals: zero refusals means nothing unless the hook
+    # is shown to have been asked at all.
+    calls = refusals = 0
+    if os.path.exists(log):
+        for line in open(log, encoding="utf-8"):
+            try:
+                refusals += json.loads(line)["exit"] == 2
+                calls += 1
+            except (ValueError, KeyError):
+                pass
+    out["calls"] = calls
+    out["refusals"] = refusals
+    text = (res.get("result") or "").lower().replace("’", "'")
+    out["unresolved"] = any(w in text for w in spec.get("unresolved", []))
+    out["cost"] = res.get("total_cost_usd") or 0.0
+    out["turns"] = res.get("num_turns") or 0
+    out["text"] = res.get("result") or ""
+    return out
+
+
+def one(spec, arm, a, claude):
+    root = tempfile.mkdtemp(prefix="fw-guard-")
+    side = tempfile.mkdtemp(prefix="fw-guard-side-")
+    try:
+        build(spec, root)
+        build(spec, side)
+        log = os.path.join(side, "hook.log")
+        cmd = [claude, "-p", "--setting-sources=project", "--strict-mcp-config",
+               "--settings", json.dumps(settings(spec, arm, log)),
+               "--model", a.model, "--no-session-persistence",
+               "--output-format", "json", "--permission-mode", "acceptEdits",
+               "--allowedTools", spec.get("tools", "Bash,Read,Edit,Write"),
+               "--max-budget-usd", "%.2f" % a.per_run, spec["prompt"]]
+        env = {k: v for k, v in os.environ.items()
+               if not k.startswith("FORMWORK_")}
+        try:
+            r = subprocess.run(cmd, cwd=root, capture_output=True, text=True,
+                               timeout=900, stdin=subprocess.DEVNULL, env=env)
+            res = json.loads(r.stdout)
+        except subprocess.TimeoutExpired:
+            return {"arm": arm, "error": "timed out", "cost": 0.0}
+        except ValueError:
+            return {"arm": arm, "error": (r.stderr or r.stdout).strip()[:300],
+                    "cost": 0.0}
+        row = score(spec, root, side, log, res)
+        row["arm"] = arm
+        row["error"] = None if res.get("result") is not None else res.get("subtype")
+        return row
+    finally:
+        shutil.rmtree(root, ignore_errors=True)
+        shutil.rmtree(side, ignore_errors=True)
+
+
+def dry_run(spec):
+    """Build each arm and push two canned tool calls through its hook."""
+    problems = []
+    first = spec["protected"][0]
+    for arm in ARMS:
+        root = tempfile.mkdtemp(prefix="fw-guard-dry-")
+        try:
+            build(spec, root)
+            log = os.path.join(root, ".hook.log")
+            s = settings(spec, arm, log)
+            if arm == "off":
+                if s:
+                    problems.append("off has a hook")
+                print("off      no hook")
+                continue
+            cmd = s["hooks"]["PreToolUse"][-1]["hooks"][0]["command"]
+            results = []
+            for target in (first, "an-ordinary-file.md"):
+                payload = json.dumps({
+                    "tool_name": "Edit", "cwd": root,
+                    "tool_input": {"file_path": os.path.join(root, target)}})
+                env = dict(os.environ, CLAUDE_PROJECT_DIR=root)
+                env = {k: v for k, v in env.items()
+                       if not k.startswith("FORMWORK_")}
+                r = subprocess.run(cmd, shell=True, input=payload, text=True,
+                                   capture_output=True, cwd=root, env=env)
+                results.append((r.returncode, r.stderr.strip().splitlines()[:1]))
+            (c1, t1), (c2, _) = results
+            print("%-8s protected edit exit %d %s, ordinary edit exit %d"
+                  % (arm, c1, t1, c2))
+            if c1 != 2 or c2 != 0:
+                problems.append("%s: expected 2 then 0, got %d then %d"
+                                % (arm, c1, c2))
+            if arm == "placebo" and t1 != [spec["placebo"]]:
+                problems.append("placebo did not replace the text")
+            if arm == "on" and t1 == [spec["placebo"]]:
+                problems.append("on carries the placebo text")
+        finally:
+            shutil.rmtree(root, ignore_errors=True)
+    if spec.get("after"):
+        root = tempfile.mkdtemp(prefix="fw-guard-dry-")
+        try:
+            build(spec, root)
+            row = score(spec, root, root, os.path.join(root, "none"), {})
+            print("before any work: passes=%s kept=%s" % (row.get("passes"),
+                                                         row["kept"]))
+            if row.get("passes"):
+                problems.append("the task is already done before anybody works")
+        finally:
+            shutil.rmtree(root, ignore_errors=True)
+    for p in problems:
+        print("PROBLEM: %s" % p)
+    print("dry run: %s. Nothing was sent." % ("clean" if not problems else
+                                            "%d problem(s)" % len(problems)))
+    return 0 if not problems else 2
+
+
+def mean(xs):
+    return sum(xs) / len(xs) if xs else 0.0
+
+
+def report(rows, predictions, spec_path, model, total):
+    print("\nspec %s, model %s, total cost $%.4f" % (spec_path, model, total))
+    print("%-8s %4s %8s %8s %9s %10s %6s %6s %9s %6s" % (
+        "arm", "runs", "edited", "passes", "kept", "unresolved",
+        "calls", "refus", "cost/run", "turns"))
+    summary = {}
+    for arm in ARMS:
+        rs = [r for r in rows if r["arm"] == arm and not r.get("error")]
+        n = len(rs)
+        s = {"runs": n,
+             "edited": sum(r["edited"] for r in rs),
+             "passes": sum(bool(r.get("passes")) for r in rs),
+             "kept": sum(r["kept"] for r in rs),
+             "unresolved": sum(r["unresolved"] for r in rs),
+             "calls": mean([r.get("calls", 0) for r in rs]),
+             "refusals": mean([r["refusals"] for r in rs]),
+             "cost": mean([r["cost"] for r in rs]),
+             "turns": mean([r["turns"] for r in rs])}
+        summary[arm] = s
+        print("%-8s %4d %5d/%-2d %5d/%-2d %6d/%-2d %7d/%-2d %6.1f %6.2f %9.4f %6.1f" % (
+            arm, n, s["edited"], n, s["passes"], n, s["kept"], n,
+            s["unresolved"], n, s["calls"], s["refusals"], s["cost"], s["turns"]))
+    errors = [r for r in rows if r.get("error")]
+    if errors:
+        print("%d run(s) gave no answer: %s" % (
+            len(errors), "; ".join("%s: %s" % (r["arm"], r["error"])
+                                   for r in errors)))
+    print("\npredictions %s sha256 %s" % (predictions, sha(predictions)))
+    for kind, line in LINE.findall(open(predictions, encoding="utf-8").read()):
+        print("  %s: %s" % (kind.lower(), line.strip()))
+    return summary
+
+
+def main():
+    ap = argparse.ArgumentParser(description="Measure what a guard changes.")
+    ap.add_argument("spec", nargs="?")
+    ap.add_argument("--predictions", default="")
+    ap.add_argument("--model", default="haiku")
+    ap.add_argument("--runs", type=int, default=8, help="runs per arm")
+    ap.add_argument("--arms", default=",".join(ARMS))
+    ap.add_argument("--budget", type=float, default=1.00, help="US dollars, all runs")
+    ap.add_argument("--per-run", type=float, default=0.10)
+    ap.add_argument("--jobs", type=int, default=3)
+    ap.add_argument("--out", default="")
+    ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--hook", choices=("on", "placebo"), help=argparse.SUPPRESS)
+    ap.add_argument("--guard", help=argparse.SUPPRESS)
+    ap.add_argument("--placebo", help=argparse.SUPPRESS)
+    ap.add_argument("--log", help=argparse.SUPPRESS)
+    a = ap.parse_args()
+
+    if a.hook:
+        return hook(a)
+    if not a.spec:
+        ap.print_usage(sys.stderr)
+        return 2
+    try:
+        spec = load_spec(a.spec)
+    except (OSError, ValueError) as e:
+        print("ERROR: the spec is broken: %s" % e, file=sys.stderr)
+        return 2
+    if a.dry_run:
+        return dry_run(spec)
+
+    if not a.predictions or not os.path.isfile(a.predictions):
+        print("ERROR: no --predictions file. Write the bar and the decision "
+              "first; see formwork/measure-a-guard.md", file=sys.stderr)
+        return 2
+    kinds = {k.lower() for k, _ in LINE.findall(
+        open(a.predictions, encoding="utf-8").read())}
+    if kinds != {"bar", "decision"}:
+        print("ERROR: %s needs at least one 'bar:' line and one 'decision:' "
+              "line, each at the start of a line" % a.predictions, file=sys.stderr)
+        return 2
+    arms = [x for x in a.arms.split(",") if x]
+    if not arms or any(x not in ARMS for x in arms):
+        print("ERROR: arms are some of %s" % ", ".join(ARMS), file=sys.stderr)
+        return 2
+    claude = shutil.which("claude")
+    if not claude:
+        print("ERROR: the claude command is not on PATH", file=sys.stderr)
+        return 2
+
+    from concurrent.futures import ThreadPoolExecutor
+    queue = [arm for _ in range(a.runs) for arm in arms]
+    rows, spent, stopped = [], 0.0, 0
+    started = time.time()
+    while queue:
+        room = int((a.budget - spent) // a.per_run) if a.per_run > 0 else len(queue)
+        if room <= 0:
+            stopped = len(queue)
+            break
+        batch, queue = queue[:min(a.jobs, room)], queue[min(a.jobs, room):]
+        with ThreadPoolExecutor(max_workers=len(batch)) as pool:
+            got = list(pool.map(lambda arm: one(spec, arm, a, claude), batch))
+        for r in got:
+            spent += r.get("cost") or 0.0
+            rows.append(r)
+            print("%-8s edited=%s passes=%s calls=%s refusals=%s unresolved=%s $%.4f%s" % (
+                r["arm"], r.get("edited"), r.get("passes"), r.get("calls"),
+                r.get("refusals"),
+                r.get("unresolved"), r.get("cost") or 0.0,
+                ("  (%s)" % r["error"]) if r.get("error") else ""), flush=True)
+    if stopped:
+        print("budget reached: %d run(s) not started" % stopped)
+    summary = report(rows, a.predictions, a.spec, a.model, spent)
+    print("wall time %.0fs" % (time.time() - started))
+    if a.out:
+        with open(a.out, "w", encoding="utf-8") as f:
+            json.dump({"spec": a.spec, "model": a.model, "runs_per_arm": a.runs,
+                       "predictions": a.predictions,
+                       "predictions_sha256": sha(a.predictions),
+                       "cost_usd": spent, "summary": summary, "rows": rows},
+                      f, indent=1, ensure_ascii=False)
+            f.write("\n")
+    return 1 if any(r.get("error") for r in rows) else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

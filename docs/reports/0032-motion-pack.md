@@ -91,3 +91,6 @@ Nothing staged. `git status --short`:
 - **Done but not asked for.** The Ripping items (see Contradictions). A "How to look at motion" section at the top of the pack, so a reviewer knows to use recordings and reduced motion.
 - **Asked for but not done.** None. `deck` was not pointed to the pack; the brief did not name it, though the Ripping study suggests motion-11 fits there.
 - **Wrong in the brief.** Nothing in the files. The brief's list of Glide items matched the research. The research's motion-8 and motion-9 are the "any others" the brief allowed for.
+
+accepted: 2026-11-15
+in my words: accepted, the motion pack looks good

@@ -235,6 +235,31 @@ owning a design it was created to stay out of.
 
 ---
 
+## A review: review, then refute
+
+When the work is a review (a review round, or reading a change before it is
+accepted), it has two halves, and the second is the one that gets skipped.
+
+**Review.** One reviewer per dimension, all at once, each with its own list of
+what to look at. None reads another's findings first.
+
+**Merge by evidence.** Two findings that point at the same line, screen or
+picture are one finding, with both reviewers named. Merge on the evidence,
+never on the wording: two reviewers describe one fault differently, and one
+reviewer can describe two faults alike.
+
+**Refute.** Every serious finding goes to a verifier who did not raise it,
+with the evidence and nothing else. Its answer is "refuted" unless the
+evidence holds when it looks for itself. A refuted finding stays in the report
+as refuted, with why.
+
+**A missing reviewer makes the review incomplete, never a pass.** A reviewer
+that died, timed out or came back empty is named, with its dimension. Do not
+restart it by reflex (the same rule as a round), and do not report the review
+as clean. The template is `formwork/templates/review-round.md`.
+
+---
+
 ## Running the round
 
 ### Ground yourself, then produce one briefing

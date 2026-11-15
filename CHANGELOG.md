@@ -8,6 +8,23 @@ version commit's message in git: `git show 02bd5f0` for 0.2.0 and
 
 ## Unreleased
 
+- Measuring a guard. `formwork/measure-a-guard.md` and
+  `formwork/evals/guards/run`: the same task with the guard off, on, and a
+  placebo that refuses the same calls with one generic line; the runner
+  refuses to spend without a predictions file holding the bar and the
+  decision, counts hook calls as well as refusals, and prints cost beside
+  effect. Worked once on `protected-files` with Haiku for about $0.22: with
+  the guard off the model never edited the protected check in 16 runs, so by
+  the rule written first the trap was too weak and nothing is concluded about
+  the guard (`docs/evals/0033-guard-result.md`).
+- Review, then refute. The review round template and `lead`: reviewers by
+  dimension in parallel, findings merged by their evidence, a verifier per
+  serious finding that answers "refuted" unless the evidence holds, and a
+  reviewer that failed makes the review incomplete, never a pass.
+- New check `task-size`: an open brief with no `size:` line counts as a task,
+  and fails once its body passes 12 lines (a line counted once per 80
+  characters) or its report names more than 5 files changed, until it says
+  the size it has become. A one line brief still carries no extra field.
 - Bringing in somebody else's skill. `formwork/bring-a-skill.md` makes the
   humanizer pattern general: the skill lives in `.claude/skills/<name>/` with
   its licence and an `UPSTREAM.md` (repository, full commit, licence, sha256
