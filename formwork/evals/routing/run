@@ -1,0 +1,204 @@
+#!/usr/bin/env python3
+"""Measure the routing table: run every prompt in prompts.json through it once.
+
+    formwork/evals/routing/run                  run the whole set (Haiku)
+    formwork/evals/routing/run --model sonnet   another model
+    formwork/evals/routing/run --only f01,a02   some prompts only
+    formwork/evals/routing/run --out FILE.json  keep every answer
+    formwork/evals/routing/run --dry-run        check the set, show the prompt, spend nothing
+
+Each prompt goes to a fresh `claude -p` session in safe mode: no CLAUDE.md, no
+skills, no hooks, no tools, no memory. Its system prompt is what a fresh
+director would read: the stand in `standing.md`, an empty `docs/routing.md`,
+`formwork/route.md`, and the director role. It ends its answer with one JSON
+line naming the kind, size and first step, and that line is scored against
+prompts.json. A prompt passes only when all three match.
+
+CANNOT TELL whether the route said back in words matches the JSON line, or
+whether the brief that would follow is any good. It scores the choice only.
+
+Exit status: 0 every prompt passed, 1 at least one failed or did not answer,
+2 the runner could not run.
+"""
+import argparse
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+from concurrent.futures import ThreadPoolExecutor
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+KIT = os.path.dirname(os.path.dirname(HERE))
+
+ASK = """You are the director, in a fresh session of a project that uses formwork.
+You have just read the files below, in this order. docs/routing.md exists and
+is empty: there are no corrections yet. In this run you cannot read or write
+any file, so do not try. A real session could read the repository: where a
+detail (a library name, a file, a version) would come from reading it, assume
+you will read it after routing, and do not ask for it. The next message is one
+plain prompt a person typed.
+
+Route it, as your role and the routing table say. Say the plan back in one or
+two plain lines. Then end with exactly one line of JSON and nothing after it:
+
+{"kind": K, "size": S, "first": F}
+
+K is one of: %(kinds)s, or "none" when you would ask first.
+S is one of: %(sizes)s, or "none" when you would ask first.
+F is one of: %(firsts)s.
+%(legend)s
+"""
+
+
+def load_set():
+    with open(os.path.join(HERE, "prompts.json"), encoding="utf-8") as f:
+        data = json.load(f)
+    seen = set()
+    for p in data["prompts"]:
+        for field, allowed in (("kind", data["kinds"]), ("size", data["sizes"]),
+                               ("first", list(data["firsts"]))):
+            for v in as_list(p[field]):
+                if v != "*" and v not in allowed:
+                    raise ValueError("%s: %s %r is not in the list" % (p["id"], field, v))
+        if p["id"] in seen:
+            raise ValueError("%s appears twice" % p["id"])
+        seen.add(p["id"])
+    return data
+
+
+def as_list(v):
+    return v if isinstance(v, list) else [v]
+
+
+def system_prompt(data):
+    def read(path):
+        with open(path, encoding="utf-8") as f:
+            return f.read()
+    legend = "\n".join("  %s: %s" % kv for kv in data["firsts"].items())
+    head = ASK % {
+        "kinds": ", ".join('"%s"' % k for k in data["kinds"]),
+        "sizes": ", ".join('"%s"' % s for s in data["sizes"]),
+        "firsts": ", ".join('"%s"' % f for f in data["firsts"]),
+        "legend": legend,
+    }
+    parts = [head]
+    for name, path in (
+        ("docs/standing.md", os.path.join(HERE, "standing.md")),
+        ("docs/routing.md", None),
+        ("formwork/route.md", os.path.join(KIT, "route.md")),
+        ("formwork/roles/method/director.md",
+         os.path.join(KIT, "roles", "method", "director.md")),
+    ):
+        parts.append("===== %s =====\n%s" % (name, read(path) if path else "(empty)"))
+    return "\n\n".join(parts)
+
+
+JSON_LINE = re.compile(r"\{[^{}]*\"kind\"[^{}]*\}")
+
+
+def ask(claude, model, system, prompt, workdir):
+    cmd = [claude, "-p", "--safe-mode", "--model", model, "--tools", "",
+           "--no-session-persistence", "--output-format", "json",
+           "--system-prompt", system, prompt]
+    try:
+        out = subprocess.run(cmd, cwd=workdir, capture_output=True, text=True,
+                             timeout=300)
+    except subprocess.TimeoutExpired:
+        return {"error": "timed out"}
+    try:
+        res = json.loads(out.stdout)
+    except ValueError:
+        return {"error": (out.stderr or out.stdout).strip()[:300]}
+    text = res.get("result", "")
+    found = JSON_LINE.findall(text)
+    route = None
+    if found:
+        try:
+            route = json.loads(found[-1])
+        except ValueError:
+            pass
+    return {"text": text, "route": route, "cost": res.get("total_cost_usd", 0.0),
+            "error": None if route else "no JSON line"}
+
+
+def score(p, route):
+    if not route:
+        return {"kind": False, "size": False, "first": False}
+    got = {}
+    for field in ("kind", "size", "first"):
+        want = as_list(p[field])
+        got[field] = "*" in want or str(route.get(field, "")).strip().lower() in want
+    return got
+
+
+def main():
+    ap = argparse.ArgumentParser(description="Measure formwork/route.md.")
+    ap.add_argument("--model", default="haiku")
+    ap.add_argument("--only", default="")
+    ap.add_argument("--out", default="")
+    ap.add_argument("--jobs", type=int, default=6)
+    ap.add_argument("--dry-run", action="store_true")
+    a = ap.parse_args()
+
+    try:
+        data = load_set()
+    except (OSError, ValueError, KeyError) as e:
+        print("ERROR: the prompt set is broken: %s" % e, file=sys.stderr)
+        return 2
+    prompts = data["prompts"]
+    if a.only:
+        ids = set(a.only.split(","))
+        prompts = [p for p in prompts if p["id"] in ids]
+    system = system_prompt(data)
+    if a.dry_run:
+        print(system)
+        print("\n%d prompt(s), set is valid. Nothing was sent." % len(prompts))
+        return 0
+    claude = shutil.which("claude")
+    if not claude:
+        print("ERROR: the claude command is not on PATH", file=sys.stderr)
+        return 2
+
+    # An empty folder, so nothing in this repository is in the session's reach.
+    with tempfile.TemporaryDirectory() as workdir:
+        with ThreadPoolExecutor(max_workers=max(1, a.jobs)) as pool:
+            answers = list(pool.map(
+                lambda p: ask(claude, a.model, system, p["prompt"], workdir), prompts))
+
+    rows, passed, cost = [], 0, 0.0
+    for p, ans in zip(prompts, answers):
+        s = score(p, ans.get("route"))
+        ok = all(s.values())
+        passed += ok
+        cost += ans.get("cost") or 0.0
+        rows.append({"id": p["id"], "tag": p["tag"], "prompt": p["prompt"],
+                     "want": {f: p[f] for f in ("kind", "size", "first")},
+                     "got": ans.get("route"), "match": s, "pass": ok,
+                     "error": ans.get("error"), "text": ans.get("text", "")})
+
+    for r in rows:
+        mark = "ok  " if r["pass"] else "FAIL"
+        got = r["got"] or {}
+        print("%s %-4s want %-34s got %s%s" % (
+            mark, r["id"],
+            "/".join("|".join(as_list(r["want"][f])) for f in ("kind", "size", "first")),
+            "/".join(str(got.get(f, "?")) for f in ("kind", "size", "first")),
+            ("  (%s)" % r["error"]) if r["error"] else ""))
+    print()
+    for f in ("kind", "size", "first"):
+        print("%s right: %d of %d" % (f, sum(r["match"][f] for r in rows), len(rows)))
+    print("%d of %d routed as expected (model %s, cost $%.4f)" % (
+        passed, len(rows), a.model, cost))
+    if a.out:
+        with open(a.out, "w", encoding="utf-8") as f:
+            json.dump({"model": a.model, "passed": passed, "total": len(rows),
+                       "cost_usd": cost, "rows": rows}, f, indent=1, ensure_ascii=False)
+            f.write("\n")
+    return 0 if passed == len(rows) else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

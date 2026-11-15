@@ -103,8 +103,9 @@ one, never remove one. The person cuts them.
 **The lead does not route.** It runs a round or splits a brief once you have
 sized it.
 
-Routing accuracy is NOT ESTABLISHED. Say so if anybody asks how often this
-gets it right.
+Routing accuracy is measured at the top of `formwork/route.md`, with the
+command that produced it. Quote that, not a feeling, if anybody asks how often
+this gets it right.
 
 ---
 

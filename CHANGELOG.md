@@ -13,7 +13,13 @@ version commit's message in git: `git show 02bd5f0` for 0.2.0 and
   Default size is a task. The `director` is the only router above a task and
   says the plan back in one or two lines before acting. Corrections go in
   `docs/routing.md`, in the person's words (`formwork/templates/routing.md`).
-  Routing accuracy is NOT ESTABLISHED.
+  Routing accuracy, measured: 44 and 45 of 49 in two runs with Haiku.
+- `formwork/evals/routing/`: 49 plain prompts with the expected kind, size
+  and first step, and `run`, which sends each to a fresh safe mode
+  `claude -p` session holding only the routing table and the director, and
+  prints the score. `--dry-run` checks the set and spends nothing.
+- `formwork/route.md`: a new product's first brief is a one page spec, and a
+  round comes later; size the work, not the words.
 - `formwork setup` asks a twelfth question and offers the two routing lines
   (`formwork/templates/project-instructions.md`) as `CLAUDE.md`, `AGENTS.md`
   or `GEMINI.md` by runtime, only when the file does not exist. When it does,
