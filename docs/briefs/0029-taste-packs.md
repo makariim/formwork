@@ -2,7 +2,7 @@
 brief: 0029
 stream: method
 title: Taste packs
-status: open, 2026-11-15
+status: done (accepted 2026-11-15)
 starts: now
 ---
 

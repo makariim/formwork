@@ -8,14 +8,15 @@ Two of the three numbers below are measured. The most important one is not.
 
 ```
 $ /usr/bin/time -p formwork/fw check
-real 4.76
-real 4.88
-real 5.29
+real 17.57
+real 7.08
+real 13.62
 ```
 
-About five seconds on this repository, over three runs. That is one
-run of all fourteen checks over 310 files, including the fixtures each check is tried
-against. It runs at the end of
+Between seven and eighteen seconds on this repository, over three runs on
+2026-11-15, on a machine doing other work. The spread is the machine, not the
+gate. That is one run of all seventeen checks over 409 files, including the
+fixtures each check is tried against. It runs at the end of
 every turn in which something changed.
 
 **What would make that wrong:** it scales with how many files you have, and with
@@ -25,11 +26,11 @@ this line.
 ## What the kit adds to your repository. Measured
 
 ```
-$ find formwork -type f | wc -l
-310
+$ find formwork -type f -not -path '*/__pycache__/*' | wc -l
+409
 ```
 
-310 files. Plain text and a few small programs. Python 3, standard library only,
+409 files. Plain text and a few small programs. Python 3, standard library only,
 no dependencies of any kind. It costs nothing to carry and nothing to install.
 
 ---

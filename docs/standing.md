@@ -58,6 +58,10 @@ without it.
 
 ## What is decided
 
+- 2026-11-15, **0030 resumed with the protected files guard on warn, for this brief only** (his words: "warn for 0030"), after it stopped at the guard: the hidden unicode check was built; the linked file fix to the guard, its tests and the docs remained. Every protected change still shows in kit-integrity for his review before he re-records.
+
+- 2026-11-15, **0029 accepted**: taste packs (screens, web, deck, iOS); the seven step plan from 0022 is complete. **0030** (ECC ideas 5 and 6: linked protected files and hidden unicode) started; ideas 1 and 2 follow.
+
 - 2026-11-15, **0028 accepted** (committed 4d9f211, 16 checks green): six optional templates, phases as streams, checked gates. His choice on the ECC study (`docs/research/ecc-ideas.md`): "c, go": step 7 taste packs first, then ECC ideas 1 (measure a guard with arms), 2 (review then refute), 5 (linked protected files), 6 (hidden unicode) as small steps. **0029** (taste packs) started.
 
 - 2026-11-15, **0027 accepted** (committed 9b9ae53, 15 checks green): relabel first, new project roles by brief, the roles-named check. **0028** (step 6, optional templates and gates) started.

@@ -1,0 +1,217 @@
+#!/usr/bin/env python3
+"""Check: kit files carry no characters a reader cannot see.
+
+    hidden-unicode <directory>
+
+A role file or a rule file is read by an agent as instructions. A character
+that takes up no space on screen, or one that reverses the order text is
+shown in, lets a file say one thing to the person reviewing it and another to
+the model reading it. Every copy of the kit carries whatever is in it.
+
+It reads the same files as kit-leak-scan: `formwork/`, `formwork_cli/`,
+`FORMWORK.md`, and the role files the generator writes into a project (the
+ones marked GENERATED FROM). A project's own documents are not read.
+
+CATCHES  Zero width characters: zero width space, non-joiner and joiner, word
+         joiner, the invisible maths operators, the Mongolian vowel separator,
+         and a byte order mark anywhere but the very start of a file.
+         Bidirectional controls: the embeddings, overrides and isolates, the
+         left-to-right and right-to-left marks, and the Arabic letter mark.
+         Tag characters (U+E0000 to U+E007F), which spell out plain letters
+         that no screen shows. A run of them on one line is one hit, with
+         its length, so a hidden sentence does not flood the report.
+
+         Each hit is named with its file, line, column and code point, never
+         printed raw, so the report itself hides nothing.
+
+CANNOT TELL
+
+Whether a hit is harmful. A right-to-left mark is ordinary in Arabic or
+Hebrew text. The kit is written in English, so any hit is refused; a fork
+written in such a language will need its own exemptions.
+
+Look-alike letters. A Cyrillic "a" in place of a Latin one is visible, only
+misleading, and is not caught.
+
+Joiners inside emoji. A family emoji is built with zero width joiners and is
+refused like any other. Variation selectors, which give an emoji its colour,
+are left alone.
+
+Files that are not UTF-8 text. Binary files are skipped, and bytes that do not
+decode are not examined.
+
+Wiring files (.claude/settings.json and the like), for the same reason as
+kit-leak-scan: they are partly the project's own.
+
+Exit status:
+    0   no kit file carries any of the characters above, or there is no kit
+    1   at least one does, and each hit is named
+    2   the check could not run
+"""
+import os
+import sys
+
+KIT_DIRS = ("formwork", "formwork_cli")
+KIT_FILES = ("FORMWORK.md",)
+GENERATED_TREES = (
+    os.path.join(".claude", "agents"),
+    os.path.join(".gemini", "agents"),
+    os.path.join(".codex", "agents"),
+)
+GENERATED = "GENERATED FROM"
+SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv"}
+
+ZERO_WIDTH = {
+    0x200B: "zero width space",
+    0x200C: "zero width non-joiner",
+    0x200D: "zero width joiner",
+    0x2060: "word joiner",
+    0x2061: "invisible function application",
+    0x2062: "invisible times",
+    0x2063: "invisible separator",
+    0x2064: "invisible plus",
+    0x180E: "Mongolian vowel separator",
+    0xFEFF: "byte order mark inside the text",
+}
+BIDI = {
+    0x200E: "left-to-right mark",
+    0x200F: "right-to-left mark",
+    0x061C: "Arabic letter mark",
+    0x202A: "left-to-right embedding",
+    0x202B: "right-to-left embedding",
+    0x202C: "pop directional formatting",
+    0x202D: "left-to-right override",
+    0x202E: "right-to-left override",
+    0x2066: "left-to-right isolate",
+    0x2067: "right-to-left isolate",
+    0x2068: "first strong isolate",
+    0x2069: "pop directional isolate",
+}
+
+
+def name_of(cp):
+    if cp in ZERO_WIDTH:
+        return ZERO_WIDTH[cp]
+    if cp in BIDI:
+        return BIDI[cp]
+    if 0xE0000 <= cp <= 0xE007F:
+        return "tag character"
+    return None
+
+
+def excluded_paths(root):
+    """Paths the runner has told this check to stay out of, like the fixtures."""
+    out = []
+    for p in os.environ.get("FORMWORK_EXCLUDE", "").split(os.pathsep):
+        if p:
+            out.append(os.path.realpath(p if os.path.isabs(p)
+                                        else os.path.join(root, p)))
+    return out
+
+
+def is_excluded(path, excludes):
+    a = os.path.realpath(path)
+    return any(a == e or a.startswith(e + os.sep) for e in excludes)
+
+
+def walk(d, excludes):
+    for base, dirs, files in os.walk(d):
+        dirs[:] = sorted(x for x in dirs if x not in SKIP_DIRS
+                         and not is_excluded(os.path.join(base, x), excludes))
+        for fn in sorted(files):
+            full = os.path.join(base, fn)
+            if not is_excluded(full, excludes):
+                yield full
+
+
+def kit_files(root):
+    """Every kit file, and whether it must carry the generated marker."""
+    excludes = excluded_paths(root)
+    for d in KIT_DIRS:
+        full = os.path.join(root, d)
+        if os.path.isdir(full) and not is_excluded(full, excludes):
+            for f in walk(full, excludes):
+                yield f, False
+    for f in KIT_FILES:
+        full = os.path.join(root, f)
+        if os.path.isfile(full) and not is_excluded(full, excludes):
+            yield full, False
+    for t in GENERATED_TREES:
+        full = os.path.join(root, t)
+        if os.path.isdir(full) and not is_excluded(full, excludes):
+            for f in walk(full, excludes):
+                yield f, True
+
+
+def hits_in(text):
+    out = []
+    for n, line in enumerate(text.split("\n"), 1):
+        run = None                   # [line, column, first code point, length]
+        for col, ch in enumerate(line, 1):
+            cp = ord(ch)
+            # A byte order mark as the first character is an encoding marker.
+            if cp == 0xFEFF and n == 1 and col == 1:
+                continue
+            what = name_of(cp)
+            # Tag characters spell whole words, so a run is one hit, not one per letter.
+            if what == "tag character":
+                if run is None:
+                    run = [n, col, cp, 0]
+                    out.append(run)
+                run[3] += 1
+                continue
+            run = None
+            if what:
+                out.append((n, col, cp, what))
+    return [h if isinstance(h, tuple) else
+            (h[0], h[1], h[2], "tag character" if h[3] == 1
+             else "run of %d tag characters" % h[3]) for h in out]
+
+
+def main(argv):
+    args = [a for a in argv[1:] if not a.startswith("--")]
+    if not args:
+        print("usage: hidden-unicode <directory>", file=sys.stderr)
+        return 2
+    root = args[0]
+    if not os.path.isdir(root):
+        print("ERROR: not a directory: %s" % root, file=sys.stderr)
+        return 2
+
+    findings, read = [], 0
+    for full, needs_marker in kit_files(root):
+        try:
+            with open(full, "rb") as fh:
+                data = fh.read()
+        except OSError as e:
+            print("ERROR: cannot read %s: %s" % (full, e), file=sys.stderr)
+            return 2
+        if b"\0" in data[:8192]:
+            continue
+        text = data.decode("utf-8", errors="replace")
+        if needs_marker and GENERATED not in text:
+            continue
+        read += 1
+        rel = os.path.relpath(full, root).replace("\n", "\\n")
+        for n, col, cp, what in hits_in(text):
+            findings.append((rel, n, col, cp, what))
+
+    if not read:
+        print("no kit files here, nothing to scan")
+        return 0
+
+    if findings:
+        print("%d hidden character(s) in kit files" % len(findings))
+        for rel, n, col, cp, what in findings[:20]:
+            print("  %s:%d:%d  U+%04X %s" % (rel, n, col, cp, what))
+        if len(findings) > 20:
+            print("  and %d more" % (len(findings) - 20))
+        print("  Delete each one. A reader cannot see it, and a model reads it.")
+        return 1
+
+    print("%d kit file(s) read, no hidden characters" % read)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))
