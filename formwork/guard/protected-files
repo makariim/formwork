@@ -242,7 +242,74 @@ def inside_project(absolute):
 
 
 def is_protected(path, holder=False):
-    """Which protected thing this path is, or None.
+    """Which protected thing this path is, or None, following links.
+
+    A name check alone let a link walk past: `ln -s formwork/guard/x notes`
+    and then editing `notes` wrote the guard under a name nobody protects.
+    """
+    hit = named_protected(path, holder)
+    if hit or not path:
+        return hit
+    p = path.strip().strip("'\"")
+    if any(ch in p for ch in "*?["):
+        return None
+    return linked_protected(os.path.abspath(os.path.expanduser(p)), holder)
+
+
+def linked_protected(absolute, holder=False):
+    """The protected file this path reaches through a link, or None.
+
+    Two shapes. A symbolic link anywhere along the path is followed to where it
+    lands, and that path is asked again. A file with more than one hard link is
+    the same bytes as every other link, so it is compared by inode with each
+    protected file. Directories are skipped: they always have several links.
+    """
+    try:
+        real = os.path.realpath(absolute)
+    except OSError:
+        return None
+    if real != absolute:
+        hit = named_protected(real, holder)
+        if hit:
+            return "%s (reached through a symbolic link)" % hit
+    try:
+        st = os.stat(real)
+    except OSError:
+        return None
+    if not os.path.isfile(real) or st.st_nlink < 2:
+        return None
+    for prefix, candidate in protected_files():
+        try:
+            other = os.stat(candidate)
+        except OSError:
+            continue
+        if (other.st_dev, other.st_ino) == (st.st_dev, st.st_ino):
+            return "%s (the same file through a hard link)" % prefix
+    return None
+
+
+def protected_files():
+    """(entry, path) for every protected file that exists on this machine."""
+    roots = [(prefix, os.path.join(PROJECT, *prefix.rstrip("/").split("/")))
+             for prefix in PROTECTED]
+    home = os.path.expanduser("~")
+    for h in PROTECTED_HOME:
+        roots.append((h, os.path.join(home, *h.split("/"))))
+    if STATE_DIR:
+        state = os.path.abspath(os.path.expanduser(STATE_DIR))
+        for h in PROTECTED_HOME:
+            roots.append((h, os.path.join(state, os.path.basename(h))))
+    for prefix, top in roots:
+        if os.path.isfile(top):
+            yield prefix, top
+        elif os.path.isdir(top):
+            for base, dirs, files in os.walk(top):
+                for fn in files:
+                    yield prefix, os.path.join(base, fn)
+
+
+def named_protected(path, holder=False):
+    """Which protected thing this path is by its name, or None.
 
     A path that does not exist yet is not protected. Disarming means altering
     or removing enforcement that is already there — creating a new guard or a

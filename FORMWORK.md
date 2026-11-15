@@ -47,6 +47,7 @@ These do not ask you. They refuse.
 | An open brief with a `starts:` gate does not run before the gate is met | `formwork/check/checks/gates` |
 | Every generated role names the style page | `formwork/check/checks/style-pointed` |
 | Kit files carry no home path, private address, local hostname, email or key | `formwork/check/checks/kit-leak-scan` |
+| Kit files carry no character a reader cannot see | `formwork/check/checks/hidden-unicode` |
 | A round file or a brief's team row names a real role | `formwork/check/checks/roles-named` |
 | A report opens with a part for the human, under 1,000 words, no commands | `formwork/check/checks/report-shape` |
 

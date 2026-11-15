@@ -345,6 +345,44 @@ def main():
               "nice -n 5 ls", "bash -c 'echo hi'"]:
         expect(c, ALLOW, command=c)
 
+    print("LINKS: a protected file reached under another name (0030)")
+    with tempfile.TemporaryDirectory(prefix="formwork-links-") as project:
+        guard_dir = os.path.join(project, "formwork", "guard")
+        os.makedirs(guard_dir)
+        target = os.path.join(guard_dir, "a-guard")
+        with open(target, "w") as f:
+            f.write("guard\n")
+        notes = os.path.join(project, "docs")
+        os.makedirs(notes)
+        os.symlink(target, os.path.join(notes, "soft.md"))
+        os.link(target, os.path.join(notes, "hard.md"))
+        os.symlink(guard_dir, os.path.join(project, "g"))
+        with open(os.path.join(notes, "plain.md"), "w") as f:
+            f.write("ordinary\n")
+        with open(os.path.join(notes, "own.md"), "w") as f:
+            f.write("ordinary\n")
+        os.link(os.path.join(notes, "own.md"), os.path.join(notes, "own2.md"))
+        os.symlink(os.path.join(notes, "plain.md"), os.path.join(notes, "alias.md"))
+        for label, rel in [("symbolic link to a guard", "docs/soft.md"),
+                           ("hard link to a guard", "docs/hard.md"),
+                           ("guard through a linked folder", "g/a-guard")]:
+            expect("edit " + label, REFUSE, path=rel, project=project)
+            expect("edit " + label + " (absolute)", REFUSE,
+                   path=os.path.join(project, rel), project=project)
+        expect("write through a symbolic link", REFUSE,
+               command="echo x > docs/soft.md", project=project)
+        expect("sed in place on a hard link", REFUSE,
+               command="sed -i s/a/b/ docs/hard.md", project=project)
+        expect("warn: hard link to a guard", WARN, path="docs/hard.md",
+               project=project, level="warn")
+        for label, rel in [("ordinary file", "docs/plain.md"),
+                           ("hard links between ordinary files", "docs/own2.md"),
+                           ("symbolic link to an ordinary file", "docs/alias.md"),
+                           ("new file in a linked guard folder", "g/new-guard")]:
+            expect("edit " + label, ALLOW, path=rel, project=project)
+        expect("read through a symbolic link", ALLOW,
+               command="cat docs/soft.md", project=project)
+
     print()
     print("%d of %d behaved as specified." % (sum(results), len(results)))
     return 0 if all(results) else 1

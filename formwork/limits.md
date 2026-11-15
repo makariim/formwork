@@ -46,10 +46,15 @@ Closed during the audit: writing through a pipe, `chmod` in every spelling,
 deleting or moving the folder that holds the guards, re-recording the integrity
 fingerprints, hiding a path inside a here-document.
 
+Closed since: a symbolic link to a protected file, or to the folder holding one,
+and a hard link that shares a protected file's bytes. The guard follows the
+link and asks about where it lands. **The cost:** deleting a link to a guard is
+refused too, though it would leave the guard in place. A hard link is found by
+comparing it with every file the guard protects, so a file the guard does not
+list is never compared.
+
 **Still open:** everything in the list above, for the same reason. Plus:
 
-- **Symbolic and hard links.** A link to a protected file is a different path,
-  and the guard compares paths.
 - **A long-running program.** Approved once, then doing whatever it likes.
 
 ---
@@ -126,6 +131,12 @@ plain words**, and catching that would take a list of real names, which would
 itself be the leak. A personal folder written as `~/<word>/` looks like any
 other folder and passes. It skips wiring files, which are partly the project's
 own, and a public address or email that is still personal.
+
+**`hidden-unicode`** refuses zero width, bidirectional control and tag
+characters in kit files. **It cannot tell a harmful one from an ordinary one**:
+a right-to-left mark is normal in Arabic text, and the kit refuses it anyway.
+It does not catch look-alike letters, such as a Cyrillic letter in place of a
+Latin one, and it refuses the joiners inside a family emoji.
 
 **`roles-named`** fails a round file in `docs/rounds/` or a team row in an
 open brief that names no real role. **It cannot tell whether the right role

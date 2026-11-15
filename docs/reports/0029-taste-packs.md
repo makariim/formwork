@@ -76,3 +76,6 @@ All quotes came through a fetch tool that summarises with a small model. They we
 - Fingerprints: his to re-record after review if needed (the gate is green now).
 - Brief left `open` until the read-back.
 - No other repository touched. No git writes. `docs/standing.md` not edited beyond what was already in the tree.
+
+accepted: 2026-11-15
+in my words: next, he re-recorded the fingerprints and committed the taste packs

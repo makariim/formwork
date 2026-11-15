@@ -29,7 +29,7 @@ A small program that reads your project and says green or red. Checks look at
 what is there. Guards stop what is about to happen.
 
 **The gate**, also called **the aggregate**
-All sixteen checks, run together, with one answer at the end. Green or red.
+All seventeen checks, run together, with one answer at the end. Green or red.
 
 You will see the word aggregate in a refusal: *the aggregate is red, so this
 turn cannot conclude*. It means the same thing.
@@ -120,7 +120,11 @@ enforced by a guard, not by asking nicely.
 
 **Self-protection**
 The rule that your agent cannot quietly change the kit's own files. The guards,
-the checks and the settings.
+the checks and the settings. A link to one of them counts as the file itself.
+
+**Link**
+A second name for a file. A symbolic link points at another path. A hard link
+is the same file under another name, so writing either one writes both.
 
 **Strength**
 How hard a guard bites. Three settings: `block` refuses, `warn` lets it through
@@ -147,6 +151,11 @@ must reject, and one it must accept.
 **Must-fail** and **must-pass**
 Those two kinds. A check has to tell them apart. Being able to complain is not
 enough.
+
+**Hidden character**
+A character that takes no space on screen, or that turns text round, so a file
+shows a person one thing and tells a model another. `hidden-unicode` refuses
+them in kit files.
 
 **Green** and **red**
 Green means every check passed. Red means at least one found something and
