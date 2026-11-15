@@ -6,7 +6,16 @@
 A round lives in docs/rounds/<name>/ and holds one file per participant. The
 challenger's file is predictions.md.
 
+Projects also hold rounds elsewhere under docs/, beside the work they argue:
+docs/research/, docs/design/, docs/review/round-1/ and so on. Any folder under
+docs/ that holds a predictions file or a challenge file is read as a round too.
+A predictions file is predictions.md or <anything>-predictions.md. A challenge
+file is challenge.md or challenger.md. A challenge file with a heading that
+starts "Predictions" carries its predictions inside it, and counts.
+
 CATCHES  A round whose predictions were written afterwards, or not at all.
+         Outside docs/rounds/, that is a folder where a challenger wrote and
+         no predictions are on record.
 
          An objection composed after reading somebody's work is shaped by that
          work — you find whichever weakness the text put in front of you. A
@@ -29,30 +38,94 @@ The second is reported as a warning rather than treated as proof. Nothing here
 can prove when somebody thought something; what it can do is make the absence
 impossible to miss.
 
+CANNOT TELL  A round outside docs/rounds/ that has no challenge file and no
+         predictions file. It looks like any folder of notes. Nor whether a
+         file called challenge.md is a challenger's work. Predictions kept
+         inside the challenge file cannot be dated apart from it, so that
+         case is a warning, never proof of order.
+
 Exit status:
     0   every round has predictions, written first as far as can be told
     1   a round has reports and no predictions
     2   the check could not run
 """
 import os
+import re
 import sys
 
+DOCS = "docs"
 ROUNDS = os.path.join("docs", "rounds")
 PREDICTIONS = "predictions.md"
+CHALLENGE = {"challenge.md", "challenger.md"}
+PREDICTIONS_HEADING = re.compile(r"^#{1,6}\s+predictions\b", re.M | re.I)
 # brief.md is the human's input, written before anybody works. Counting it as
 # a participant report meant every correctly-run round warned about itself.
 SKIP = {"README.md", "round.md", "index.md", "brief.md"}
 
 
-def rounds(root):
-    base = os.path.join(root, ROUNDS)
-    if not os.path.isdir(base):
-        return None
+# Paths the runner has told this check to stay out of. Resolved against the
+# directory being checked, the same as the other checks.
+def excluded_paths(root):
     out = []
-    for name in sorted(os.listdir(base)):
-        d = os.path.join(base, name)
-        if os.path.isdir(d):
-            out.append((name, d))
+    for p in os.environ.get("FORMWORK_EXCLUDE", "").split(os.pathsep):
+        if not p:
+            continue
+        out.append(os.path.realpath(p if os.path.isabs(p)
+                                    else os.path.join(root, p)))
+    return out
+
+
+def is_excluded(path, excludes):
+    a = os.path.realpath(path)
+    return any(a == e or a.startswith(e + os.sep) for e in excludes)
+
+
+def is_predictions(fn):
+    return fn == PREDICTIONS or fn.endswith("-" + PREDICTIONS)
+
+
+def has_predictions_heading(path):
+    try:
+        text = open(path, encoding="utf-8", errors="replace").read()
+    except OSError:
+        return False
+    return bool(PREDICTIONS_HEADING.search(text))
+
+
+def rounds(root):
+    """Every round, as (name, folder, needs_round_folder).
+
+    docs/rounds/<name>/ is a round by where it sits. Anywhere else under docs/
+    a folder is a round only when a predictions or challenge file says so.
+    Projects kept their rounds in docs/research/ and docs/design/, and this
+    check used to look only in docs/rounds/ and print clean over nothing.
+    """
+    out = []
+    base = os.path.join(root, ROUNDS)
+    have_rounds = os.path.isdir(base)
+    if have_rounds:
+        for name in sorted(os.listdir(base)):
+            d = os.path.join(base, name)
+            if os.path.isdir(d):
+                out.append((os.path.join(ROUNDS, name), d))
+
+    docs = os.path.join(root, DOCS)
+    excludes = excluded_paths(root)
+    if os.path.isdir(docs):
+        for d, dirs, files in os.walk(docs):
+            dirs.sort()
+            rel = os.path.relpath(d, root)
+            if rel == ROUNDS or rel.startswith(ROUNDS + os.sep):
+                dirs[:] = []
+                continue
+            if is_excluded(d, excludes):
+                dirs[:] = []
+                continue
+            names = set(files)
+            if any(is_predictions(f) for f in names) or names & CHALLENGE:
+                out.append((rel, d))
+    if not have_rounds and not out:
+        return None
     return out
 
 
@@ -68,7 +141,8 @@ def main(argv):
 
     found = rounds(root)
     if found is None:
-        print("no %s directory, no rounds to check" % ROUNDS)
+        print("no %s directory and no predictions or challenge file under "
+              "%s, no rounds to check" % (ROUNDS, DOCS))
         return 0
     if not found:
         print("no rounds recorded yet")
@@ -81,25 +155,32 @@ def main(argv):
     for name, d in found:
         files = [f for f in sorted(os.listdir(d))
                  if f.endswith(".md") and f not in SKIP]
-        reports = [f for f in files if f != PREDICTIONS]
+        preds = [f for f in files if is_predictions(f)]
+        reports = [f for f in files if not is_predictions(f)]
         if not reports:
             continue                      # nothing was argued yet
         checked += 1
 
-        predictions = os.path.join(d, PREDICTIONS)
-        if not os.path.exists(predictions):
+        if not preds:
+            inside = [f for f in files if f in CHALLENGE
+                      and has_predictions_heading(os.path.join(d, f))]
+            if inside:
+                warnings.append("%s: predictions are inside %s, so nothing "
+                                "can tell whether they came first"
+                                % (name, inside[0]))
+                continue
             problems.append("%s — has %d report(s) and no %s"
                             % (name, len(reports), PREDICTIONS))
             continue
 
         try:
-            when = os.path.getmtime(predictions)
+            when = min(os.path.getmtime(os.path.join(d, p)) for p in preds)
             earliest = min(os.path.getmtime(os.path.join(d, r)) for r in reports)
         except OSError:
             continue
         if when > earliest:
             warnings.append("%s — %s is newer than the earliest report"
-                            % (name, PREDICTIONS))
+                            % (name, preds[0]))
 
     if problems:
         print("%d round(s) argued without predictions, of %d checked"

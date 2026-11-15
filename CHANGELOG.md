@@ -8,6 +8,17 @@ version commit's message in git: `git show 02bd5f0` for 0.2.0 and
 
 ## Unreleased
 
+- `predictions-first` reads rounds outside `docs/rounds/`: any folder under
+  `docs/` with a predictions file (`predictions.md`, `*-predictions.md`) or a
+  challenge file (`challenge.md`, `challenger.md`). A challenge file with no
+  predictions on record fails. Predictions under a heading inside the
+  challenge file pass with a warning.
+- `standing-current` compares the standing brief with dated briefs and
+  reports (`date:`, `updated:`, `accepted:`), and fails a "What is next" that
+  names a brief marked done or dropped.
+- `open_briefs_per = "stream"` under `[strength]` makes `open_briefs` the
+  limit for each stream, read from a brief's `stream:` or `**Stream:**` line.
+- `formwork/COSTS.md` counts thirteen checks, not twelve.
 - `protected-files` checks Codex `apply_patch` headers, including patches fed
   through shell arguments, wrappers, pipes, and heredocs, before a guarded
   file can be changed. It reads Codex's whitespace forms and refuses an

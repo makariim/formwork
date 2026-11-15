@@ -15,6 +15,19 @@ CATCHES  A standing brief left behind. A decision was recorded on Tuesday, the
          Also a template copied and never filled in, which reads like a
          standing brief and carries no state at all.
 
+         Also a standing brief that has fallen behind the work. A brief or
+         report dated after it (by `date:`, `updated:` or the read-back's
+         `accepted:`), and a "What is next" that names a brief already
+         marked done or dropped. Projects ran five briefs past a standing
+         brief that still said "then brief 0001", and this check said it was
+         ahead of all 0 records.
+
+Briefs and reports with no date are not compared, and the success line
+counts them, so a project whose work carries no dates is not shown as current
+over nothing. A "What is next" that names a finished brief only as history
+("building on brief 0003") is refused too: name it without the word "brief",
+or say it in "Where we are now".
+
 What it cannot do is tell whether what you wrote is true. Nothing can. It
 checks the date, the headings and the empty bullets, and those are enough to
 catch the way this file actually fails.
@@ -36,6 +49,15 @@ import sys
 STANDING = os.path.join("docs", "standing.md")
 DECISIONS = os.path.join("docs", "decisions")
 ROUNDS = os.path.join("docs", "rounds")
+BRIEFS = os.path.join("docs", "briefs")
+REPORTS = os.path.join("docs", "reports")
+NUMBERED = re.compile(r"^(\d{1,6})[-_]")
+# The read-back's date, the moment the human accepted a piece of work.
+ACCEPTED = re.compile(r"^accepted\s*:\s*(\d{4})-(\d{2})-(\d{2})", re.M | re.I)
+STATUS = re.compile(r"^status\s*:\s*[\"']?([a-z]+)", re.M | re.I)
+# A brief named in prose: "brief 0001", "briefs 0004", "docs/briefs/0007-x.md".
+NAMED_BRIEF = re.compile(r"\bbriefs?\s+(\d{1,6})\b|briefs/(\d{1,6})[-_]",
+                         re.I)
 
 DATE = re.compile(r"^\s*(?:updated|date)\s*:\s*[\"']?(\d{4})-(\d{2})-(\d{2})",
                   re.M | re.I)
@@ -132,6 +154,34 @@ def record_files(root):
                     continue
                 out.append(os.path.relpath(full, root))
     return sorted(out)
+
+
+def work_files(root):
+    """Numbered briefs and reports, as {number: relative path} per folder."""
+    excludes = excluded_paths(root)
+    out = {}
+    for sub in (BRIEFS, REPORTS):
+        found = {}
+        d = os.path.join(root, sub)
+        if os.path.isdir(d) and not is_excluded(d, excludes):
+            for fn in sorted(os.listdir(d)):
+                full = os.path.join(d, fn)
+                m = NUMBERED.match(fn)
+                if (not m or not fn.endswith(".md") or not os.path.isfile(full)
+                        or is_excluded(full, excludes)):
+                    continue
+                found.setdefault(int(m.group(1)), os.path.join(sub, fn))
+        out[sub] = found
+    return out
+
+
+def latest_date(body):
+    """The latest of the dates a brief or report states about itself."""
+    text = without_fences(body)
+    dates = [as_date(m) for m in DATE.finditer(text)]
+    dates += [as_date(m) for m in ACCEPTED.finditer(text)]
+    dates = [d for d in dates if d is not None]
+    return max(dates) if dates else None
 
 
 def sections(text):
@@ -240,6 +290,44 @@ def main(argv):
                                 "so it does not know about this one"
                                 % (rel, when, updated))
 
+    # Behind the work: briefs and reports dated after it.
+    work = work_files(root)
+    dated = undated = 0
+    for sub in (BRIEFS, REPORTS):
+        for n, rel in sorted(work[sub].items()):
+            try:
+                body = read(os.path.join(root, rel))
+            except OSError as e:
+                print("ERROR: cannot read %s: %s" % (rel, e), file=sys.stderr)
+                return 2
+            when = latest_date(body)
+            if when is None:
+                undated += 1
+                continue
+            dated += 1
+            if updated is not None and when > updated:
+                problems.append("%s is dated %s. The standing brief says %s, "
+                                "so it does not know about this one"
+                                % (rel, when, updated))
+
+    # Behind the work: "what is next" names a brief that is already finished.
+    nxt = bodies.get("what is next", "")
+    named = sorted({int(a or b) for a, b in NAMED_BRIEF.findall(nxt)})
+    for n in named:
+        rel = work[BRIEFS].get(n)
+        if not rel:
+            continue
+        try:
+            sm = STATUS.search(read(os.path.join(root, rel)))
+        except OSError as e:
+            print("ERROR: cannot read %s: %s" % (rel, e), file=sys.stderr)
+            return 2
+        status = sm.group(1).lower() if sm else ""
+        if status in ("done", "dropped"):
+            problems.append("%s: 'What is next' names brief %04d, and %s says "
+                            "%s. The standing brief has fallen behind the work"
+                            % (STANDING, n, rel, status))
+
     if problems:
         print("%d problem(s) with the standing brief" % len(problems))
         for p in problems:
@@ -247,8 +335,13 @@ def main(argv):
         return 1
 
     n = len(record_files(root))
-    print("standing brief filled in, dated %s, ahead of all %d record(s)"
-          % (updated, n))
+    tail = ""
+    if dated or undated:
+        tail = ", and of %d dated brief(s) and report(s)" % dated
+        if undated:
+            tail += "; %d undated one(s) not compared" % undated
+    print("standing brief filled in, dated %s, ahead of all %d record(s)%s"
+          % (updated, n, tail))
     return 0
 
 

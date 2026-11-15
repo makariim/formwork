@@ -125,13 +125,14 @@ protect_files = "block"          # block | warn | off
 aggregate_gate = "block"         # the turn-end gate
 gate_budget = 3                  # refusals before it stands aside
 open_briefs = 1                  # briefs open at once, 0 for no limit
+open_briefs_per = "project"      # project | stream: the limit for each stream
 read_back_words = 5              # words after "in my words:", 0 for none
 ```
 
 `[bindings]` is your setup. `[strength]` tunes how hard the enforced guards
 bite. There is no third section: see above.
 
-**The last four lines appear only once you change them.** They have working
+**The last five lines appear only once you change them.** They have working
 defaults, so a fresh file is shorter than this.
 
 **You do not have to write any of it by hand.** `formwork setup` asks a few

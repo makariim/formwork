@@ -341,6 +341,39 @@ time.sleep(600)
                                     REPORT_BODY + READ_BACK}))
     check("open limit: done and dropped do not count", code, 0, out)
 
+    def in_streams(*pairs):
+        out = {}
+        for i, (status, stream) in enumerate(pairs, 1):
+            line = ("stream: %s\n" % stream) if stream else ""
+            out["docs/briefs/%04d-thing.md" % i] = (
+                "---\nstatus: %s\n%s---\n\n# %04d\n" % (status, line, i))
+        return out
+
+    per_stream = strength(open_briefs_per='"stream"')
+    code, out = work_paired(dict(in_streams(("open", "engine"),
+                                            ("open", "runner")), **per_stream))
+    check("per stream: one open in each of two streams", code, 0, out)
+    code, out = work_paired(dict(in_streams(("open", "engine"),
+                                            ("open", "Engine (tests)")),
+                                 **per_stream))
+    check("per stream: two open in one stream", code, 1, out)
+    check("per stream: and the stream is named", "'engine'" in out, True, out)
+    code, out = work_paired(in_streams(("open", "engine"), ("open", "runner")))
+    check("per stream: not declared, the project limit holds", code, 1, out)
+    code, out = work_paired(dict(in_streams(("open", ""), ("open", "")),
+                                 **per_stream))
+    check("per stream: briefs with no stream share one", code, 1, out)
+    code, out = work_paired(dict(in_streams(("open", "engine"),
+                                            ("open", "engine")),
+                                 **strength(open_briefs_per='"stream"',
+                                            open_briefs=2)))
+    check("per stream: open_briefs is the limit in each", code, 0, out)
+    code, out = work_paired(dict(in_streams(("open", "engine"),
+                                            ("open", "runner")),
+                                 **strength(open_briefs_per='"streams"')))
+    check("per stream: a value it does not know means the project", code, 1,
+          out)
+
     code, out = work_paired(done_with(""))
     check("read-back: done, report has neither line", code, 1, out)
     check("read-back: and the missing line is named",

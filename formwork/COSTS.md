@@ -14,7 +14,7 @@ real 3.92
 ```
 
 About four seconds on this repository, over three runs. That is one
-run of all twelve checks over 201 files, including the fixtures each check is tried
+run of all thirteen checks over 201 files, including the fixtures each check is tried
 against. It runs at the end of
 every turn in which something changed.
 
