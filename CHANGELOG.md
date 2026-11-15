@@ -8,6 +8,19 @@ version commit's message in git: `git show 02bd5f0` for 0.2.0 and
 
 ## Unreleased
 
+- Bringing in somebody else's skill. `formwork/bring-a-skill.md` makes the
+  humanizer pattern general: the skill lives in `.claude/skills/<name>/` with
+  its licence and an `UPSTREAM.md` (repository, full commit, licence, sha256
+  of each file), from `formwork/templates/upstream.md`; the human fetches, and
+  nothing updates on its own. New check `skill-provenance` fails a skill folder
+  with no record, no licence, no full commit, or a file that no longer matches
+  its sha256. A skill written in the project says `written here, no upstream`.
+- Two lines in a builder's report: files touched outside its own, and packages
+  added with licence, what they install and where they came from. In
+  `formwork/templates/build.md` and in what `lead` asks of each piece.
+- Localisation and right to left layout have owners: `writer` owns the words
+  in every language shipped, `visual` how the layout mirrors, `frontend` and
+  `mobile` building it (leading and trailing, never left and right).
 - Taste packs, optional. `formwork/taste/README.md` holds the three kit
   items that apply to every product (decoration never poses as data; copy
   says the thing, not the feature; every rendered screen is asked "generic

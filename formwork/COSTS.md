@@ -27,10 +27,10 @@ this line.
 
 ```
 $ find formwork -type f -not -path '*/__pycache__/*' | wc -l
-409
+433
 ```
 
-409 files. Plain text and a few small programs. Python 3, standard library only,
+433 files, counted with the `skill-provenance` check and its fixtures in place. Plain text and a few small programs. Python 3, standard library only,
 no dependencies of any kind. It costs nothing to carry and nothing to install.
 
 ---

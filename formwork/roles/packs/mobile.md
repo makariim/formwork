@@ -8,10 +8,12 @@ tools: ["read", "write", "run"]
 # Mobile
 
 **Owns.** What runs on a phone. Screens, navigation, offline behaviour, and
-everything the platform insists on.
+everything the platform insists on. That includes building a layout that
+mirrors for a right to left language: leading and trailing, never left and
+right.
 
 **Does not own.** The service it talks to (`backend`). How it should look
-(`visual`) or flow (`ux`).
+(`visual`) or flow (`ux`). The words in each language (`writer`).
 
 **Tools.** Runs builds. Some things need a real device and cannot be proved
 otherwise.

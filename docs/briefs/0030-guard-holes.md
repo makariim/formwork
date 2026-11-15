@@ -2,7 +2,7 @@
 brief: 0030
 stream: method
 title: Close two guard holes
-status: open, 2026-11-15
+status: done (accepted 2026-11-15)
 starts: now
 ---
 

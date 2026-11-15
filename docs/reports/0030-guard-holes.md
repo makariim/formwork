@@ -92,3 +92,6 @@ patch -p1 < docs/reports/0030-guard-holes.patch
 formwork/fw test
 formwork/fw record
 ```
+
+accepted: 2026-11-15
+in my words: done, he applied the guard patch himself, re-recorded and committed f82feb0

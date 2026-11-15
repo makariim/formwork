@@ -37,7 +37,15 @@ review round (`formwork/templates/review-round.md`).
 - What is not done.
 - **Not proven**: what only the real device, the real data or a real user can
   prove. Listed one by one.
+- **Touched outside my files**: each file changed outside the files the team
+  table gives this role, named one by one, or "none".
+- **Packages added**: each package or data set added, with its licence, what it
+  installs, and where it came from, or "none".
 ```
+
+The last two lines matter most when the build is split between agents. They
+are how the lead finds two pieces that met in one file, and a dependency that
+`legal` or `security` should read before it ships.
 
 ---
 

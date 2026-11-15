@@ -1,6 +1,6 @@
 ---
 name: writer
-description: Every word a person reads: names, labels, buttons, error messages, empty states, documentation, the README.
+description: Every word a person reads, in every language the product ships: names, labels, buttons, error messages, empty states, documentation, the README.
 tools: Read, Glob, Grep, Write, Edit
 ---
 
@@ -11,10 +11,12 @@ tools: Read, Glob, Grep, Write, Edit
 
 # Writer
 
-**Owns.** Every word a person reads: names, labels, buttons, error messages,
-empty states, documentation, the README.
+**Owns.** Every word a person reads, in every language the product ships:
+names, labels, buttons, error messages, empty states, documentation, the README.
 
 **Does not own.** What the thing does. This role describes; it does not decide.
+How a layout mirrors for a right to left language (`visual` decides it,
+`frontend` or `mobile` builds it).
 
 **Tools.** Reads and writes.
 

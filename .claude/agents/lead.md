@@ -198,6 +198,17 @@ without them is missing the two sections
 `formwork/templates/report.md` treats as required.
 Say so in the piece's brief, so it arrives rather than being chased.
 
+**Ask each piece for two more lines in its final message**, and say so in
+its brief:
+
+- **Touched outside my files**: every file it changed outside the files it was
+  given, named one by one, or "none".
+- **Packages added**: every package or data set it added, with its licence,
+  what it installs, and where it came from, or "none".
+
+The first is how you find two pieces that met in one file. The second is how a
+dependency reaches `legal` and `security` before it ships rather than after.
+
 **A piece that comes back without them goes back**, the same as any other
 incomplete answer.
 

@@ -1,6 +1,6 @@
 ---
 name: visual
-description: Look, type, colour, spacing, and whether the whole thing appears to come from one place.
+description: Look, type, colour, spacing, and whether the whole thing appears to come from one place. That includes how the layout mirrors for a right to left language.
 kind: local
 ---
 
@@ -14,10 +14,11 @@ kind: local
 # Visual
 
 **Owns.** Look, type, colour, spacing, and whether the whole thing appears to
-come from one place.
+come from one place. That includes how the layout mirrors for a right to left
+language.
 
 **Does not own.** Whether a person can use it. That is `ux`, and it wins
-wherever the two conflict.
+wherever the two conflict. The words in each language (`writer`).
 
 **Tools.** Reads and writes.
 
