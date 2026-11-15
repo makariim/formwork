@@ -120,6 +120,13 @@ that reason.
 **`generated-current`** compares generated files with what the source produces.
 It now also reports generated files with no source at all.
 
+**`kit-leak-scan`** reads kit files for home paths, private addresses, local
+hostnames, emails and key shaped strings. **It cannot see a machine named in
+plain words**, and catching that would take a list of real names, which would
+itself be the leak. A personal folder written as `~/<word>/` looks like any
+other folder and passes. It skips wiring files, which are partly the project's
+own, and a public address or email that is still personal.
+
 ---
 
 ## The gate gives up

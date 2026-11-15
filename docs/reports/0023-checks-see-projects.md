@@ -15,6 +15,9 @@ I left the brief `open`. Your read-back closes it, as the kit's report template 
 
 ## Accepted
 
+accepted: 2026-11-15
+in my words: next (he reviewed, re-recorded the kit fingerprints and committed 2537c06)
+
 ## For the director
 
 ### What changed

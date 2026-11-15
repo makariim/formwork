@@ -2,7 +2,7 @@
 brief: 0023
 stream: method
 title: The checks see where projects work
-status: open, 2026-11-15
+status: done (accepted 2026-11-15)
 ---
 
 # 0023 The checks see where projects work

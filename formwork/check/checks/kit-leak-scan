@@ -1,0 +1,262 @@
+#!/usr/bin/env python3
+"""Check: the kit's own files carry nothing that belongs to one person or machine.
+
+    kit-leak-scan <directory>
+
+Formwork is copied into other people's projects. Whatever sits in the kit goes
+with it. A home folder written into a page, an address on somebody's network,
+a machine's name, an email, a key: each one tells every reader of every copy
+something about whoever wrote it.
+
+It reads kit files only: `formwork/`, `formwork_cli/`, `FORMWORK.md`, and the
+role files the generator writes into a project (the ones marked GENERATED
+FROM). A project's own documents are its own business, and are not read.
+
+CATCHES  A real looking home path: /Users/<name>/, /home/<name>/,
+         C:\\Users\\<name>\\, or ~<name>/.
+         A private network address: 10.x, 172.16 to 172.31, 192.168, and the
+         Tailscale range 100.64 to 100.127.
+         A local hostname: anything ending .local, .lan, .internal,
+         .localdomain, .home.arpa, or .ts.net.
+         An email address.
+         An API key shaped string, and the first line of a private key.
+
+         Placeholders pass: a name in angle brackets, a $VARIABLE, a handful of
+         generic words (you, user, name, example and the like), example.com and
+         the other reserved domains, the reserved documentation addresses, and
+         keys made of x's or dots.
+
+CANNOT TELL
+
+A machine named in plain words. "Run it on the big box in the office" is a
+leak and passes, because a name not written as a hostname looks like any other
+word. Catching it would take a list of the real names, and that list would
+itself be the leak (entry 8 of the dogfood log, in the source repository).
+
+A folder under the home folder, written as ~/<word>/. A personal folder layout
+looks exactly like an ordinary one, so ~/Repos/ passes. Only ~<name>/, with no
+slash after the tilde, is read as a person.
+
+A public address, a public hostname, or a public email that is still personal.
+Any of those passes unless it lands in one of the shapes above.
+
+A key with no recognisable prefix. A random string is just a random string.
+
+Wiring files (.claude/settings.json and the like). They are partly the
+project's own, so a hit there would not be the kit's.
+
+Exit status:
+    0   no kit file carries any of the shapes above, or there is no kit here
+    1   at least one does, and each hit is named with its file and line
+    2   the check could not run
+"""
+import os
+import re
+import sys
+
+KIT_DIRS = ("formwork", "formwork_cli")
+KIT_FILES = ("FORMWORK.md",)
+
+# The role trees the generator writes into a project. The same list
+# style-pointed reads.
+GENERATED_TREES = (
+    os.path.join(".claude", "agents"),
+    os.path.join(".gemini", "agents"),
+    os.path.join(".codex", "agents"),
+)
+GENERATED = "GENERATED FROM"
+
+SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv"}
+
+# Generic words that stand in for a person. Not anybody's real name.
+PLACEHOLDER_NAMES = {
+    "you", "your", "yourname", "your-name", "me", "user", "username",
+    "user-name", "name", "someone", "somebody", "example", "person", "dev",
+    "developer", "foo", "bar", "alice", "bob", "jane", "john", "joe",
+    "shared", "public", "runner", "ubuntu", "root", "admin", "test",
+    "whoever", "x",
+}
+
+# Reserved for documentation and testing (RFC 2606, RFC 6761).
+PLACEHOLDER_DOMAINS = ("example.com", "example.org", "example.net",
+                       "example", "test", "invalid", "localhost")
+
+# Local parts that are protocol users, not people.
+NOT_PEOPLE = {"git", "noreply", "no-reply"}
+
+HOME = re.compile(
+    r"(?:/Users/|/home/|[A-Za-z]:\\\\?Users\\\\?)([A-Za-z0-9_][A-Za-z0-9_.-]*)")
+TILDE_USER = re.compile(r"(?<![\w~])~([A-Za-z][\w.-]*)/")
+IPV4 = re.compile(r"(?<![\w.])(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})(?![\w.]*\d)")
+HOST = re.compile(
+    r"(?<![\w.@/-])((?:[A-Za-z0-9][A-Za-z0-9-]*\.)+)"
+    r"(local|lan|internal|localdomain|home\.arpa|ts\.net)(?![\w.-])",
+    re.IGNORECASE)
+EMAIL = re.compile(
+    r"(?<![\w.+-])([A-Za-z0-9][A-Za-z0-9._%+-]*)@"
+    r"([A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,})(?![\w-])")
+KEYS = [
+    ("an API key", re.compile(r"(?<![\w-])(sk-(?:ant-|proj-)?[A-Za-z0-9_-]{20,})")),
+    ("a GitHub token", re.compile(r"(?<!\w)((?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{30,})")),
+    ("a GitHub token", re.compile(r"(?<!\w)(github_pat_[A-Za-z0-9_]{30,})")),
+    ("a GitLab token", re.compile(r"(?<!\w)(glpat-[A-Za-z0-9_-]{20,})")),
+    ("an AWS key", re.compile(r"(?<![A-Z0-9])((?:AKIA|ASIA)[A-Z0-9]{16})(?![A-Z0-9])")),
+    ("a Slack token", re.compile(r"(?<!\w)(xox[abprs]-[A-Za-z0-9-]{10,})")),
+    ("a Google key", re.compile(r"(?<!\w)(AIza[A-Za-z0-9_-]{35})")),
+    ("a private key", re.compile(r"(-----BEGIN [A-Z ]*PRIVATE KEY-----)")),
+]
+
+
+def excluded_paths(root):
+    """Paths the runner has told this check to stay out of, like the fixtures."""
+    out = []
+    for p in os.environ.get("FORMWORK_EXCLUDE", "").split(os.pathsep):
+        if p:
+            out.append(os.path.realpath(p if os.path.isabs(p)
+                                        else os.path.join(root, p)))
+    return out
+
+
+def is_excluded(path, excludes):
+    a = os.path.realpath(path)
+    return any(a == e or a.startswith(e + os.sep) for e in excludes)
+
+
+def walk(d, excludes):
+    for base, dirs, files in os.walk(d):
+        dirs[:] = sorted(x for x in dirs if x not in SKIP_DIRS
+                         and not is_excluded(os.path.join(base, x), excludes))
+        for fn in sorted(files):
+            full = os.path.join(base, fn)
+            if not is_excluded(full, excludes):
+                yield full
+
+
+def kit_files(root):
+    """Every kit file, and whether it must carry the generated marker."""
+    excludes = excluded_paths(root)
+    for d in KIT_DIRS:
+        full = os.path.join(root, d)
+        if os.path.isdir(full) and not is_excluded(full, excludes):
+            for f in walk(full, excludes):
+                yield f, False
+    for f in KIT_FILES:
+        full = os.path.join(root, f)
+        if os.path.isfile(full) and not is_excluded(full, excludes):
+            yield full, False
+    for t in GENERATED_TREES:
+        full = os.path.join(root, t)
+        if os.path.isdir(full) and not is_excluded(full, excludes):
+            for f in walk(full, excludes):
+                yield f, True
+
+
+def placeholder_word(w):
+    w = w.strip().lower()
+    return (not w or w.startswith(("<", "$", "{", "%", "["))
+            or w in PLACEHOLDER_NAMES or set(w) <= set("x.*_-"))
+
+
+def placeholder_key(k):
+    body = re.sub(r"^[A-Za-z]+[_-](?:ant-|proj-)?", "", k)
+    low = body.lower()
+    return (len(set(low)) <= 3 or "xxxx" in low or "example" in low
+            or "your" in low or "..." in body)
+
+
+def private_address(parts):
+    try:
+        a, b, c, d = (int(x) for x in parts)
+    except ValueError:
+        return False
+    if max(a, b, c, d) > 255:
+        return False
+    return (a == 10 or (a == 172 and 16 <= b <= 31) or (a == 192 and b == 168)
+            or (a == 100 and 64 <= b <= 127))
+
+
+def hits_in(line):
+    out = []
+    for m in HOME.finditer(line):
+        if not placeholder_word(m.group(1)):
+            out.append(("a home path", m.group(0)))
+    for m in TILDE_USER.finditer(line):
+        if not placeholder_word(m.group(1)):
+            out.append(("a home path", m.group(0)))
+    for m in IPV4.finditer(line):
+        if private_address(m.groups()):
+            out.append(("a private address", m.group(0)))
+    for m in HOST.finditer(line):
+        first = m.group(1).split(".")[0]
+        if not placeholder_word(first) and first.lower() not in (
+                "localhost", "host", "machine", "my-machine", "your-machine"):
+            out.append(("a local hostname", m.group(0)))
+    for m in EMAIL.finditer(line):
+        local, domain = m.group(1).lower(), m.group(2).lower()
+        if local in NOT_PEOPLE or placeholder_word(local) and domain in PLACEHOLDER_DOMAINS:
+            continue
+        if any(domain == p or domain.endswith("." + p) for p in PLACEHOLDER_DOMAINS):
+            continue
+        out.append(("an email address", m.group(0)))
+    for label, rx in KEYS:
+        for m in rx.finditer(line):
+            k = m.group(1)
+            if label != "a private key" and placeholder_key(k):
+                continue
+            # A key is never printed whole, not even in a refusal.
+            shown = k if label == "a private key" else k[:6] + "..."
+            out.append((label, shown))
+    return out
+
+
+def main(argv):
+    args = [a for a in argv[1:] if not a.startswith("--")]
+    if not args:
+        print("usage: kit-leak-scan <directory>", file=sys.stderr)
+        return 2
+    root = args[0]
+    if not os.path.isdir(root):
+        print("ERROR: not a directory: %s" % root, file=sys.stderr)
+        return 2
+
+    findings, read = [], 0
+    for full, needs_marker in kit_files(root):
+        try:
+            with open(full, "rb") as fh:
+                data = fh.read()
+        except OSError as e:
+            print("ERROR: cannot read %s: %s" % (full, e), file=sys.stderr)
+            return 2
+        if b"\0" in data[:8192]:
+            continue
+        text = data.decode("utf-8", errors="replace")
+        if needs_marker and GENERATED not in text:
+            continue
+        read += 1
+        rel = os.path.relpath(full, root).replace("\n", "\\n")
+        for n, line in enumerate(text.splitlines(), 1):
+            for kind, what in hits_in(line):
+                findings.append((rel, n, kind, what))
+
+    if not read:
+        print("no kit files here, nothing to scan")
+        return 0
+
+    if findings:
+        print("%d thing(s) in kit files that belong to one person or machine"
+              % len(findings))
+        for rel, n, kind, what in findings[:20]:
+            print("  %s:%d  %s: %s" % (rel, n, kind, what))
+        if len(findings) > 20:
+            print("  and %d more" % (len(findings) - 20))
+        print("  Replace each with a placeholder: /Users/<you>/, "
+              "you@example.com, 192.0.2.10, my-machine.local.")
+        return 1
+
+    print("%d kit file(s) read, nothing that belongs to one person or machine"
+          % read)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

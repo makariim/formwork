@@ -19,6 +19,11 @@ version commit's message in git: `git show 02bd5f0` for 0.2.0 and
 - `open_briefs_per = "stream"` under `[strength]` makes `open_briefs` the
   limit for each stream, read from a brief's `stream:` or `**Stream:**` line.
 - `formwork/COSTS.md` counts thirteen checks, not twelve.
+- New check `kit-leak-scan` reads kit files only (`formwork/`,
+  `formwork_cli/`, `FORMWORK.md`, generated roles) and fails on a real looking
+  home path, a private network address, a local hostname, an email address or
+  an API key shaped string. Placeholders such as `/Users/<you>/` and
+  `example.com` pass. It cannot see a machine named in plain words.
 - `protected-files` checks Codex `apply_patch` headers, including patches fed
   through shell arguments, wrappers, pipes, and heredocs, before a guarded
   file can be changed. It reads Codex's whitespace forms and refuses an
