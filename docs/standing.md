@@ -58,6 +58,8 @@ without it.
 
 ## What is decided
 
+- 2026-11-15, **0027 accepted** (committed 9b9ae53, 15 checks green): relabel first, new project roles by brief, the roles-named check. **0028** (step 6, optional templates and gates) started.
+
 - 2026-11-15, **0026 accepted** (committed 6223baf; routing 44 and 45 of 49 on Haiku, about $0.13). His choice ("b, everything is already working, no need to disrupt them now"): continue the kit plan, do not bring routing into his projects yet. **0027** (step 5, roles) started.
 
 - 2026-11-15, **0025 accepted** ("next"; committed eafd01c): routing table, director routes, corrections file, setup writes two lines, personal defaults template. **0026** (measure routing) started.

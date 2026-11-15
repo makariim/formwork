@@ -29,7 +29,7 @@ A small program that reads your project and says green or red. Checks look at
 what is there. Guards stop what is about to happen.
 
 **The gate**, also called **the aggregate**
-All fifteen checks, run together, with one answer at the end. Green or red.
+All sixteen checks, run together, with one answer at the end. Green or red.
 
 You will see the word aggregate in a refusal: *the aggregate is red, so this
 turn cannot conclude*. It means the same thing.
@@ -58,6 +58,15 @@ gate runs at the end of every turn where something changed.
 **Brief**
 What you want, written down before any work starts. Six short headings. The
 template is in `formwork/templates/brief.md`.
+
+**Phase**
+A run of ordinary briefs that share a `stream:` line, such as `spec` or
+`build`. A label, not a process, and phases have no fixed order.
+
+**Gate**
+A `starts:` line on a brief: `now`, `after <stream>` or `decision NNNN`.
+Optional. The check `gates` refuses an open brief whose gate is not met. See
+`formwork/loop.md`.
 
 **Style**
 How an agent writes a reply, as against what it does. The kit's default is

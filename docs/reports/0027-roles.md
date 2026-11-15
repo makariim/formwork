@@ -101,3 +101,6 @@ A second refusal, a false hit: a Python heredoc that edited only this report was
 ```
 
 The 0026 brief, report and `docs/standing.md` changes were in the tree before this session and were not touched.
+
+accepted: 2026-11-15
+in my words: next, he fixed the dashes himself, re-recorded and committed 9b9ae53

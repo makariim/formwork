@@ -100,6 +100,45 @@ formwork/check/checks/work-paired --next .
 
 ---
 
+## Phases and gates
+
+**A phase is a label, not a process.** It is a run of ordinary briefs that
+share a `stream:` line: `stream: spec`, `stream: build`, `stream: review`.
+Each brief runs this same loop. There is no fixed order of phases, and two
+may run side by side.
+
+**A gate is optional, and a program checks it.** A brief that must wait
+carries one `starts:` line in its frontmatter, in one of three forms:
+
+```
+starts: now
+starts: after <stream>        every brief there done with its read-back, or dropped
+starts: decision NNNN         that decision record exists
+```
+
+`formwork/check/checks/gates` refuses an open brief whose gate is not met,
+and any `starts:` line not in those three forms. A gate in prose is
+decoration, because no program can tell when it is true. A brief with no
+`starts:` line has no gate.
+
+Two gates are offered as the default for a build, in the templates:
+
+1. **No build brief before a spec is accepted.** The build brief carries
+   `starts: after spec` ([`templates/spec.md`](templates/spec.md)).
+2. **Unproven items listed and seen before the next phase opens.** The build
+   report lists them under "Not proven"; the read-back on it is the "seen";
+   the next brief carries `starts: after build`
+   ([`templates/build.md`](templates/build.md)).
+
+The other optional templates for a phase:
+[`research-lane.md`](templates/research-lane.md),
+[`design-round.md`](templates/design-round.md),
+[`review-round.md`](templates/review-round.md),
+[`release-step.md`](templates/release-step.md). Use one when it fits. None is
+required, and none comes in a fixed order.
+
+---
+
 ## How a report is written
 
 Two parts, in this order: `## For you`, the whole of it as a story for the

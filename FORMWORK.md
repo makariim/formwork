@@ -44,6 +44,7 @@ These do not ask you. They refuse.
 | Work marked finished left a report behind | `formwork/check/checks/work-paired` |
 | Work marked finished carries the human's read-back, dated | `formwork/check/checks/work-paired` |
 | One brief is open at a time, unless you raise the limit | `formwork/check/checks/work-paired` |
+| An open brief with a `starts:` gate does not run before the gate is met | `formwork/check/checks/gates` |
 | Every generated role names the style page | `formwork/check/checks/style-pointed` |
 | Kit files carry no home path, private address, local hostname, email or key | `formwork/check/checks/kit-leak-scan` |
 | A round file or a brief's team row names a real role | `formwork/check/checks/roles-named` |

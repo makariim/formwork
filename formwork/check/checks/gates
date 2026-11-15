@@ -1,0 +1,219 @@
+#!/usr/bin/env python3
+"""Check: an open brief does not start before its gate is met.
+
+    gates <directory>
+
+A gate is optional. A brief that wants one carries a `starts:` line in its
+frontmatter, in one of three forms and no other:
+
+    starts: now
+    starts: after <stream>       every brief in that stream is done, with its
+                                 read-back, or dropped; at least one is done
+    starts: decision NNNN        docs/decisions/NNNN-*.md exists
+
+A phase is a label on a run of ordinary briefs, written with the `stream:`
+line that `work-paired` already reads. So "no build before the spec is
+accepted" is a build brief with `starts: after spec`, and the spec brief's
+report carrying its read-back is what opens it. There is no order of phases.
+Two streams may run side by side, and a brief with no `starts:` line has no
+gate at all.
+
+CATCHES  An open brief whose gate is not met: the stream it waits on still
+         has an open brief, or a done brief whose report has no read-back,
+         or no done brief at all; or the decision it waits on is not written.
+
+         A gate written in prose. "starts: when the spec feels ready" is
+         decoration, because no program can tell when it is true. Refused,
+         with the three forms named.
+
+         A brief that waits on its own stream, which can never open.
+
+CANNOT TELL  Whether the gate was the right one, or whether the person read
+         the report behind the read-back. The read-back is two lines anybody
+         can type; see `work-paired`. Closed briefs are history and are not
+         read: a gate that was not met when the work ran is not caught later.
+
+Exit status:
+    0   every open brief with a gate has its gate met
+    1   at least one does not, or a gate is not one of the three forms
+    2   the check could not run
+"""
+import importlib.machinery
+import importlib.util
+import os
+import re
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+DECISIONS = os.path.join("docs", "decisions")
+FORMS = "'starts: now', 'starts: after <stream>' or 'starts: decision NNNN'"
+
+STARTS = re.compile(r"^starts\s*:[ \t]*(.*)$", re.M | re.I)
+AFTER = re.compile(r"^after\s+(.+)$", re.I)
+DECISION = re.compile(r"^decision\s+(\d{1,6})$", re.I)
+
+
+def load_work_paired():
+    """The brief parser `work-paired` already uses. A second copy would drift."""
+    sys.dont_write_bytecode = True
+    path = os.path.join(HERE, "work-paired")
+    loader = importlib.machinery.SourceFileLoader("work_paired", path)
+    spec = importlib.util.spec_from_loader("work_paired", loader)
+    mod = importlib.util.module_from_spec(spec)
+    loader.exec_module(mod)
+    return mod
+
+
+def frontmatter(text):
+    """The block between the opening '---' lines, or the whole text if none."""
+    lines = text.splitlines()
+    if lines and lines[0].strip() == "---":
+        for i in range(1, len(lines)):
+            if lines[i].strip() == "---":
+                return "\n".join(lines[1:i])
+    return text
+
+
+def read(path):
+    return open(path, encoding="utf-8", errors="replace").read()
+
+
+def main(argv):
+    args = [a for a in argv[1:] if not a.startswith("--")]
+    if not args:
+        print("usage: gates <directory>", file=sys.stderr)
+        return 2
+    root = args[0]
+    if not os.path.isdir(root):
+        print("ERROR: not a directory: %s" % root, file=sys.stderr)
+        return 2
+    try:
+        wp = load_work_paired()
+    except (OSError, SyntaxError, ImportError) as e:
+        print("ERROR: cannot load work-paired beside this check: %s" % e,
+              file=sys.stderr)
+        return 2
+
+    briefs = wp.numbered(root, wp.BRIEFS)
+    if briefs is None:
+        print("no %s directory, no gates" % wp.BRIEFS)
+        return 0
+    reports = wp.numbered(root, wp.REPORTS) or {}
+    need = wp.read_back_words(root)
+
+    # Every numbered brief once: its file, status, stream and frontmatter.
+    table = []
+    for n, names in sorted((k, v) for k, v in briefs.items() if k is not None):
+        for fn in names:
+            try:
+                text = read(os.path.join(root, wp.BRIEFS, fn))
+            except OSError as e:
+                print("ERROR: cannot read %s/%s: %s" % (wp.BRIEFS, fn, e),
+                      file=sys.stderr)
+                return 2
+            m = wp.STATUS.search(text)
+            table.append({
+                "n": n,
+                "file": "%s/%s" % (wp.BRIEFS, fn),
+                "status": m.group(1).lower() if m else None,
+                "stream": wp.stream_of(text),
+                "head": frontmatter(text),
+            })
+
+    def stream_holds(target, me):
+        """Why the stream is not closed yet, or None when it is."""
+        members = [b for b in table if b["stream"] == target and b is not me]
+        if not members:
+            return ("no brief names stream '%s', so this gate can never open"
+                    % target)
+        done = 0
+        for b in members:
+            if b["status"] == wp.DROPPED:
+                continue
+            if b["status"] != wp.DONE:
+                return "%s in stream '%s' is still %s" % (
+                    b["file"], target, b["status"] or "without a status")
+            if b["n"] not in reports:
+                return "%s in stream '%s' says done and has no report" % (
+                    b["file"], target)
+            rn = reports[b["n"]][0]
+            try:
+                body = read(os.path.join(root, wp.REPORTS, rn))
+            except OSError:
+                return "%s/%s cannot be read" % (wp.REPORTS, rn)
+            gaps = wp.read_back_missing(body, need)
+            if gaps:
+                return ("%s/%s in stream '%s' has %s, so nobody has accepted "
+                        "it yet" % (wp.REPORTS, rn, target, gaps[0]))
+            done += 1
+        if not done:
+            return "every brief in stream '%s' was dropped" % target
+        return None
+
+    def decision_written(num):
+        d = os.path.join(root, DECISIONS)
+        if not os.path.isdir(d):
+            return False
+        for fn in os.listdir(d):
+            m = wp.NUMBERED.match(fn)
+            if fn.endswith(".md") and m and int(m.group(1)) == num:
+                return True
+        return False
+
+    problems = []
+    gated = 0
+    for b in table:
+        if b["status"] != wp.OPEN:
+            continue
+        lines = STARTS.findall(b["head"])
+        if not lines:
+            continue
+        gated += 1
+        if len(lines) > 1:
+            problems.append("%s: %d 'starts:' lines. One gate per brief, "
+                            "one of %s" % (b["file"], len(lines), FORMS))
+            continue
+        gate = " ".join(lines[0].split())
+        if gate.lower() == "now":
+            continue
+        m = AFTER.match(gate)
+        if m:
+            target = wp.stream_of("stream: " + m.group(1))
+            if not target:
+                problems.append("%s: 'starts: %s' names no stream"
+                                % (b["file"], gate))
+            elif target == b["stream"]:
+                problems.append("%s: waits on its own stream '%s', which "
+                                "cannot close while this brief is open"
+                                % (b["file"], target))
+            else:
+                why = stream_holds(target, b)
+                if why:
+                    problems.append("%s: gate not met, %s"
+                                    % (b["file"], why))
+            continue
+        m = DECISION.match(gate)
+        if m:
+            num = int(m.group(1))
+            if not decision_written(num):
+                problems.append("%s: gate not met, decision %04d is not in "
+                                "%s" % (b["file"], num, DECISIONS))
+            continue
+        problems.append("%s: 'starts: %s' is not a gate a program can check. "
+                        "Use %s" % (b["file"], gate, FORMS))
+
+    if problems:
+        print("%d problem(s) across %d gated open brief(s)"
+              % (len(problems), gated))
+        for p in problems:
+            print("  %s" % p)
+        return 1
+    if gated:
+        print("%d open brief(s) with a gate, every gate met" % gated)
+    else:
+        print("no open brief carries a gate")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))
