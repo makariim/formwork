@@ -84,7 +84,21 @@ and nothing more. Whether the line keeps anybody in the loop, or becomes a line
 people type without reading, is NOT ESTABLISHED.
 
 It also counts open briefs against `open_briefs`. It cannot see briefs that
-were never saved, or work going on in a window with no brief at all.
+were never saved, or work going on in a window with no brief at all. With
+`open_briefs_per = "stream"` it counts each stream on its own, by the brief's
+`stream:` or `**Stream:**` line. It cannot tell whether a brief is in the right
+stream, and a misspelt stream is a new one.
+
+**`predictions-first`** also reads folders under `docs/` that hold a
+predictions or challenge file, because projects hold rounds beside their
+research and design. **It cannot see a round there with neither file**, and
+predictions written inside the challenge file cannot be dated apart from it.
+
+**`standing-current`** also compares the standing brief with the dates on
+briefs and reports, and refuses a "What is next" that names a brief already
+done or dropped. **Briefs and reports with no date are counted, not
+compared**, and a finished brief named only as history in "What is next" is
+refused too.
 
 **`report-shape`** refuses a report with no `## For you`, one where another
 heading comes first, one over 1,000 words, and one holding a fenced code

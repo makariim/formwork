@@ -1,6 +1,6 @@
 ---
-updated: 2026-10-25
-by: the conversation that made the read-back minimum a setting
+updated: 2026-11-15
+by: the working session for brief 0022
 ---
 
 # Standing brief
@@ -58,6 +58,8 @@ without it.
 
 ## What is decided
 
+- 2026-11-15, **0022 accepted** ("take your picks, start step 1"): beside, not over; routing corrections in a separate small file per project; the director routes; roles may be created mid project by the relabel first path; the kit ships a template for personal defaults; steps 1 to 4 before publishing 1.0.0. **0023** (step 1, the checks see where projects work) started.
+
 Two records in `docs/decisions/`, both `proposed`, waiting for him: 0001,
 humanizer for text sent as the human; 0002, formwork is changed only here and
 installed everywhere else. The decisions before it live in the design pages
@@ -68,6 +70,8 @@ held on the scenario in the README. That is the first evidence from anybody
 who did not write it, and it is one person on one scenario, self reported.
 
 ## What is open
+
+- 2026-11-15, from the maintainer: extend formwork to build a whole project end to end (phase cycle, research round shape, taste checklist, review rounds, dynamic roles). Noted in `docs/ideas/2026-11-15-whole-project-builds.md`; not decided. Researched in brief 0022: proposal in `docs/research/0022-whole-project-builds.md`, five questions for him in its last section. Nothing in the kit changed.
 
 Whether the kit should ship a standing brief for itself at all, or only the
 template. This file is the experiment.

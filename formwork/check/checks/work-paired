@@ -28,6 +28,14 @@ CATCHES  A brief marked done with no report. That is work that happened and
          limit. Several open at once is how the human stops holding the
          picture and starts carrying text between windows.
 
+         A project that runs several streams, one thread each, declares it
+         with `open_briefs_per = "stream"` under [strength]. Then
+         `open_briefs` is the limit for each stream, not for the project.
+         A brief names its stream with a `stream:` line, or a `**Stream:**`
+         line in its body. The name is the words before any bracket, comma
+         or full stop, so "app (release 2)" is the stream "app". Briefs with
+         no stream count together as one more stream.
+
          A brief marked done whose report has no read-back. The report needs
          two lines, each at the start of a line:
 
@@ -38,6 +46,9 @@ CATCHES  A brief marked done with no report. That is work that happened and
          after the colon. Five by default, set with `read_back_words` under
          [strength]: 1 lets a single word such as "accepted" through, and 0
          lets the line be empty, though it must still be there.
+
+CANNOT TELL  Whether a brief is in the right stream, or whether a stream
+         it names was ever agreed. A misspelt stream is a new stream.
 
 CANNOT TELL  Whether the human wrote those words, or whether they are true.
          An agent can type both lines, and a sentence copied from the report
@@ -81,6 +92,11 @@ DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 DEFAULT_READ_BACK_WORDS = 5
 
 DEFAULT_OPEN = 1
+PER_PROJECT, PER_STREAM = "project", "stream"
+# Frontmatter `stream: x`, or a body line `**Stream:** x`, both at line start.
+STREAM = re.compile(r"^(?:stream\s*:|\*\*stream\s*:\s*\*\*)[ \t]*(.*)$",
+                    re.M | re.I)
+NO_STREAM = "(no stream)"
 
 OPEN, DONE, DROPPED = "open", "done", "dropped"
 
@@ -105,6 +121,21 @@ def setting(root, key, allowed, default):
 def open_limit(root):
     v = setting(root, "open_briefs", None, str(DEFAULT_OPEN))
     return int(v) if str(v).isdigit() else DEFAULT_OPEN
+
+
+def open_per(root):
+    return setting(root, "open_briefs_per", (PER_PROJECT, PER_STREAM),
+                   PER_PROJECT)
+
+
+def stream_of(text):
+    """The stream a brief names, lowercased, or None."""
+    m = STREAM.search(text)
+    if not m:
+        return None
+    name = re.split(r"[(.,;*]", m.group(1), maxsplit=1)[0]
+    name = " ".join(name.split()).lower()
+    return name or None
 
 
 def read_back_words(root):
@@ -211,6 +242,7 @@ def main(argv):
     need = read_back_words(root)
     seen_status = []
     open_names = []
+    open_streams = {}
     reports = reports or {}
 
     for fn in briefs.get(None, []):
@@ -242,6 +274,8 @@ def main(argv):
         seen_status.append(status)
         if status == OPEN:
             open_names.append("%s/%s" % (BRIEFS, fn))
+            open_streams.setdefault(stream_of(text) or NO_STREAM, []).append(
+                "%s/%s" % (BRIEFS, fn))
         if status not in ALLOWED:
             problems.append("%s/%s — status '%s' is not one of: %s"
                             % (BRIEFS, fn, m.group(1), ", ".join(ALLOWED)))
@@ -274,7 +308,16 @@ def main(argv):
                                 % (REPORTS, rn, n, gap))
 
     limit = open_limit(root)
-    if limit and len(open_names) > limit:
+    if limit and open_per(root) == PER_STREAM:
+        for stream, names in sorted(open_streams.items()):
+            if len(names) > limit:
+                problems.append("%d briefs are open in stream '%s' and the "
+                                "limit is %d per stream: %s. Finish or drop "
+                                "one, or raise open_briefs under [strength] "
+                                "in .formwork.toml"
+                                % (len(names), stream, limit,
+                                   ", ".join(names)))
+    elif limit and len(open_names) > limit:
         problems.append("%d briefs are open and the limit is %d: %s. Finish "
                         "or drop one, or raise open_briefs under [strength] "
                         "in .formwork.toml"

@@ -1,0 +1,6 @@
+[bindings]
+runtime = "claude-code"
+
+[strength]
+# This project runs several streams, one thread each, one open brief in each.
+open_briefs_per = "stream"
