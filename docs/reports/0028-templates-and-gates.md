@@ -88,3 +88,6 @@ The brief stays `open` until you write the read-back.
 ```
 
 The 0027 brief and report changes, the `docs/standing.md` changes and the 0028 brief were already in the tree before this session. I did not touch them.
+
+accepted: 2026-11-15
+in my words: c, go, he re-recorded the fingerprints and committed 4d9f211

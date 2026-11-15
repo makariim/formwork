@@ -140,6 +140,11 @@ read-back it counts. A misspelt stream in `starts: after` is a stream nobody
 names, and is refused as such. Closed briefs are not read, so a brief that
 ran before its gate opened is not caught afterwards.
 
+**No check judges taste.** The taste packs in `formwork/taste/` are read by
+people and roles looking at pictures in a review round. Their search
+patterns are hints. A screen that passes every pack item can still look
+generic or dead, and only a person looking at it will say so.
+
 ---
 
 ## The gate gives up

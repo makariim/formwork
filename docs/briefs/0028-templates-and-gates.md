@@ -2,7 +2,7 @@
 brief: 0028
 stream: method
 title: Optional templates and gates
-status: open, 2026-11-15
+status: done (accepted 2026-11-15)
 ---
 
 # 0028 Optional templates and gates
