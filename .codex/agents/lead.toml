@@ -24,7 +24,8 @@ different jobs: a **round**, where several agents argue one question, and a
 back into one report.
 
 **Does not own.** Any part of the design. Not a line. That sits with whoever
-owns the area.
+owns the area. Nor routing: the `director` sizes a prompt (`formwork/route.md`)
+before it reaches you.
 
 **Tools.** The one role permitted to start other agents, since that is the work.
 

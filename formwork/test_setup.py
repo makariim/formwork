@@ -164,9 +164,9 @@ script = (
     "    os.chdir(%r)\n"
     "    os.execv(sys.executable, [sys.executable, %r])\n"
     # length, knowing, language, never, building, now, next,
-    # strength=warn, budget=5, folders, standing, write it
+    # strength=warn, budget=5, folders, standing, routing, write it
     "os.write(fd, b'1\\n2\\n\\n\\nA contact sheet tool\\nReading works\\n"
-    "Make the size a setting\\n2\\n5\\n1\\n1\\n1\\n')\n"
+    "Make the size a setting\\n2\\n5\\n1\\n1\\n1\\n1\\n')\n"
     "out = b''\n"
     "try:\n"
     "    while True:\n"
@@ -210,7 +210,7 @@ script = (
     "if pid == 0:\n"
     "    os.chdir(%r)\n"
     "    os.execv(sys.executable, [sys.executable, %r])\n"
-    "os.write(fd, b'\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n2\\n')\n"
+    "os.write(fd, b'\\n'*12 + b'2\\n')\n"
     "try:\n"
     "    while os.read(fd, 4096): pass\n"
     "except OSError:\n"
@@ -269,6 +269,36 @@ check("control characters are dropped",
       S.clean("\x1b[2Jred\x07"), "[2Jred")
 check("newlines collapse", S.clean("a\nb"), "a b")
 
+print("The routing lines for the project's instruction file")
+p = project(config=CONFIG)
+code, out = setup(p, "--defaults")
+mine = read(p, "CLAUDE.md") or ""
+check("claude-code gets CLAUDE.md", "formwork/route.md" in mine, True, out)
+check("carrying both lines", "docs/standing.md" in mine
+      and "Say the plan back" in mine, True, mine)
+check("and nothing else is created", read(p, "AGENTS.md"), None, out)
+
+p = project(config=CONFIG.replace("claude-code", "codex"))
+code, out = setup(p, "--defaults")
+check("codex gets AGENTS.md",
+      "formwork/route.md" in (read(p, "AGENTS.md") or ""), True, out)
+check("and no CLAUDE.md", read(p, "CLAUDE.md"), None, out)
+
+p = project(config=CONFIG, **{"CLAUDE.md": "my own rules\n"})
+code, out = setup(p, "--defaults")
+check("an existing CLAUDE.md is never written over",
+      read(p, "CLAUDE.md"), "my own rules\n", out)
+check("it is reported as kept", "CLAUDE.md, which you already have" in out,
+      True, out)
+check("and the lines are shown to paste", "paste these" in out
+      and "formwork/route.md" in out, True, out)
+check("that is not an error", code, 0, out)
+
+p = project(config=CONFIG)
+code, out = setup(p, "--dry-run", "--defaults")
+check("--dry-run names the file", "CLAUDE.md" in out, True, out)
+check("and writes no instruction file", read(p, "CLAUDE.md"), None, out)
+
 print("Cancelling means no, everywhere")
 # Ctrl-D at the confirm prompt. Ctrl-C lands in the same except clause, one
 # line away, but driving a signal through a pseudo-terminal is flaky enough
@@ -282,7 +312,7 @@ script = (
     "if pid == 0:\n"
     "    os.chdir(%r)\n"
     "    os.execv(sys.executable, [sys.executable, %r])\n"
-    "os.write(fd, b'\\n'*11)\n"
+    "os.write(fd, b'\\n'*12)\n"
     "import time; time.sleep(1)\n"
     "os.write(fd, b'\\x04')\n"           # end of input at 'Write it?'
     "try:\n"
@@ -305,7 +335,7 @@ script = (
     "if pid == 0:\n"
     "    os.chdir(%r)\n"
     "    os.execv(sys.executable, [sys.executable, %r])\n"
-    "os.write(fd, b'\\n'*11 + b'no\\n')\n"
+    "os.write(fd, b'\\n'*12 + b'no\\n')\n"
     "try:\n"
     "    while os.read(fd, 4096): pass\n"
     "except OSError:\n"
@@ -323,7 +353,7 @@ script = (
     "if pid == 0:\n"
     "    os.chdir(%r)\n"
     "    os.execv(sys.executable, [sys.executable, %r])\n"
-    "os.write(fd, b'\\n'*11)\n"
+    "os.write(fd, b'\\n'*12)\n"
     "time.sleep(1)\n"
     "os.makedirs(%r, exist_ok=True)\n"
     "open(%r, 'w').write('MINE, WRITTEN WHILE IT WAS ASKING\\n')\n"

@@ -20,6 +20,10 @@ sizes, and how to pick one, are in [`formwork/loop.md`](formwork/loop.md).
 Work is handed down from a planning conversation and reported back up by you.
 That part is in [`formwork/threads.md`](formwork/threads.md).
 
+**One plain prompt is enough to start.** What kind of work it is, how big, and
+who does it are worked out from [`formwork/route.md`](formwork/route.md), and
+said back to you in a line or two before anything happens.
+
 ---
 
 ## What is blocked
@@ -144,6 +148,7 @@ you say yes:
 - `docs/standing.md`, seeded with what you are building and what is next
 - `docs/decisions/`, `docs/briefs/`, `docs/reports/`, started and explained
 - the `[strength]` values, including `gate_budget`
+- the two routing lines in `CLAUDE.md` or `AGENTS.md`, only when there is none
 
 It never overwrites a file you already have, and it never touches
 `[bindings]`, which the installer worked out by looking at your project.

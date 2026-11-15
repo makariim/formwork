@@ -1,0 +1,132 @@
+# Routing one plain prompt
+
+A person types one plain sentence. This page says what happens next: what kind
+of work it is, how big, who does it, what shape the brief takes, and where it
+stops.
+
+**Routing accuracy is NOT ESTABLISHED.** Nobody has run a set of prompts
+through this table and counted how often it picked right. Until somebody does,
+with the command and the number written down, treat every route as a guess the
+person can correct in one line.
+
+---
+
+## Who routes
+
+| Size | Who routes |
+|---|---|
+| a task | the session that got the prompt. It may route down only |
+| anything above a task | the `director`, and nobody else |
+
+A working session that finds the work is bigger than a task says so in one line
+and hands it up. It never writes a bigger brief itself. The `lead` does not
+route either: it runs a round or splits a brief once the director has sized it.
+
+---
+
+## Before routing
+
+Read, in this order:
+
+1. `docs/standing.md`: where the project is, and the live stream if streams are
+   declared.
+2. `docs/routing.md`: this person's corrections, in their words. A correction
+   beats this table.
+3. This page.
+
+If `docs/routing.md` does not exist, route from this page alone. Do not create
+it until there is a correction to write.
+
+---
+
+## The kinds
+
+Pick one from this list. Not from role descriptions, not from skill names. A
+short named list is what keeps routing from drifting as the library grows.
+
+| Kind | Size test | Template | Team | Stops |
+|---|---|---|---|---|
+| **A question** | an answer, nothing changes in the repository | none | the session that got it | after the answer |
+| **A fix** | one fault, reproduced, one or two files | one line brief | the session that got it | after the fix, its test and `formwork check` |
+| **A change to an existing product** | task if a sentence covers it; checkpoint if you have to say what is out of scope | one line, or `templates/brief.md` | the session, or one working role (`backend`, `frontend`, ...) | at the report |
+| **Research** | task if one source answers it; round if the answer is unclear and costly to get wrong | one line, or `templates/round.md` | `researcher`; a round through `lead` | at the report or the round record |
+| **A deck or document** | task if the words already exist; checkpoint if the argument has to be built | one line, or `templates/brief.md` | `writer`, with `visual` when it is looked at | at the draft, for the person to read |
+| **A new product** | never a task. Milestone, made of phases | `templates/brief.md` for the first brief, a round when a choice is open | `director` plans; `lead` splits; the packs build | after each phase's report, and before anything is released |
+
+When two kinds fit, take the smaller one. When none fits, ask one question.
+
+---
+
+## Size
+
+**The default is a task.** Step up only when the work grows, never at the start
+to be safe.
+
+The test is the loop's own (`formwork/loop.md`): could a reviewer sensibly
+accept one part and reject the next? If yes, it is more than one piece of
+work, and it is above a task.
+
+Say the size in plain words. The person can override it in one line.
+
+---
+
+## The team
+
+1. An existing role whose `owns` covers the work.
+2. A relabel when the work needs a focus: an existing role given a title for
+   this brief ("`visual` as art director").
+3. A new role only when no `owns` covers it, following
+   `formwork/roles/HOW-TO-ADD-A-ROLE.md`.
+
+Hooks are not chosen per prompt. They are wired once by `formwork install` and
+run on everything. `formwork check` runs whole, every time.
+
+---
+
+## Say it back, then act on the size
+
+**A task.** One line, then do it. No "Go?". The person corrects only when the
+line is wrong.
+
+> Task, fix: reproduce the empty search result, fix it, add the test. One line
+> brief.
+
+**Above a task.** Two lines: kind, size, team, first brief. Then the director
+writes that brief and stops with its fixed sentence. The work runs alone inside
+the brief, and choices are collected for the report.
+
+> Milestone, new product: a one page spec from your words first, for you to
+> read. Then research, design samples for your pick, build, our review beside
+> yours; release only when you say.
+
+A request for a stream whose start condition is not met is said back as such,
+and not started.
+
+---
+
+## Corrections
+
+When the person says the route was wrong, the director writes their words into
+`docs/routing.md`, a dated pair, append only:
+
+```
+routed: 2026-11-20
+in my words: bugs in the search page are tasks, never rounds
+```
+
+The person cuts lines. The director never edits or rewords one. The template is
+`formwork/templates/routing.md`.
+
+A correction that turns up in more than one project is a reason for a brief
+that changes this page. It is never a reason to copy anybody's words into the
+kit.
+
+---
+
+## What this cannot do
+
+Tell that a small ask was born large. No check reads intent, so a one line
+request briefed as a round passes every check. The director's rule is the only
+guard: if you cannot tell the size, ask one question.
+
+Know that it routed well. See the top of this page.

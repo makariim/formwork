@@ -8,6 +8,18 @@ version commit's message in git: `git show 02bd5f0` for 0.2.0 and
 
 ## Unreleased
 
+- Routing one plain prompt. `formwork/route.md` is the routing table: six
+  kinds of request, each with its size test, template, team and stops.
+  Default size is a task. The `director` is the only router above a task and
+  says the plan back in one or two lines before acting. Corrections go in
+  `docs/routing.md`, in the person's words (`formwork/templates/routing.md`).
+  Routing accuracy is NOT ESTABLISHED.
+- `formwork setup` asks a twelfth question and offers the two routing lines
+  (`formwork/templates/project-instructions.md`) as `CLAUDE.md`, `AGENTS.md`
+  or `GEMINI.md` by runtime, only when the file does not exist. When it does,
+  setup shows the lines to paste and writes nothing there.
+- `formwork/templates/personal-defaults.md`: a page to copy into your own
+  global instruction file, with one line pointing at formwork's routing.
 - `predictions-first` reads rounds outside `docs/rounds/`: any folder under
   `docs/` with a predictions file (`predictions.md`, `*-predictions.md`) or a
   challenge file (`challenge.md`, `challenger.md`). A challenge file with no
