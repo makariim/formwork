@@ -55,6 +55,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 CHECKS_DIR = os.path.join(HERE, "checks")
 FIXTURES_DIR = os.path.join(HERE, "fixtures")
 PROJECT_ROOT = os.path.dirname(os.path.dirname(HERE))
+# Background agent worktrees hold full copies of the kit, must-fail fixtures included.
+WORKTREES_DIR = os.path.join(PROJECT_ROOT, ".claude", "worktrees")
 
 CLEAN, FINDINGS, CANNOT_RUN = 0, 1, 2
 
@@ -266,7 +268,7 @@ def main(argv):
 
     # Pass 1 — the project itself.
     for name, path, _f, _p, _x in checks:
-        code, out = invoke(path, PROJECT_ROOT, exclude=[FIXTURES_DIR])
+        code, out = invoke(path, PROJECT_ROOT, exclude=[FIXTURES_DIR, WORKTREES_DIR])
         if code == CANNOT_RUN:
             print("ERROR: check %s could not run:\n%s" % (name, out),
                   file=sys.stderr)

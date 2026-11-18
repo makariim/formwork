@@ -1,5 +1,5 @@
 ---
-updated: 2026-11-15
+updated: 2026-11-18
 by: the working session for brief 0031
 ---
 
@@ -16,6 +16,8 @@ and a gate of checks that shows itself failing as well as passing. It carries
 nothing about anybody's product. It is the shape, empty.
 
 ## Where we are now
+
+**2026-11-18, the director's update:** briefs 0022 to 0033 are done and committed by him (latest cfbfb16, 0033: guard measurement method, review then refute, task size check; b6cc797, 0032: the motion taste pack). Ten commits are ahead of GitHub (`git log origin/main..HEAD`), not pushed; 1.0.0 still not published to PyPI. Read backs pending for the recent briefs. Parked: the whole project layer (`docs/ideas/2026-11-15-whole-project-builds.md`, mostly built as 0025 to 0033). Optional next: stop an AI from fixing a check by breaking its data (from 0033).
 
 **0.2.1 is what is on PyPI. 1.0.0 is built here and not published.** It
 carries everything below. In it: a role's
