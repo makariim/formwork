@@ -36,7 +36,7 @@ OURS = ("formwork/",)
 # Third-party and generated trees. Without these, a single install of
 # somebody's dependencies produced dozens of findings about other people's
 # READMEs, and the file count in the summary was meaningless.
-SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv", "venv", "env",
+SKIP_DIRS = {".git", ".build", "node_modules", "__pycache__", ".venv", "venv", "env",
              ".tox", ".nox", "build", "dist", "target", "vendor",
              "site-packages", ".next", ".nuxt", "coverage", ".mypy_cache",
              ".pytest_cache", ".ruff_cache", ".gradle", "Pods"}
