@@ -148,7 +148,7 @@ Source: https://www.designcouncil.org.uk/our-resources/the-double-diamond/
   beginning of their diamond work".
 - **Who decides.** Not stated.
 - **Transfers.** The split between "is this the right problem" and "is this
-  the right solution" as two separate phases. the health app's "correct and dead" v1 is
+  the right solution" as two separate phases. The health app's "correct and dead" v1 is
   a second diamond done well on a first diamond done badly.
 
 ### Dual track agile (Cagan, SVPG)

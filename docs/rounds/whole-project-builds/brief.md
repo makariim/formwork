@@ -57,7 +57,7 @@ building a small ask (a task keeps a one line brief).
 6. **The kit's open question already on record** (`docs/standing.md`, What is
    open): "Whether the `lead` may invent a role ... Open, and it cuts across what
    `role-shape` is for."
-7. **Style.** Plain English, short sentences. No em dashes or en dashes anywhere.
+7. **Style.** Short sentences in plain English, and no long or short dash characters at all.
    (`docs/style.md`.)
 
 ## What already exists in the kit, briefly
@@ -87,7 +87,7 @@ building a small ask (a task keeps a one line brief).
   the brief).
 - Skills and a model per role were planned and dropped (`docs/standing.md`, What
   we tried and stopped).
-- the health app v1 was "correct and dead": clean is not the same as alive (idea file).
+- The health app v1 was "correct and dead": clean is not the same as alive (idea file).
 
 ## The three projects (read only)
 

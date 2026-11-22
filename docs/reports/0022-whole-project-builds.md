@@ -9,7 +9,7 @@ date: 2026-11-15
 
 You asked what formwork should become so it can build a whole project from one plain prompt. Five roles researched it and argued it out. The kit was not touched.
 
-The first thing to know: your projects already built the structure by hand, and the kit's own checks could not see it. In the health app the rounds happened, but in folders `predictions-first` never reads, so it said clean over nothing. the health app's standing still names brief 0001 as next. the desktop app breaks its own one-open-brief-per-stream rule today, and no check notices.
+The first thing to know: your projects already built the structure by hand, and the kit's own checks could not see it. In the health app the rounds happened, but in folders `predictions-first` never reads, so it said clean over nothing. The health app's standing still names brief 0001 as next. The desktop app breaks its own one-open-brief-per-stream rule today, and no check notices.
 
 My recommendation is "beside, not over". It is one loop, with no product process on top. Formwork gains four things. Its checks learn to look where projects actually work. The director routes a plain prompt from a written table and says the plan back in one or two lines. A specialist is an existing role with a new title, and a new role file appears only when no role owns the work. Optional templates (spec, research round, review round, release step) and small taste packs cover big work.
 
@@ -81,7 +81,7 @@ Nothing staged.
 
 - **Done but not asked for.** The lead sent one challenge to each contested position after all five answers were in, as `formwork/roles/method/lead.md` says to. Four factual disputes were settled by opening files. The researcher's scratch downloads were deleted.
 - **Asked for but not done.** The brief says to set the brief to `status: done`. I left it `open`. `work-paired` refuses a done brief whose report has no read-back, and only you write the read-back. Once you have written the two lines above, the brief can be marked done.
-- **Wrong in the brief.** the desktop app has 198 reports, not 310. The 310 counts attachment folders. "Skills were dropped" is half out of date, since 1.0.0 ships `humanizer`. `docs/standing.md` says both things in two different sections. The idea file's "every time" holds for personal rules (run alone appears in 155 of 218 briefs) and not for the general method, which cost about one sentence per project. Product's claim that the health app never wrote a read-back is wrong: reports 0001 to 0003 carry it. I repeated that error in one challenge and withdrew it before it was answered.
+- **Wrong in the brief.** The desktop app has 198 reports, not 310. The 310 counts attachment folders. "Skills were dropped" is half out of date, since 1.0.0 ships `humanizer`. `docs/standing.md` says both things in two different sections. The idea file's "every time" holds for personal rules (run alone appears in 155 of 218 briefs) and not for the general method, which cost about one sentence per project. Product's claim that the health app never wrote a read-back is wrong: reports 0001 to 0003 carry it. I repeated that error in one challenge and withdrew it before it was answered.
 
 ### The body of the work
 

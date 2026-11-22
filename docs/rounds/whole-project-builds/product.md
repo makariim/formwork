@@ -30,9 +30,9 @@ ripgrep search tool, run with the pattern, the folder and the file glob shown.
    "Avoid AI slop" produced an app that was "CLEAN UI BUT SOOOOO DEAD". A taste
    pack that only lists what to remove will produce dead products. It needs
    the "alive" half too.
-5. **Dynamic roles were mostly relabels, not new files.** the health app wrote four
+5. **Dynamic roles were mostly relabels, not new files.** The health app wrote four
    project roles and relabelled about eight kit roles inline ("`visual` as
-   creative director"). the desktop app wrote none and invented its reviewers inside
+   creative director"). The desktop app wrote none and invented its reviewers inside
    each brief. The cheap form (a relabel plus a skill) carried most of the
    load.
 6. **Protecting the person's live device or screen recurs in 105 brief
@@ -56,10 +56,9 @@ recurred, and whether it belongs in a kit (general) or stays in the project
 
 **Where and what.**
 
-- `<health-app>/docs/product-spec.md` section 12: "Three phases,
-  each run without interrupting him, each ending with something for him to
-  review: 1. Research ... 2. Design ... 3. Build ... then one or two review
-  rounds".
+- `<health-app>/docs/product-spec.md` section 12: research, design and build as
+  three phases. None stops for him midway, each ends with a result he reviews,
+  and one or two review rounds follow.
 - `<health-app>/docs/briefs/` 0001 to 0005: streams `research`,
   `design`, `build`, `review`, `design` (round 2).
 - `<desktop-app>/docs/briefs/` 0033 to 0041, all stream `director`:
@@ -95,11 +94,9 @@ order.
 **Where and what.**
 
 - `<health-app>/docs/briefs/0001-research.md`: each lane writes one
-  file "in exactly these six parts: 1. The question, and why it matters ...
-  2. Theory ... 3. State of the art ... 4. What it means for [the product] ...
-  5. Proposals. Ranked, each with the evidence behind it, its cost, and what it
-  replaces or removes ... 6. Risks and unknowns". Then "Round 2, cross
-  reading", "Round 3, the story" (one integrator joins everything), "Round 4,
+  file in six fixed parts (the question and its importance; theory; state of
+  the art; meaning for the product; ranked proposals with evidence, cost and
+  what each replaces; risks and unknowns). Then a cross reading round, "Round 3, the story" (one integrator joins everything), "Round 4,
   challenge", "Spec update".
 - `~/Personal/Repos/ship-ai/docs/briefs/0001-the-roadmap.md`: two researchers,
   a planner, "Content writer (integrator)", then "Challenger: reads the roadmap
@@ -109,10 +106,9 @@ order.
   different whole designs", "walk every design through every scenario", score
   against requirements, "the breaker", "compare and recommend one".
 - `<health-app>/docs/reports/0001-research.md` shows what the round
-  cost and what it would change: "It would have been cheaper without losing
-  quality if each round 1 file had ended with a 20 line summary for cross
-  reading", and "the shared search budget also ran out ... search should be
-  rationed per lane".
+  cost and what it would change: a 20 line summary closing each first round
+  file would have made cross reading cheaper at no loss, and the shared
+  search budget ran dry, so it should be split per lane.
 
 **Recurred.** The shape "parallel lanes, then one integrator, then a challenger
 read cold" appears in 6 briefs I read: health-app 0001, 0002, 0004, 0005;
@@ -133,9 +129,9 @@ the integrator step, and the spec update at the end.
   real numbers"; "one neutral surface"; "standard system navigation"; "say the
   thing, not the feature"; no placeholders that look fake; "one category colour
   per row".
-- `<health-app>/docs/briefs/0005-bring-it-to-life.md`: "'Avoid AI
-  slop' was read as 'remove life'. The goal now: alive, warm, smooth, creative,
-  and still calm".
+- `<health-app>/docs/briefs/0005-bring-it-to-life.md`: the instruction to
+  avoid AI slop had been taken as an instruction to strip out all life; the new
+  aim was warm and lively while staying calm.
 - `<desktop-app>/docs/briefs/0475-quiet-and-right.md`: "no
   unnecessary statements or wordings", "no pills anywhere".
 - `<desktop-app>/docs/standing.md`, 2026-11-08: "his taste changed".
@@ -165,19 +161,19 @@ and briefs). Present in all 4 projects.
 
 **Where and what.**
 
-- `<health-app>/docs/product-spec.md` 1b: "one story, not a pile of
-  features ... Every screen answers 'where am I today, what is next, how am I
-  doing' ... Any feature that does not fit the story is cut or folded in. The
-  design phase is judged against this section first."
-- Same file, section 2: "[the person] is user zero. His real history is how we
-  discover what the app must do. Every feature is written as a general need
-  that his case revealed, never as a rule about him."
+- `<health-app>/docs/product-spec.md` 1b: a single story rather than a
+  list of features. Each screen tells the person where they stand today, what
+  comes next and how they are doing; a feature outside the story is dropped or
+  merged, and design is judged against this section before anything else.
+- Same file, section 2: the owner is user zero. His own history shows what the
+  app needs, and each feature is phrased as a general need his case exposed,
+  not a rule written about him.
 - `<health-app>/docs/review/round-1/findings.md`, item 4 of the five
   that hurt most: "User zero's shape reached everyone". So the pattern needs a
   check at review time, not only a sentence in the spec.
-- `<desktop-app>/docs/briefs/0034-requirements-first.md`: "a product
-  reviewer standing for the five user kinds (overfitting to him)". And 0039: "a
-  product reviewer for the ten user kinds".
+- `<desktop-app>/docs/briefs/0034-requirements-first.md`: a product
+  reviewer who speaks for five kinds of user, to stop the design fitting only
+  the owner; 0039 widens that to ten kinds.
 - `<health-app>/formwork/roles/project/ux-principal.md`: "Would be
   wrong if. The result is a feature list with screens, a tab bar of tools ... or
   a story that only works in the happy path."
@@ -195,20 +191,20 @@ own data stays in the project and, as health-app shows, outside git.
 Two different kinds showed up. Both were supplied by hand.
 
 **a. Experience review of the running product.**
-`<health-app>/docs/briefs/0004-review-round-1.md`: "our own review,
-at the same depth as the design round, on the running app, then the fixes for
-both his notes and ours". "Use your own simulator device, never the one he
-uses". "Drive every journey ... Screenshot each step ... compare each with its
-design render". Findings "group by journey. Start with the five that hurt the
-story most. Mark anything that only the real phone can prove." Part B: "merge
-them ... his notes first, his words kept". the desktop app 0485 adds "a look check: every
-screen drawn and looked at by the reviewer, not only read in code".
+`<health-app>/docs/briefs/0004-review-round-1.md`: the team reviews the
+running app as deeply as it ran the design round, then fixes both his notes
+and its own. It uses a separate simulator, not his. Every journey is driven,
+each step captured and set beside its design render. Findings are grouped by
+journey, the five that hurt the story most come first, and anything only a
+real phone can confirm is marked. Part B merges the lists with his notes on
+top, in his own wording. The desktop app 0485 adds a visual check: the
+reviewer looks at every screen as drawn, not only at the code.
 
 **b. Code review rounds until a named reviewer signs off.**
-`<desktop-app>/docs/standing.md`: "Code briefs run in rounds until a
-staff reviewer signs off ... round after round, logged, until the staff
-reviewer writes that it is fine to proceed". Sized per brief: "Small part: one
-staff review round", "Medium part ... at most three rounds".
+`<desktop-app>/docs/standing.md`: a code brief repeats logged review
+rounds until a staff reviewer writes that the work may go ahead. The number
+scales with the brief: one round for a small part, up to three for a medium
+one.
 
 **Recurred.** "staff review" or "fine to proceed": 106 times in 69 desktop-app brief
 files (Grep `staff (senior )?review|fine to proceed`, case insensitive, in
@@ -218,28 +214,28 @@ product: health-app 0004, desktop-app 0475 and 0485 (by reading). The ship-ai di
 (`~/Personal/Repos/ship-ai/docs/standing.md`).
 
 **General or personal.** General. After launch, desktop-app added a feedback ledger
-(`<desktop-app>/docs/feedback.md`: "Give it the next F- number ...
-The director checks each row, sets its severity and state, and plans it for a
-numbered release"). Also general.
+(`<desktop-app>/docs/feedback.md`: each item gets the next F number,
+and the director reviews every row, gives it a severity and a state, and
+schedules it into a numbered release). Also general.
 
 ### 6. Dynamic and project roles
 
 **Where and what.**
 
-- the health app wrote four role files in `<health-app>/formwork/roles/project/`
+- The health app wrote four role files in `<health-app>/formwork/roles/project/`
   (ux-principal, behaviour-scientist, nutrition-scientist,
   training-scientist). Ship-ai wrote four (field-researcher,
   academic-researcher, content-writer, project-manager). Studio wrote none.
   the desktop app has no `<desktop-app>/formwork/roles/project/` folder at
   all (Glob returned no files).
 - Far more specialists were made by relabelling a kit role inline, plus a
-  skill. the health app 0001: "`researcher` (formwork), as iOS platform researcher",
-  "`product` (formwork), as landscape researcher". the health app 0005: "Creative
+  skill. The health app 0001: "`researcher` (formwork), as iOS platform researcher",
+  "`product` (formwork), as landscape researcher". The health app 0005: "Creative
   director | `visual`", "Motion designer | `ux` with `animate`,
   `review-animations` ... skills", "Apple reviewer | `reviewer` with
   `apple-design`". About 8 relabels across health-app 0001, 0002, 0004, 0005 (by
   reading).
-- the desktop app invented its reviewers in each brief with no file: "a requirements
+- The desktop app invented its reviewers in each brief with no file: "a requirements
   engineer", "a product reviewer standing for the five user kinds", "the
   breaker ... whose only job is to invent new everyday scenarios", "a staff
   senior engineer who has the last word".
@@ -267,12 +263,12 @@ works in the happy path").
   the strong one; "at most 3 review rounds, 2 reviewers a round"; "a thread
   reads standing's rules and decisions that apply to its stream ... not every
   design and report"; "Every brief says these four".
-- Same file line 422: "paused for his usage limit (about 95% used)", with what
-  was running and how to resume.
-- Same file line 370: "queued to start by itself the moment 0480 reports (one
-  Claude worker)".
-- `<health-app>/docs/reports/0001-research.md`: "Token counts and
-  spend were not observable from this session: NOT ESTABLISHED", and the
+- Same file line 422: work paused when his plan was nearly used up, with a
+  note of what was running and how to pick it up again.
+- Same file line 370: a brief set to begin on its own as soon as 0480
+  reported, on a single worker.
+- `<health-app>/docs/reports/0001-research.md`: tokens and spend could
+  not be seen from that session, so they were marked NOT ESTABLISHED, and the
   search budget ran out mid round.
 
 **Recurred.** 2 of 4 projects (desktop-app, health-app). In desktop-app the four rules were
@@ -289,10 +285,11 @@ personal settings tied to a plan.
 
 - `<desktop-app>/docs/briefs/0463-signing-on-the-air.md`: "Runs on
   his [second machine], as a thread." 
-- `<desktop-app>/docs/standing.md` line 401: the release session
-  "releases only on a director line `release: go <version>` in standing, runs
-  package, check, in-app install, R2 upload, update page, live checks, and
-  pushes only a release record; tester emails stay his". Lines 404 and 405:
+- `<desktop-app>/docs/standing.md` line 401: a release
+  session acts only when standing carries a director line `release: go
+  <version>`. It packages, checks, installs in the app, uploads, updates the
+  download page, runs live checks and pushes nothing but a release record;
+  writing to testers stays with him. Lines 404 and 405:
   it stopped twice and said exactly why, then shipped on the third go.
 - `<health-app>/docs/reports/0003-build.md`: "To put it on your
   iPhone ... follow [the install guide] on your [second machine]".
@@ -308,8 +305,8 @@ release record in the repository.
 
 ### Gaps the idea file did not list
 
-**9. Samples, then a stop for the person's pick.** the health app 0005: "Phase 1 ends
-with ten pictures and stops for his yes". the desktop app 0485: "Draw 2 or 3 versions
+**9. Samples, then a stop for the person's pick.** The health app 0005: "Phase 1 ends
+with ten pictures and stops for his yes". The desktop app 0485: "Draw 2 or 3 versions
 ... Then stop half 1 ... and wait for his pick". "his pick", "his yes", "stops
 for his": 80 times in 54 brief files (Grep `his pick|his yes|stops? for
 his|wait for his pick`, case insensitive, glob
@@ -318,13 +315,13 @@ stop inside a design phase the person kept asking for.
 
 **10. Running alone.** "Never stop to ask" (or "do not stop to ask"): 58 times
 in 57 brief files (Grep `(never|do not|don't) stop to ask`, case insensitive,
-same glob). the desktop app also has a full overnight mode
-(`<desktop-app>/docs/standing.md` line 471: "never stops to ask him;
-where a choice comes up it builds the recommended option and lists the choice
-at the end ... uses no screen at all"). General.
+same glob). The desktop app also has a full overnight mode
+(`<desktop-app>/docs/standing.md` line 471: it does not stop for him;
+at a fork it builds the recommended option and lists the fork at the end, and
+it never uses the screen). General.
 
-**11. The person's live surface is off limits.** the health app 0004: "Use your own
-simulator device, never the one he uses". the desktop app standing line 475: "When a
+**11. The person's live surface is off limits.** The health app 0004: "Use your own
+simulator device, never the one he uses". The desktop app standing line 475: "When a
 thread drives his real screen ... no typed keys at all to whatever app is in
 front". "his simulator", "his device", "his screen", "his installed", "own
 simulator", "never touch his": 129 times in 105 brief files (Grep with that
@@ -348,10 +345,10 @@ Phase work moves fast and writes many decided entries. The top sections are
 not kept. (Whether `standing-current` would catch this: NOT ESTABLISHED; I did
 not run it there.)
 
-**14. Decisions lived in standing, not in decision files.** the health app has 0
+**14. Decisions lived in standing, not in decision files.** The health app has 0
 decision files (Glob for markdown files in its docs/decisions folder found
 none) against 15 dated
-decisions in its standing. the desktop app has 3 decision files (name, character, look)
+decisions in its standing. The desktop app has 3 decision files (name, character, look)
 against about 300 dated standing entries (Grep `^- 20` count in
 `<desktop-app>/docs/standing.md`: 300). In practice the cross phase
 record is the standing's "What is decided" list, in the person's words.
@@ -408,12 +405,12 @@ when it was missing.
    (health-app findings item 4).
 8. **Usage caps as settings.** Parallel builders, review rounds, reading
    scope. Asked for once, under pressure, and then repeated forever.
-9. **After launch: a feedback ledger and a release record.** the desktop app needed both
+9. **After launch: a feedback ledger and a release record.** The desktop app needed both
    from its first tester wave.
 
 ### What would be overhead
 
-- **Full paperwork for task sized asks.** the desktop app 0492 is a 39 line brief for
+- **Full paperwork for task sized asks.** The desktop app 0492 is a 39 line brief for
   sending one email. 0478 is 25 lines for replacing a link in drafts. A one line
   brief and a two line report would have carried both. The kit already says
   this (`formwork/roles/method/director.md`, Size the brief); a project layer
@@ -477,7 +474,7 @@ and as role files only where they need their own "would be wrong if". The
 taste pack for the product kind switched on. The live device rule switched on.
 
 **What must still stop for the person.** The spec read (health-app standing, first
-decision: "let me review it, after i review it, i want team of researchers").
+decision: he would read the spec first and only then wanted a research team).
 Forks only he can settle, collected at the end of each phase. The sample pick in
 design. Anything that uses private data about him. Accounts, signing, money,
 publishing. Git.
@@ -542,9 +539,9 @@ From the evidence, corrections came in three shapes, all one line:
 - **Size or stops.** "i dont want to be stopped in the middle" (ship-ai 0002).
   "no stops". The read back line should name the size and the stops, because
   those are the two things he corrected.
-- **Meaning.** "no i didnt mean to remove the figures completely, i meant to
-  draw them better" (health-app standing). "he took back the subscription check
-  ins" (health-app standing). Recorded as a dated entry in his words, and the plan
+- **Meaning.** He meant the figures should be drawn better, not removed
+  (health-app standing). He withdrew a request about subscription check ins
+  (health-app standing). Recorded as a dated entry in his words, and the plan
   re-said in one line.
 - **Direction.** "we need to reset the design, start all over again" (desktop-app
   0034). This one changes the phase, not the brief.
@@ -679,13 +676,13 @@ Headings as the projects actually used them. Each one fits on a page.
   `docs/ideas/2026-11-15-whole-project-builds.md`; searches in `formwork/`
   for taste, slop, usage, release and the report shape; `formwork/loop.md`
   (phase and milestone lines).
-- the health app (`<health-app>/`): the product spec (sections 1 to 2 and 9
+- The health app (`<health-app>/`): the product spec (sections 1 to 2 and 9
   to 13 in full; the rest by headings), briefs 0001 to 0005 in full, reports
   0001 to 0005 (the first 70 to 80 lines of each), the story (headings only),
   the director's AI check, the round 1 findings (first 50 lines), the four
   project roles, the standing page, AGENTS.md. I did not open the profile
   folder.
-- the desktop app (`<desktop-app>/`): the standing page (the top 45 lines and
+- The desktop app (`<desktop-app>/`): the standing page (the top 45 lines and
   lines 370 to 482, which hold the last entries and the standing rules, plus
   lines 177 to 188 for the usage rules), the feedback page (first 40 lines),
   briefs 0034, 0039, 0441, 0445, 0449, 0457, 0463, 0466, 0470, 0475, 0478,
@@ -709,7 +706,7 @@ Headings as the projects actually used them. Each one fits on a page.
 - The relabel count (about 8) is by reading, not by a search.
 - Whether formwork's `standing-current` check would flag health-app's stale top
   sections. I did not run any check in another project.
-- Token or plan usage per phase in any project. the health app's report says it was
+- Token or plan usage per phase in any project. The health app's report says it was
   not observable; desktop-app records only the percentage the person saw.
 - What the person would say back to a one line plan read. No project shows a
   router; every read back here is inferred from how he started and corrected
@@ -730,7 +727,7 @@ Two failures a director expanding one sentence did not catch:
    to stop it: "we need to reset the design, start all over again"
    (`<desktop-app>/docs/briefs/0034-requirements-first.md`). A gate
    "no build brief until a spec or requirements page is accepted" catches this.
-2. **Verify never closed.** the health app's UI journey tests were written and never
+2. **Verify never closed.** The health app's UI journey tests were written and never
    ran, in 0003 and again in 0004, and both reports carried it as "not done"
    while the next phase started (`<health-app>/docs/reports/0003-build.md`
    and 0004). A gate "unproven items are listed and seen before the next phase"

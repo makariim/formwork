@@ -60,7 +60,7 @@ open when this was written.
   check in its first brief, I was wrong.
 - Product: if product shows the same hand supplied method in desktop-app AND at
   least one of ship-ai or studio, with file paths, not only in the health app, I was
-  wrong. the desktop app showing it alone with counts would make me half wrong.
+  wrong. The desktop app showing it alone with counts would make me half wrong.
 - Record-keeper: if every proposed check names a fixture that would break it
   on a wrong phase or a duplicated `owns`, not only a missing heading, I was
   wrong.
@@ -83,7 +83,7 @@ second real project to ask for it.
 
 ## What nobody has asked
 
-Who reads the project layer after the build ends. the health app, ship-ai and studio
+Who reads the project layer after the build ends. The health app, ship-ai and studio
 are short projects. A phase layer pays off only if a project lives long enough
 to cross several phases, and the one long project (desktop-app, 204 briefs) is the
 one that ran without such a layer. Nobody will ask whether the long project

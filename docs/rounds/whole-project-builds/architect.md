@@ -12,18 +12,18 @@ The briefing asks where a "project layer" fits over, under or beside the kit.
 The evidence says the layer already exists, three times, built by hand and
 built differently each time, and the kit's checks cannot see any of it.
 
-- the health app, ship-ai and this kit's own brief 0022 all carry a `stream:` line in
+- The health app, ship-ai and this kit's own brief 0022 all carry a `stream:` line in
   brief frontmatter (`<health-app>/docs/briefs/0003-build.md` says
   `stream: build`; `~/Personal/Repos/ship-ai/docs/briefs/0001-the-roadmap.md`
   says `stream: course`; `docs/briefs/0022-whole-project-builds.md` says
   `stream: method`). No check reads it. No file declares which streams exist.
-- the desktop app declares streams in a table in `<desktop-app>/docs/standing.md`
+- The desktop app declares streams in a table in `<desktop-app>/docs/standing.md`
   ("How the work is organised"): each stream has a page, a brief number range
-  and a start condition such as "when identity has picked the look and the
-  engine's shape is settled". It also invented "one open brief per stream",
+  and a start condition, for example that the visual identity and the
+  engine design must both be settled first. It also invented "one open brief per stream",
   which the kit cannot express: `open_briefs` in `work-paired` is one number for
   the whole project.
-- the health app ran its phase rounds in `docs/research/`, `docs/design/round-2/` and
+- The health app ran its phase rounds in `docs/research/`, `docs/design/round-2/` and
   `docs/review/round-1/lanes/`, not in `docs/rounds/<name>/`.
   `formwork/check/checks/predictions-first` only looks under `docs/rounds/`
   (its `ROUNDS` constant), so every one of the health app's rounds was invisible to the
@@ -226,7 +226,7 @@ starts: after build
 
 Parallel streams, the desktop app's case, are the same entry with a different start
 condition (`starts: now` on several). A brief number range per stream, which
-the desktop app used to stop threads colliding, is optional; the kit's own
+The desktop app used to stop threads colliding, is optional; the kit's own
 `work-paired --next` already prevents collisions in one folder.
 
 ### How a brief knows its phase
@@ -249,7 +249,7 @@ three:
   and every `done` one carries its read-back
 - `starts: decision NNNN`: that decision record exists in `docs/decisions/`
 
-**A gate written in prose is decoration.** the desktop app's "when identity has picked
+**A gate written in prose is decoration.** The desktop app's "when identity has picked
 the look" was a real gate, and it was only true in the human's head. In this
 model it becomes `starts: decision NNNN`, where the decision records the pick,
 or `starts: after identity`. The human's read-back on the last report of the
@@ -456,7 +456,7 @@ Why each step sits where it does:
 NOT ESTABLISHED** on any runtime. If it cannot, the role creation is its own
 task brief ("add these two roles"), which stops, and the next session uses
 them. That costs one STOP, and the person sees the new roles before they work.
-the health app made four project roles and ship-ai four, so this is a rare step, not a
+The health app made four project roles and ship-ai four, so this is a rare step, not a
 per brief one.
 
 ### How they pass role-shape
@@ -469,7 +469,7 @@ worth having:
 - **A round participant must be a real role.** Every `<role>.md` in a round
   folder names a role that exists. This is checkable from files, and it is the
   only mechanical evidence that the lead spawned a declared role rather than a
-  persona. the health app's lane files (`a-journeys.md`, `b-behaviour.md`) would have
+  persona. The health app's lane files (`a-journeys.md`, `b-behaviour.md`) would have
   failed it, and that is the point.
 - **The template should say**: a role that touches plans, phases or order names
   the director and the lead in "Does not own". The ship-ai project manager
@@ -646,7 +646,7 @@ honestly is the reviewer's, and the page should say so.
 - **A `phase:` field next to `stream:`.** Two names for one fact, in a field
   that is hard to change later.
 - **Subfolders of project roles per stream.** Checked and never generated.
-- **Per stream `open_briefs`.** the desktop app needed it. It is a change to
+- **Per stream `open_briefs`.** The desktop app needed it. It is a change to
   `work-paired` and a new setting, and only parallel streams need it. Leave it
   until a second project asks.
 - **Usage awareness as a setting** (how many builders at once against plan
@@ -671,7 +671,7 @@ honestly is the reviewer's, and the page should say so.
   and one stream page.
 - The cost of routing, in turns or money. `formwork/COSTS.md` says rounds are
   unmeasured; the plan back adds one exchange per request, unmeasured.
-- the health app's full docs layout: a broad search timed out, so I listed only
+- The health app's full docs layout: a broad search timed out, so I listed only
   `docs/briefs/`, `docs/design/`, `docs/review/`, `docs/research/` one by one.
   `docs/profile/` was not opened.
 
@@ -712,7 +712,7 @@ participant's file in this round.
 **Objections 1 and 2: I yield on the separate file. I keep the field, the gates and the check.**
 Here is what docs/project.md held, and where each item really belongs:
 - **Roles in use:** a copy of the project roles folder. That is a second home for one fact, so I drop it. My own derived-copy test fails it.
-- **Streams, gates and what each one settles:** "where we are" and "what is next", made structured. That is standing's job. the desktop app already keeps its stream table in its standing brief.
+- **Streams, gates and what each one settles:** "where we are" and "what is next", made structured. That is standing's job. The desktop app already keeps its stream table in its standing brief.
 - **Routing corrections and the taste pack name:** the only items standing does not hold today. Neither changes faster or slower than "what is decided", so change rate does not justify a second file.
 
 So the adjustment is:
@@ -720,11 +720,11 @@ So the adjustment is:
 - stream-known reads the standing brief instead of a project file.
 - "What rebuilds you is docs/standing.md, and nothing else" stays true.
 
-The length risk is real. the desktop app's bloat came from free narrative ("Now:" paragraphs). Fixed-field stream entries do not need narrative. Whether they stay short is NOT ESTABLISHED, and the two-page rule still applies: cut before you add. Separate stream pages stay optional, for parallel streams only, as the desktop app did.
+The length risk is real. The desktop app's bloat came from free narrative ("Now:" paragraphs). Fixed-field stream entries do not need narrative. Whether they stay short is NOT ESTABLISHED, and the two-page rule still applies: cut before you add. Separate stream pages stay optional, for parallel streams only, as the desktop app did.
 
 **Objection 3: I adjust. A relabel is allowed. A pasted persona is not.** The line is where the boundary comes from:
-- **Relabel, allowed:** the lead spawns an existing generated role (for example `visual`) with a title line ("creative director for this round") and, if useful, a skill to follow. The role's owns, sections and tool grant still come from its checked file. The title adds focus, not authority. the health app brief 0003 pointing roles at skills is this shape.
+- **Relabel, allowed:** the lead spawns an existing generated role (for example `visual`) with a title line ("creative director for this round") and, if useful, a skill to follow. The role's owns, sections and tool grant still come from its checked file. The title adds focus, not authority. The health app brief 0003 pointing roles at skills is this shape.
 - **Pasted persona, not allowed:** a spawn whose instructions are not an existing generated role, such as a general agent given a role body in the prompt. Its boundary and tool grant are unchecked.
 - **The test for a new file and a STOP:** does an existing role's owns cover the work? If yes, it is a relabel and needs no file. If no, as with the health app's scientists, it needs a file. That was about four per project, not the eight relabels.
-- **the desktop app's reviewers invented inside briefs:** these were relabels if each was the reviewer role with a lens. They needed files only if they owned something new.
+- **The desktop app's reviewers invented inside briefs:** these were relabels if each was the reviewer role with a lens. They needed files only if they owned something new.
 - **The participant check loosens to match:** a round file is `<role>.md` or `<role>-<label>.md`, where `<role>` is a real role. So `visual-creative-director.md` passes and an unknown name fails.

@@ -359,9 +359,9 @@ card uses a nearly flat spring (bounce 0.12) for a size change.
 ## For his apps
 
 His rules for both: one moving thing at a time, no glow everywhere, motion
-that means something, Reduce Motion respected. the desktop app is the Mac notch
+that means something, Reduce Motion respected. The desktop app is the Mac notch
 companion ("gentle motion all day, real reactions, rare words, playful when
-clicked"; the notch moves less than the floating one). the health app is the iPhone
+clicked"; the notch moves less than the floating one). The health app is the iPhone
 training and nutrition app with a Coach and a Nutritionist, near-black, raised
 cards, soft glow and smooth motion welcome.
 
@@ -373,68 +373,68 @@ In SwiftUI, Glide's three curves are
 points to feel-check on a device, not measured values.
 
 **1. Motion explains.**
-- the desktop app: the notch moves only when something changed for the user (a
+- The desktop app: the notch moves only when something changed for the user (a
   summary is ready, a task finished, a reminder is due). No idle motion
   that says nothing; its "alive" comes from reacting, not from breathing
   forever.
-- the health app: when a logged meal changes the day's totals, the number that
+- The health app: when a logged meal changes the day's totals, the number that
   changed is the one that moves. Unchanged rings and cards stay still.
 
 **2. Three curves, named by job.**
 - Both apps: one shared `Motion` file with `travel`, `arrive`, `leave` and
   three durations (about 0.15 s press, 0.3 s travel, 0.6 s for rare scenes).
   No inline curves anywhere else.
-- the desktop app: the notch expanding uses `arrive`; collapsing uses `leave`,
+- The desktop app: the notch expanding uses `arrive`; collapsing uses `leave`,
   shorter, so it gets out of the way of the user's work fast.
 
 **3. Short for touch, longer for telling.**
-- the health app: set logging buttons and checkmarks answer in about 0.15 s. Only
+- The health app: set logging buttons and checkmarks answer in about 0.15 s. Only
   the end-of-workout summary, seen once a session, gets a longer scene.
-- the desktop app: clicks on the notch answer at once; the playful reaction "when
+- The desktop app: clicks on the notch answer at once; the playful reaction "when
   clicked" is the rare-tier delight and can take longer, because it is rare.
 
 **4. One leads, one follows.**
-- the desktop app: when an answer arrives, the companion reacts first, then the text
+- The desktop app: when an answer arrives, the companion reacts first, then the text
   follows 60 to 100 ms behind, smaller. Never both at once.
-- the health app: when the Coach suggests a change, the suggestion card arrives; the
+- The health app: when the Coach suggests a change, the suggestion card arrives; the
   affected exercise row updates only after, as a follower.
 
 **5. The accent lands last.**
-- the health app: the workout complete moment ends on one accented number (the
+- The health app: the workout complete moment ends on one accented number (the
   personal best, the volume), the last thing to settle. Nothing else on the
   screen carries the accent or the soft glow.
-- the desktop app: the morning sentence writes in, and the one action in it (the
+- The desktop app: the morning sentence writes in, and the one action in it (the
   thing that needs the user) is the last element to settle and the only
   coloured one.
 
 **6. One continuous thread.**
-- the health app: tapping a meal or exercise card grows that card into its detail
+- The health app: tapping a meal or exercise card grows that card into its detail
   screen (`matchedGeometryEffect` or the zoom navigation transition); back
   shrinks it into the same place.
-- the desktop app: the floating companion and the notch are the same character. When
+- The desktop app: the floating companion and the notch are the same character. When
   it docks, it travels into the notch rather than vanishing in one place and
   appearing in another.
-- the desktop app: a Claude Code question that the user answers from the notch
+- The desktop app: a Claude Code question that the user answers from the notch
   shrinks back toward the thread it came from, so the user sees where the
   answer went.
 
 **7. Invisible work in three beats.**
-- the desktop app: a background AI task shows three quiet beats in the notch:
+- The desktop app: a background AI task shows three quiet beats in the notch:
   started, working (one slow mark, not a spinner loop), done. Then still.
-- the health app: syncing with Health or saving a plan: sent, checked, saved, as one
+- The health app: syncing with Health or saving a plan: sent, checked, saved, as one
   small mark that changes shape three times, then rests.
 
 **8. Edit the demo.**
-- the health app onboarding: one control per step, shown large, with one moving
+- The health app onboarding: one control per step, shown large, with one moving
   highlight leading to the button. No screen recordings in the app or the
   App Store preview; build the preview from the real screens, cut down.
-- the desktop app onboarding (bringing in a subscription or an API key): one field
+- The desktop app onboarding (bringing in a subscription or an API key): one field
   at a time, with the companion pointing at it.
 
 **9. Text holds still.**
-- the desktop app: a summary that arrives in the notch holds still until it could be
+- The desktop app: a summary that arrives in the notch holds still until it could be
   read; no new motion in the notch during that time.
-- the health app: Coach and Nutritionist replies arrive, then hold. No shimmer or
+- The health app: Coach and Nutritionist replies arrive, then hold. No shimmer or
   pulse on text the user is reading.
 
 **10. Still frame first.**
@@ -446,19 +446,19 @@ points to feel-check on a device, not measured values.
   judge every motion against it.
 
 **11. Run only when seen; designed reduced version.**
-- the desktop app: its ambient motion pauses when the Mac is idle, the screen is
+- The desktop app: its ambient motion pauses when the Mac is idle, the screen is
   locked, a full screen app is in front, or the notch is hidden. With
   Reduce Motion on, reactions become a short cross-fade or a still
   expression change, and docking becomes a fade in place.
-- the health app: anything looping (a timer ring, a rest countdown) pauses when the
+- The health app: anything looping (a timer ring, a rest countdown) pauses when the
   app goes to the background (`scenePhase`). With Reduce Motion, card
   growth becomes a cross-fade and number changes become a plain swap.
 
 **12. Platform feel.**
-- the health app: keep native sheets, scroll and the back swipe; motion goes around
+- The health app: keep native sheets, scroll and the back swipe; motion goes around
   them. Drag to dismiss uses a spring that keeps the finger's speed (the
   `apple-design` rule), not a glide curve.
-- the desktop app: notch behaviour should feel like the system's own Mac notch and
+- The desktop app: notch behaviour should feel like the system's own Mac notch and
   menu bar, never like a web page placed in it.
 
 ## What I could not see

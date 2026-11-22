@@ -14,7 +14,7 @@ copy are sales copy, and most of that is not taste to copy (see "What not to
 take").
 
 Because it is not a fitness, nutrition or training app, the brief's
-conditional section **"For the health app" is left out**. the health app still appears under
+conditional section **"For the health app" is left out**. The health app still appears under
 "For his apps".
 
 ---
@@ -350,78 +350,78 @@ measured.
 ## For his apps
 
 His rules: one moving thing at a time, no glow everywhere, motion that means
-something, Reduce Motion respected. the desktop app is the chief of staff app on the
-Mac, with its ink drop character, the notch and one chat. the health app is the
+something, Reduce Motion respected. The desktop app is the chief of staff app on the
+Mac, with its ink drop character, the notch and one chat. The health app is the
 iPhone app for training and food, rooted at Today, with The Road, Capture,
 kept days and weeks held, and no guilt.
 
 **1. Motion follows the words.**
-- the desktop app: while a reply streams, only the newest words carry the fade in; the
+- The desktop app: while a reply streams, only the newest words carry the fade in; the
   drop's eyes track the line being written, then settle when the answer ends.
-- the desktop app: the one status line is replaced in place with a short crossfade on
+- The desktop app: the one status line is replaced in place with a short crossfade on
   a real phase change, never a spinner beside it.
-- the health app: when the Coach's answer says "protein is 40 g short", that number
+- The health app: when the Coach's answer says "protein is 40 g short", that number
   in the ring or bar under the message lights once as the sentence reaches
   it.
 
 **2. One idea, one picture.**
-- the health app: a week held is a short path of seven marks; each kept day lands on
+- The health app: a week held is a short path of seven marks; each kept day lands on
   it as it is kept. A comeback gets its own small mark, named in words.
-- the desktop app: a reminder that is set moves once from the reply into its place in
+- The desktop app: a reminder that is set moves once from the reply into its place in
   today's list, so the person sees where it went.
 
 **3. Build the number in reading order.**
-- the health app: on The Road, the weight trend draws, then today's dot settles, then
+- The health app: on The Road, the weight trend draws, then today's dot settles, then
   the one hero number appears. Each lands before the next. Real numbers only.
-- the desktop app: the weekly review counts closed items up once, after the list has
+- The desktop app: the weekly review counts closed items up once, after the list has
   appeared, never in parallel with it.
 
 **4. The first second says the point.**
-- the health app: opening the app shows Today with the next thing ready. No splash,
+- The health app: opening the app shows Today with the next thing ready. No splash,
   no greeting animation before content.
-- the desktop app: the first frame of a reply is the answer's first words; the
+- The desktop app: the first frame of a reply is the answer's first words; the
   thinking form appears only if the turn is slow.
 
 **5. Same words everywhere.**
-- the health app and the desktop app: the notification text, the Live Activity line and the
+- The health app and the desktop app: the notification text, the Live Activity line and the
   in-app line are the same sentence.
 
 **6. Auto-play yields.**
-- the desktop app: the drop breathes only while a run works, pauses when the window or
+- The desktop app: the drop breathes only while a run works, pauses when the window or
   notch is hidden, and is still with Reduce Motion (already the rule in its
   handbook; keep it).
-- the health app: the rest timer in the live workout is the progress ring itself, so
+- The health app: the rest timer in the live workout is the progress ring itself, so
   the motion is the timer; it stops the moment he taps "next set".
 
 **7. Entrances play once.**
-- the health app: the morning reveal of Today plays once per day, not every time he
+- The health app: the morning reveal of Today plays once per day, not every time he
   returns to the screen.
-- the desktop app: a card that persists across relaunch appears finished, not
+- The desktop app: a card that persists across relaunch appears finished, not
   animated in again.
 
 **8. Reduced motion shows the finished frame.**
-- the health app: the weekly path shows all marks placed; rings show their final
+- The health app: the weekly path shows all marks placed; rings show their final
   fill; a kept day shows its mark without the landing.
-- the desktop app: the character holds its mood pose for the state (thinking, done,
+- The desktop app: the character holds its mood pose for the state (thinking, done,
   needs you); colour alone does not carry the state.
 
 **9. One physical moment.**
-- the health app: the only spring with a little bounce is a held week (weekly, rare),
+- The health app: the only spring with a little bounce is a held week (weekly, rare),
   with one success haptic on the same frame. Daily logging stays plain.
-- the desktop app: the "done" settle of the drop is the one moment with weight; every
+- The desktop app: the "done" settle of the drop is the one moment with weight; every
   other change is a fade.
 
 **10. Progress and confirmation tell the truth.**
-- the health app: the medicine check draws only on the one named medicine he tapped,
+- The health app: the medicine check draws only on the one named medicine he tapped,
   with one light haptic; never an "all taken" animation.
-- the health app: a meal photo being read shows real steps (photo read, items found,
+- The health app: a meal photo being read shows real steps (photo read, items found,
   numbers ready), not a timed bar.
-- the desktop app: "Reminder set" draws a small check beside its Undo, once.
+- The desktop app: "Reminder set" draws a small check beside its Undo, once.
 
 **11. Leave faster than you arrive.**
-- the health app: Capture opens as a sheet that settles in, and closes faster than it
+- The health app: Capture opens as a sheet that settles in, and closes faster than it
   opened.
-- the desktop app: a dismissed card leaves in about two thirds of its entry time and
+- The desktop app: a dismissed card leaves in about two thirds of its entry time and
   travels a short way.
 
 ---

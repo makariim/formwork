@@ -38,7 +38,7 @@ date: 2026-11-15
      the spec. Then brief 0001", and briefs 0001 to 0003 are done.
    Neither is a bug by the kit's own rules. Both matter for a project layer:
    a project is exactly the place where "nothing claimed" stops being true.
-4. **the desktop app does not have 310 reports.** It has 198 report files and 112
+4. **The desktop app does not have 310 reports.** It has 198 report files and 112
    attachment folders beside them (`NNNN-files`, `NNNN-shots`). The 310 is a
    folder listing. Commands, in the desktop app: `ls docs/reports | wc -l` (310),
    `ls docs/reports | grep -c '\.md$'` (198),
@@ -47,7 +47,7 @@ date: 2026-11-15
    dropped), from `comm` of the two number lists. So reports are fewer than
    briefs, not more. `work-paired` over the desktop app: "204 brief(s), every finished
    one has its report and its read-back, 12 still open".
-5. **the desktop app's own concurrency rule is broken, and no check saw it.** Its
+5. **The desktop app's own concurrency rule is broken, and no check saw it.** Its
    standing brief says "one open brief per stream at a time". It numbers each
    stream in its own band of a hundred (director 0001 to 0099, engine 0101 to
    0199, and so on to launch 0601 to 0699). Open briefs now, from
@@ -64,30 +64,30 @@ date: 2026-11-15
 
 This shapes every answer below, so it comes first.
 
-- **the health app** (5 briefs, 5 reports, no `docs/decisions/`, no `docs/rounds/`).
+- **The health app** (5 briefs, 5 reports, no `docs/decisions/`, no `docs/rounds/`).
   Its rounds lived in `docs/research/`, `docs/design/` and `docs/review/`, each
   with its own `predictions.md` and `challenge.md`. `predictions-first` only
   looks in `docs/rounds/`, so it never saw any of them: "no docs/rounds
   directory, no rounds to check". The round discipline happened, and the check
   built for it examined nothing.
-- **the health app's "dynamic roles"** were not new role files. Brief 0005's team table
+- **The health app's "dynamic roles"** were not new role files. Brief 0005's team table
   maps personas onto existing roles: the creative director runs as `visual`,
   and both the motion designer and the interaction designer run as `ux`, with
   skills attached. Four genuinely new roles exist in its project folder
   (ux-principal, behaviour-scientist, nutrition-scientist,
   training-scientist). So the real pattern is "persona over a base role,
   declared in the brief", and `role-shape` sees only the files.
-- **The cross phase record already exists, in the standing brief.** the health app's
+- **The cross phase record already exists, in the standing brief.** The health app's
   "What is decided" is a run of dated entries, each with his words in quotes
-  and the brief they bind ("sent to 0005"). the desktop app's is the same at scale: its
+  and the brief they bind ("sent to 0005"). The desktop app's is the same at scale: its
   standing brief is 481 lines (`wc -l`), 194 of them contain "his words"
   (`grep -c -i 'his words'`), and it has 3 decision files. Four entries
   replace an earlier rule inline (`grep -c -i -E '\(replaces|supersed'`).
-- **Nobody wrote a one line brief.** the desktop app brief lengths from
+- **Nobody wrote a one line brief.** The desktop app brief lengths from
   `wc -l docs/briefs/*.md`: shortest 13 lines, median about 28, longest 86.
-  A brief for one social post is 22 lines. the health app's run 36 to 60 lines. No
+  A brief for one social post is 22 lines. The health app's run 36 to 60 lines. No
   brief in any of the four projects carries a size.
-- **the desktop app's `in my words:` lines are typed by the director**, by its own
+- **The desktop app's `in my words:` lines are typed by the director**, by its own
   standing brief: "The director types his words, never writes them", with
   `read_back_words = 1`. That is allowed by `work-paired` and is exactly the
   limit `formwork/limits.md` names.
@@ -161,7 +161,7 @@ Proposed names are plain text, because none of these files exist.
 - Breaks it: two open briefs, both `stream: engine`, limit one.
 - Cannot tell: briefs with no stream line. Whether the overnight relaxation
   was his decision, unless the lift is itself a line in the record.
-- A related cheap catch: a number band within a few numbers of full. the desktop app's
+- A related cheap catch: a number band within a few numbers of full. The desktop app's
   app band holds 90 briefs in 0401 to 0499 (`ls docs/briefs | grep -c '^04'`),
   and `work-paired --next` hands out max plus one across all bands, so it does
   not know bands exist. Only worth adding if bands become a kit pattern.
@@ -211,7 +211,7 @@ rules: each item says what it catches.
 place for its job.** Both projects kept it as dated entries under the standing
 brief's "What is decided", each with his words quoted and the brief it binds.
 The standing brief is rewritten and describes the present. A binding record
-must not be rewritten. the desktop app's four inline "replaces" entries are where that
+must not be rewritten. The desktop app's four inline "replaces" entries are where that
 starts to show: the old rule survives only in version control.
 
 Two kinds of thing are being mixed:
@@ -225,7 +225,7 @@ Two kinds of thing are being mixed:
   binds: [0003, 0005]      or   binds: all-after
   ```
 
-- **Settlements.** Small answers to open questions. the health app logged about
+- **Settlements.** Small answers to open questions. The health app logged about
   twenty in two days. A decision file each, with options and a bad column, is
   the paperwork that kills the method (`formwork/roles/method/director.md`,
   Size the brief). These stay as dated lines in the standing brief.
@@ -248,7 +248,7 @@ the standing brief.
 ## K3. Usage awareness
 
 **`open_briefs` does not cover it.** It counts briefs, not builders. One
-the health app brief, 0005, ran a team of six. And it is global, while the desktop app's real
+The health app brief, 0005, ran a team of six. And it is global, while the desktop app's real
 limit was per stream.
 
 What a kit with no network and no account access can measure:
@@ -397,7 +397,7 @@ director role; `docs/standing.md`; `docs/decisions/`; parts of
 
 In the projects, read only: the health app's docs layout, `docs/standing.md`, the
 heads of its five briefs, brief 0005's team table, the frontmatter of its
-project roles and `.formwork.toml`. the desktop app's `.formwork.toml`, the structure
+project roles and `.formwork.toml`. The desktop app's `.formwork.toml`, the structure
 and tail of `docs/standing.md` with its "How the work is organised" section,
 `docs/decisions/` (list), report and brief counts, the frontmatter of three
 briefs from 0450 onward. Ship-ai's and Studio's brief heads and one project
@@ -425,7 +425,7 @@ named beside each number above.
 I refused a file that repeats the standing brief's headings. Declared streams,
 start conditions and routing corrections are a different kind of fact: they
 bind later work, so they should not live in a page that is rewritten. Today
-the desktop app keeps its streams table inside the standing brief. Condition one: moving
+The desktop app keeps its streams table inside the standing brief. Condition one: moving
 it means deleting it there, leaving a pointer, never keeping both. Condition
 two: the file is append only for corrections, dated, in his words. A fork
 still goes to a decision record. The check is worth having: every brief's
@@ -433,19 +433,19 @@ still goes to a decision record. The check is worth having: every brief's
 `stream: engine` and no engine stream declared. Cannot tell: whether the
 stream was the right one. With no project file, nothing is claimed.
 
-**2. Rebut the fact, keep the key.** the health app's reports do carry the read-back.
+**2. Rebut the fact, keep the key.** The health app's reports do carry the read-back.
 `grep -n -i -E "^accepted\s*:|^in my words\s*:" docs/reports/*.md` in the health app
 finds both lines in all three done reports (0001, 0002, 0003). And the go word
 is the read-back: 0002's `in my words:` line is "finished, lets go buildinggg,
 start". So the gate already keys off something he actually does. The weak part
-is the one `formwork/limits.md` names: who typed the line. the desktop app's director
+is the one `formwork/limits.md` names: who typed the line. The desktop app's director
 types it, with `read_back_words = 1`. No file check can see a hand on a
 keyboard. A phase gate keyed off a standing entry would be weaker still,
 because that page is rewritten. I keep `after:` keyed off done with read-back,
 labelled with that limit.
 
 **3. Adjust: neither required everywhere, each required once claimed.**
-`stream:` is the field people already write. the desktop app has it in 66 of 204
+`stream:` is the field people already write. The desktop app has it in 66 of 204
 briefs, and none of the four projects writes a size. So: `stream:` becomes
 required once the project file declares streams, and checked against it.
 For size: **a brief with no `size:` line counts as a task**, and a task over

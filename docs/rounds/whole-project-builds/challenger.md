@@ -19,7 +19,7 @@ that.
 - What he really repeated by hand is **his own taste** and **"run alone, never
   stop to ask"**. Both are personal. Both already have a home that works: his
   CLAUDE.md and each project's AGENTS.md.
-- the health app ran the full phase cycle (research, design, build, review) and v1
+- The health app ran the full phase cycle (research, design, build, review) and v1
   still came out "correct and dead". The phase cycle was there. It did not
   prevent the failure that motivates this idea. He caught it by looking at the
   running app.
@@ -59,11 +59,11 @@ rg '^status:' <health-app>/docs/briefs
 ls ~/Personal/Repos/{health-app,ship-ai,studio,desktop-app}/formwork/roles/project/
 ```
 
-the desktop app's brief total: I listed the folder and the listing stopped at 100
+The desktop app's brief total: I listed the folder and the listing stopped at 100
 files with more remaining. I did not count further. The 204 is the briefing's
 number, NOT ESTABLISHED by me.
 
-**The one long project used no project roles and no phase cycle.** the desktop app is
+**The one long project used no project roles and no phase cycle.** The desktop app is
 the only project that lived longer than a week, and it is the one that would
 need a project layer most. It ran without one.
 
@@ -133,12 +133,12 @@ real pictures and writing rules for this product on this day.
 ### Where I concede
 
 One shape does recur across two projects: **show a direction, stop for his
-yes, then apply it.** the health app 0005 ("Phase 1 ends with ten pictures and stops
+yes, then apply it.** The health app 0005 ("Phase 1 ends with ten pictures and stops
 for his yes"), desktop-app 0505 and 0603 ("part 1: the direction, for his
 approval"). Three briefs, two projects. That is real, and it is a brief shape,
 not a layer. It is the one exception to my verdict.
 
-the desktop app also invented two structures by hand that the kit does not carry:
+The desktop app also invented two structures by hand that the kit does not carry:
 **streams** with their own brief number ranges
 (`<desktop-app>/docs/standing.md`, lines 14 to 28) and a **feedback
 list** triaged into releases (`<desktop-app>/docs/feedback.md`). Both
@@ -182,7 +182,7 @@ exist for.
   `docs/standing.md`, What is open. A project layer drawn from one person's
   projects over nine days is the same n of one, one level higher.
 - "Nobody has measured what a round costs in money. Not once."
-  `formwork/COSTS.md`. the health app ran a multi role team in each of its five briefs
+  `formwork/COSTS.md`. The health app ran a multi role team in each of its five briefs
   in two days. A project layer multiplies rounds, and the price of one is
   still unknown.
 - "a check written by whoever wrote the thing it checks tends to pass for the
@@ -216,7 +216,7 @@ exist for.
 
 **It is a second process, in a kit whose page says there is one.** And it
 does not match what happened. `formwork/loop.md` says a phase takes weeks.
-the health app's "phases" took a day each, and each was one numbered brief with a lead
+The health app's "phases" took a day each, and each was one numbered brief with a lead
 and a team. That is a round, a size the kit already has. The layer would
 template something that, in the evidence, was a sequence of rounds.
 
@@ -281,7 +281,7 @@ It is May 2027. The router shipped. Everybody agrees it failed. Why?
 
 ### This is not speculation: his own product measured a router
 
-the desktop app brief 0122 records that a two class router (answer or work) trained on
+The desktop app brief 0122 records that a two class router (answer or work) trained on
 one writer's messages sent **8 of 37 work messages to the wrong door, 21.6%**,
 on another writer's messages, over its own 20% bar
 (`<desktop-app>/docs/briefs/0122-the-router-on-real-messages.md`,
@@ -333,12 +333,12 @@ must arrive with a measured misfire rate on his real prompts**, the way desktop-
    (`formwork/roles/HOW-TO-ADD-A-ROLE.md`, Where a tool grant actually binds).
    A role written at run time sets its own grant. Tool permission then comes
    from authorship, in the middle of a run, with no human in between.
-4. **Sprawl.** the health app wrote 4 roles for 5 briefs. ship-ai wrote 4 for 2 briefs.
+4. **Sprawl.** The health app wrote 4 roles for 5 briefs. ship-ai wrote 4 for 2 briefs.
    Generated per phase, a project collects roles faster than it collects
    briefs. "A role arrives when the work arrives" is satisfied literally while
    its intent, a role nobody needs does not get made, is lost.
-5. **It leaks private content into a general kit.** the health app's roles are about
-   the health app: `ux-principal` "Owns. the health app's story" and names the health app's journeys
+5. **It leaks private content into a general kit.** The health app's roles are about
+   the health app: `ux-principal` "Owns. The health app's story" and names the health app's journeys
    (`<health-app>/formwork/roles/project/ux-principal.md`, line 11).
    A "role library" fed from real projects carries their domain into the kit.
    `formwork/limits.md` says the privacy scanners "cannot see a paraphrase".
@@ -351,7 +351,7 @@ must arrive with a measured misfire rate on his real prompts**, the way desktop-
 
 ## C6: what nobody will ask
 
-1. **The long project's real gap is streams, not phases.** the desktop app's standing
+1. **The long project's real gap is streams, not phases.** The desktop app's standing
    brief says so in its own words: "workstream threads beside a director are
    new here" (`<desktop-app>/docs/standing.md`, line 28). It ran seven
    streams with number ranges and one writer of standing. That is the
@@ -422,7 +422,7 @@ lack of a template.
 
 ## What I could not establish
 
-- the desktop app's brief total. The listing stopped at 100. The briefing's 204 is not
+- The desktop app's brief total. The listing stopped at 100. The briefing's 204 is not
   checked by me.
 - Whether the method appears in briefs in words my searches did not match. The
   counts are keyword floors.
@@ -438,7 +438,7 @@ lack of a template.
 
 **I yield on "convenience only".** I checked three of the four claims myself.
 - Claim 1, mostly holds. `<health-app>/docs/research/predictions.md` and `.../docs/design/predictions.md` exist, outside `docs/rounds/`. I found no predictions file in review. Found with a glob for `**/predictions.md` under health-app `docs/`.
-- Claim 2 holds. the health app's standing "What is next" still reads "His review of the spec. Then brief 0001, research." (`rg -A4 'what is next' <health-app>/docs/standing.md`).
+- Claim 2 holds. The health app's standing "What is next" still reads "His review of the spec. Then brief 0001, research." (`rg -A4 'what is next' <health-app>/docs/standing.md`).
 - Claim 3 is dropped. The lead withdrew it, and I had found the same thing. Reports 0001, 0002 and 0003 carry `accepted:` and `in my words:` at the bottom (lines 85, 96 and 106). Only the old "Waiting for your read-back" placeholder near the top of 0001 and 0002 is stale. Briefs 0004 and 0005 are `open`, so an empty Accepted is correct there. The gate happened.
 - Claim 4 holds. Open desktop-app briefs: engine 0118 and 0126, runner 0209, 0220 and 0221, app 0470, 0471, 0472, 0490 and 0492 (`rg '^status:' docs/briefs`, open lines by number range).
 

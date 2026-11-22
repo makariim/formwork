@@ -46,7 +46,7 @@ Four disputes were settled by opening a file, so nobody spent a turn on them.
    0005 are open. **Product's P4 table and point 2 of its short version are
    wrong on this.** The lead also carried the wrong version into the challenge
    sent to the challenger, and withdrew it before the challenger answered.
-4. **the desktop app brief 0122.** Challenger used its 21.6% misroute figure against a
+4. **The desktop app brief 0122.** Challenger used its 21.6% misroute figure against a
    router. It measures a two class message classifier inside the product, not
    an agent routing a development request. Analogy, not evidence. The
    challenger agreed.
@@ -161,7 +161,7 @@ which is `read_back_words`, already a setting. Closed by the file.
   the guard protects the file from the agent (architect).
 - **A taste checklist check.** It can prove a list was copied, not that anybody
   looked (record-keeper).
-- **A linear phase order gate.** the health app ran review 0004 and redesign 0005 open
+- **A linear phase order gate.** The health app ran review 0004 and redesign 0005 open
   together, by his choice (record-keeper).
 - **A usage meter.** Needs an account or reads private transcripts
   (record-keeper). Plan limits NOT ESTABLISHED (researcher).
@@ -216,7 +216,7 @@ Closed in exchange: 1 (read-back weight). Deferred to the human: 3. Halted:
 none.
 
 Read more than once: the health app's briefs and the director role were read by four
-of five participants. the health app's reports were read by product, record-keeper and
+of five participants. The health app's reports were read by product, record-keeper and
 the challenger, and two of them reached opposite facts about the same lines.
 What would have made it cheaper without making it worse: the briefing should
 have carried the read-back fact and the true the desktop app counts, checked by the

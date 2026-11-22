@@ -17,7 +17,7 @@ participant files are beside it. Nothing in the kit was changed.
    rounds ran with predictions, but in `docs/research/` and `docs/design/`,
    where `predictions-first` never looks, so it printed clean over nothing. Its
    standing brief still names brief 0001 as next while 0001 to 0005 ran, and
-   `standing-current` printed "ahead of all 0 record(s)". the desktop app's "one open
+   `standing-current` printed "ahead of all 0 record(s)". The desktop app's "one open
    brief per stream" is broken now (engine 2, runner 3, app 5) and
    `open_briefs`, one global number set to 16, cannot see it. Sources:
    record-keeper and challenger, both checked against the files.
@@ -26,10 +26,10 @@ participant files are beside it. Nothing in the kit was changed.
    and his taste. The general method (the phase cycle) appears in all four
    projects too, but cost about one sentence per project, which the director
    expanded. Commands are in the round record.
-3. **The brief's picture had two wrong facts.** the desktop app has 198 reports, not 310
+3. **The brief's picture had two wrong facts.** The desktop app has 198 reports, not 310
    (the rest are attachment folders). Skills were not simply "dropped": 1.0.0
    ships `humanizer`. `docs/standing.md` says both things in two sections.
-4. **Nobody wrote a one line brief.** Not in any of the four projects. the desktop app's
+4. **Nobody wrote a one line brief.** Not in any of the four projects. The desktop app's
    shortest brief is 13 lines; brief 0492 is 39 lines for one email. The
    failure seen in practice is over building small asks, not under building
    big ones.
@@ -46,13 +46,13 @@ with their commands, except where the lead recounted.
 |---|---|---|
 | Run alone between gates, choices at the end with one recommendation | 155 of 218 briefs, all four projects (lead's count) | kit, as a documented mode |
 | Phase cycle (spec, research, design, build, review, release) | wording in all four projects; the health app spec section 12; desktop-app 0033 to 0041; studio "three briefs per idea"; ship-ai "words, design, build" | kit, as two gates and optional templates, not a fixed list |
-| Research round shape (six part lane file, cross reading, one integrator, challenger, spec update) | the health app 0001; same lanes then integrator then cold challenger in the health app 0002, 0004, 0005, ship-ai 0001, desktop-app 0039 (by reading) | kit template |
+| Research round shape (six part lane file, cross reading, one integrator, challenger, spec update) | The health app 0001; same lanes then integrator then cold challenger in the health app 0002, 0004, 0005, ship-ai 0001, desktop-app 0039 (by reading) | kit template |
 | Samples, then a stop for his pick | 80 matches in 54 briefs | kit, inside the design template |
-| Review on the running product, on the team's own instance, by journey, his notes first | the health app 0004; desktop-app 0475, 0485; desktop-app staff review rounds in 69 briefs | kit template |
+| Review on the running product, on the team's own instance, by journey, his notes first | The health app 0004; desktop-app 0475, 0485; desktop-app staff review rounds in 69 briefs | kit template |
 | The person's live device, screen and installed app are off limits | 129 matches in 105 briefs | kit rule (advice) |
-| One story above every feature; user zero, written as general needs | the health app spec 1b and 2; the health app review finding 4; desktop-app 0034 | kit template (spec) |
-| Taste and anti AI slop, both halves | the health app director AI check; the health app 0005 "'Avoid AI slop' was read as 'remove life'"; desktop-app 0475 | kit: three items and a pack shape; project: the look |
-| Project specialists | the health app 4 role files and about 8 relabels; ship-ai 4 files; desktop-app none, reviewers invented in each brief | kit: the mechanism; project: the roles |
+| One story above every feature; user zero, written as general needs | The health app spec 1b and 2; the health app review finding 4; desktop-app 0034 | kit template (spec) |
+| Taste and anti AI slop, both halves | The health app director AI check; the health app 0005 "'Avoid AI slop' was read as 'remove life'"; desktop-app 0475 | kit: three items and a pack shape; project: the look |
+| Project specialists | The health app 4 role files and about 8 relabels; ship-ai 4 files; desktop-app none, reviewers invented in each brief | kit: the mechanism; project: the roles |
 | Streams in parallel with their own limits | desktop-app standing, seven streams with number bands | kit: per stream count; project: the streams |
 | Usage limits | desktop-app standing line 177, after "why did we use 97% of my plan" | kit: a described pattern; project: the numbers |
 | A release step on another machine | desktop-app 0463 and standing 401 to 406; the health app 0003 install guide | project only; the kit may describe a pattern |
@@ -209,7 +209,7 @@ buildinggg, start" (record-keeper). How short it may be is
 Two gates are recommended as the default for a build, each with a real case
 behind it (product): **no build brief before a spec or requirements page is
 accepted**, and **unproven items listed and seen before the next phase
-opens**. No fixed order of phases. the health app ran review 0004 and redesign 0005
+opens**. No fixed order of phases. The health app ran review 0004 and redesign 0005
 together, and a linear gate would have refused how he worked.
 
 Phase rounds go in `docs/rounds/<stream>-<name>/`, where the checks look. Or
@@ -235,7 +235,7 @@ Three tiers, cheapest first (architect after challenge, product):
 
 1. **Relabel.** The lead spawns an existing role with a title line and,
    optionally, a skill. Its owns, sections and tool grant still come from its
-   checked file. No file, no STOP. the health app used about eight of these.
+   checked file. No file, no STOP. The health app used about eight of these.
 2. **New project role.** Only when no existing `owns` covers the work (the health app's
    scientists; about four per project). The director drafts it in the brief in
    the five section format; the person's go accepts it; a working session
@@ -289,7 +289,7 @@ ESTABLISHED). Taste is never a check. It is a review round on pictures.
 | Check | Catches | Breaks it | Cannot tell |
 |---|---|---|---|
 | `predictions-first`, widened | a round held outside `docs/rounds/` | a predictions file beside lane files in `docs/research/` | rounds named otherwise; whether predictions were good |
-| `standing-current`, widened | standing older than the newest brief or report | the health app's case: five reports newer than standing's next step | whether the text is true |
+| `standing-current`, widened | standing older than the newest brief or report | The health app's case: five reports newer than standing's next step | whether the text is true |
 | `work-paired`: size | a task brief over the line ceiling with no `size:` | a 22 line brief with no size | a small ask born large |
 | `work-paired`: streams | a `stream:` not declared; too many open in one stream; a brief opened before its gate | desktop-app's three overfull streams | whether the stream was the right one |
 | roles named exist (new, small) | a team table or round file naming a role with no file | `creative-director` with no file and no base role | whether the right role was picked |
@@ -391,7 +391,7 @@ MetaGPT, ChatDev, autogen, gstack.
 
 The four projects, read only, method quoted, no personal or health content:
 `<health-app>`, `<desktop-app>`, `~/Personal/Repos/ship-ai`,
-`~/Personal/Repos/studio`. the health app's profile folder was never opened.
+`~/Personal/Repos/studio`. The health app's profile folder was never opened.
 
 NOT ESTABLISHED: routing accuracy at formwork's size; whether a role made mid
 session can be spawned in it; Apple's guidelines; plan limits; what a round
