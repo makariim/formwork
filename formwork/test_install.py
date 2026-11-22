@@ -155,9 +155,10 @@ strays = {f for f in files
 check("and nothing else at all", strays, set(), out)
 check("the roles it generated are all it generated",
       len(files) - 2 - len(skills), 28, out)
-check("and the kit's one skill, with its licence",
+check("and the kit's two skills, humanizer with its licence",
       skills, {os.path.join(".claude", "skills", "humanizer", "SKILL.md"),
-               os.path.join(".claude", "skills", "humanizer", "LICENSE")}, out)
+               os.path.join(".claude", "skills", "humanizer", "LICENSE"),
+               os.path.join(".claude", "skills", "research-question", "SKILL.md")}, out)
 
 def outside(project, *args, **kw):
     """Run the installer from somewhere, and see what the WHOLE tree did.

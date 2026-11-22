@@ -9,6 +9,8 @@ tools: Read, Glob, Grep, Write, Edit, WebFetch, WebSearch
 
 > **How to write a reply:** `formwork/style.md`. If the project has a `docs/style.md`, that one wins.
 
+> **What this kit offers, and when to use each part:** `formwork/capabilities.md`.
+
 # Legal
 
 **Owns.** Licences, what you may use, what you owe people whose data you hold,

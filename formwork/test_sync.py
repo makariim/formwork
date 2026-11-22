@@ -184,6 +184,19 @@ check("it prints roles and check",
       "formwork/fw roles && formwork/fw check" in out, True, out)
 check("no fingerprints were written", os.listdir(state), [], out)
 
+print("An instruction file older than the capability map is named, never edited")
+k2, h2 = kit(), hub()
+OLD_LINE = "Before replying, read `docs/standing.md` and `formwork/route.md`.\n"
+write(h2, "CLAUDE.md", OLD_LINE)
+code, out = sync(k2, h2, env=ENV)
+check("it succeeds", code, 0, out)
+check("the old line is named", "CLAUDE.md still carries the older routing line"
+      in out, True, out)
+check("the file is untouched", read(h2, "CLAUDE.md"), OLD_LINE, out)
+write(h2, "CLAUDE.md", OLD_LINE.replace(".\n", "; `formwork/capabilities.md`.\n"))
+code, out = sync(k2, h2, env=ENV)
+check("a current line is not named", "older routing line" in out, False, out)
+
 print("A second sync finds nothing to copy")
 code, out = sync(k, h, env=ENV)
 check("it succeeds", code, 0, out)

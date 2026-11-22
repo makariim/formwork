@@ -67,6 +67,9 @@ short named list is what keeps routing from drifting as the library grows.
 
 When two kinds fit, take the smaller one. When none fits, ask one question.
 
+"What can you do here?" is a question. Answer it from
+`formwork/capabilities.md`, naming the file behind each part.
+
 ### Templates for a phase, offered, never required
 
 When the work is a phase (above a checkpoint, inside a milestone), offer the

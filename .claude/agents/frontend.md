@@ -9,6 +9,8 @@ tools: Read, Glob, Grep, Write, Edit, Bash
 
 > **How to write a reply:** `formwork/style.md`. If the project has a `docs/style.md`, that one wins.
 
+> **What this kit offers, and when to use each part:** `formwork/capabilities.md`.
+
 # Frontend
 
 **Owns.** What runs in a browser. Components, state, rendering, and everything

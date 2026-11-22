@@ -90,7 +90,9 @@ BANNER = ("<!-- GENERATED FROM formwork/roles/project/plain.md \u2014 DO NOT "
           "EDIT. -->\n<!-- Change the source and run formwork roles. A "
           "hand-edit here fails the gate. -->\n")
 STYLE = ("> **How to write a reply:** `formwork/style.md`. If the project has "
-         "a `docs/style.md`, that one wins.\n")
+         "a `docs/style.md`, that one wins.\n\n"
+         "> **What this kit offers, and when to use each part:** "
+         "`formwork/capabilities.md`.\n")
 BODY = "# Plain\n" + SECTIONS % PLAIN_OWNS
 BEFORE = {
     ".claude/agents/plain.md":
@@ -111,7 +113,8 @@ BEFORE = {
         "# the grant read, write is not expressed here. It is advice on "
         "Codex.\n\ndeveloper_instructions = \"\"\"\nHow to write a reply: "
         "formwork/style.md. If the project has a docs/style.md, that one "
-        "wins.\n\n%s\"\"\"\n" % (PLAIN_OWNS, BODY),
+        "wins.\n\nWhat this kit offers, and when to use each part: "
+        "formwork/capabilities.md.\n\n%s\"\"\"\n" % (PLAIN_OWNS, BODY),
 }
 
 FULL = ("description: Phase 0 triage for a pull request. Use to open a "

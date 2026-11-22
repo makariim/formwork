@@ -48,6 +48,13 @@ measured it. Inside the project, or outside it.
 is the one somebody else already paid for, and citing it honestly is a complete
 answer.
 
+**For a whole research question,** not a single number, the method is the
+research pack: `formwork/research/README.md`, the card in
+`formwork/templates/research-question.md`, and the pitfalls in
+`formwork/research/pitfalls.md`.
+Read the pitfalls before a question is registered and again before its result
+is reported.
+
 ---
 
 ## How to do this well

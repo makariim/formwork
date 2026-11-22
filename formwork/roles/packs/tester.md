@@ -44,6 +44,13 @@ than their names suggest.
 **Run the suite before you change anything.** A test that was already failing,
 or already being skipped, is a finding on its own.
 
+**When the thing is built from parts,** test it on the ladder in
+`formwork/operations/README.md`: each part alone first, perfect inputs to
+tell a reading fault from a building fault, then one join at a time. Add the
+checks automatic tests miss: an applied value check (a wrong value reported
+as success) and a scorer self test (gold in gives full marks, planted faults
+are caught). A lost test says this build, never the idea.
+
 ---
 
 ## How to do this well

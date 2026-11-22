@@ -305,10 +305,33 @@ def main(argv):
     print("  %s --record %s" % (os.path.join(
         target, "formwork", "check", "checks", "kit-integrity"), target))
     print("  cd %s && formwork/fw roles && formwork/fw check" % target)
+    stale = stale_instructions(target)
+    if stale:
+        print("")
+        print("%s still carries the older routing line. Replace it with the "
+              "first line in" % " and ".join(stale))
+        print("formwork/templates/project-instructions.md, so the agent "
+              "knows formwork/capabilities.md.")
     if dry:
         print("")
         print("Dry run. Nothing was written.")
     return 0
+
+
+def stale_instructions(target):
+    """The target's instruction files that route but do not name the map.
+
+    They belong to the project, so sync never edits them; it says what to paste.
+    """
+    out = []
+    for name in ("CLAUDE.md", "AGENTS.md", "GEMINI.md"):
+        try:
+            text = open(os.path.join(target, name), encoding="utf-8").read()
+        except OSError:
+            continue
+        if "formwork/route.md" in text and "formwork/capabilities.md" not in text:
+            out.append(name)
+    return out
 
 
 if __name__ == "__main__":

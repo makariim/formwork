@@ -62,8 +62,10 @@ TEMPLATE = os.path.join(HERE, "templates", "standing.md")
 INSTRUCTIONS = os.path.join(HERE, "templates", "project-instructions.md")
 
 # The file each runtime reads for project instructions.
+# The runtime is named gemini-cli everywhere else; the old key sent Gemini to AGENTS.md.
 INSTRUCTION_FILES = {"claude-code": "CLAUDE.md", "codex": "AGENTS.md",
-                     "cursor": "AGENTS.md", "gemini": "GEMINI.md"}
+                     "cursor": "AGENTS.md", "gemini-cli": "GEMINI.md",
+                     "gemini": "GEMINI.md"}
 
 
 # ---------------------------------------------------------------- appearance

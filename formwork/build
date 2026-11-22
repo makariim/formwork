@@ -99,6 +99,10 @@ BANNER = ("GENERATED FROM %s — DO NOT EDIT.\n"
 STYLE_NOTE = ("**How to write a reply:** `formwork/style.md`. If the project "
               "has a `docs/style.md`, that one wins.")
 
+# So any role can answer "what can you do here?" and pick the right part.
+CAPABILITY_NOTE = ("**What this kit offers, and when to use each part:** "
+                   "`formwork/capabilities.md`.")
+
 # The kit's five abstract grants, mapped to what each runtime actually calls
 # them. None means the name is not established, and the generator will not
 # invent one.
@@ -285,6 +289,8 @@ def render_markdown(role, runtime):
     lines.append("")
     lines.append("> %s" % STYLE_NOTE)
     lines.append("")
+    lines.append("> %s" % CAPABILITY_NOTE)
+    lines.append("")
     if unmapped:
         lines.append("> **This role's tool grant is not expressed here.** It "
                      "asks for %s, and %s does not have a documented name for "
@@ -324,6 +330,8 @@ def render_toml(role):
         out.append("")
     out.append('developer_instructions = """')
     out.append(STYLE_NOTE.replace("**", "").replace("`", ""))
+    out.append("")
+    out.append(CAPABILITY_NOTE.replace("**", "").replace("`", ""))
     out.append("")
     out.append(role["body"].rstrip().replace('"""', '\\"\\"\\"'))
     out.append('"""')

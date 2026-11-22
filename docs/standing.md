@@ -1,6 +1,6 @@
 ---
-updated: 2026-11-18
-by: the working session for brief 0031
+updated: 2026-11-22
+by: the director (brief 0035 accepted)
 ---
 
 # Standing brief
@@ -16,6 +16,8 @@ and a gate of checks that shows itself failing as well as passing. It carries
 nothing about anybody's product. It is the shape, empty.
 
 ## Where we are now
+
+**2026-11-22, the director's update:** brief 0035 done and accepted (his words: "read it and i accept it, let's push and release"): the operations pack (`formwork/operations/`: ladder, capped iteration loop, staged spending, per route ship rule, frozen contracts, decision log, sourced release checklist, running parallel sessions safely, pitfalls ops-1 to ops-14), four templates, and `formwork/capabilities.md` as the one map every generated role and project instruction file points to; the setup bug writing AGENTS.md for gemini-cli is fixed. Brief 0034 (the research pack) is built, report written, waiting for his read back. Brief 0033 dropped (his words: "Close 0033"). `open_briefs = 5` under `[strength]` (his decision). Not yet released: version bump and PyPI publish are his steps (RELEASING.md).
 
 **2026-11-18, the director's update:** briefs 0022 to 0033 are done and committed by him (latest cfbfb16, 0033: guard measurement method, review then refute, task size check; b6cc797, 0032: the motion taste pack). Ten commits are ahead of GitHub (`git log origin/main..HEAD`), not pushed; 1.0.0 still not published to PyPI. Read backs pending for the recent briefs. Parked: the whole project layer (`docs/ideas/2026-11-15-whole-project-builds.md`, mostly built as 0025 to 0033). Optional next: stop an AI from fixing a check by breaking its data (from 0033).
 

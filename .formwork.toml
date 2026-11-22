@@ -9,6 +9,7 @@ runtime = "claude-code"
 # Strict by default. A team may need warn; somebody working alone should not.
 git_boundary = "block"
 protect_files = "block"
+open_briefs = 5
 
 # [rules] is deliberately absent, and that is the point.
 # Rules are not switched off here. Dropping one is an edit to

@@ -24,6 +24,12 @@ That part is in [`formwork/threads.md`](formwork/threads.md).
 who does it are worked out from [`formwork/route.md`](formwork/route.md), and
 said back to you in a line or two before anything happens.
 
+**Everything the kit can do is on one page**,
+[`formwork/capabilities.md`](formwork/capabilities.md): the method, the
+roles, the packs (taste, research, operations), the skills, the templates,
+the guards and checks, the adapters and the commands, each with one example.
+Ask the agent "what can you do here?" and it answers from that page.
+
 ---
 
 ## What is blocked
@@ -239,6 +245,9 @@ would establish the rest.
 
 [`formwork/first-run.md`](formwork/first-run.md). Fifteen minutes, on your own
 project.
+
+For what is available at each step (plan, research, build, measure, review,
+report, release), [`formwork/capabilities.md`](formwork/capabilities.md).
 
 Then [`formwork/loop.md`](formwork/loop.md) for the working loop,
 [`formwork/threads.md`](formwork/threads.md) for how work starts and where the

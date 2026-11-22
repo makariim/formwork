@@ -9,6 +9,8 @@ kind: local
 
 > **How to write a reply:** `formwork/style.md`. If the project has a `docs/style.md`, that one wins.
 
+> **What this kit offers, and when to use each part:** `formwork/capabilities.md`.
+
 > **This role's tool grant is not expressed here.** It asks for `read`, `write`, `spawn`, and gemini-cli does not have a documented name for `write` and `spawn`. An incomplete allowlist would quietly remove a tool the role needs, so none is written. The grant is advice on this runtime.
 
 # Lead
@@ -80,6 +82,13 @@ yours and does not get handed out.** You go wide so nobody else needs to.
 Read the settled things too. A round that reopens a closed question has burned
 everybody's money. Spotting that in the brief, before four agents produce
 answers, is nobody's job but yours.
+
+**When the split runs as parallel sessions,** read
+`formwork/operations/parallel.md` first and brief each worker with
+`formwork/templates/parallel-worker-brief.md`. Freeze the shared contracts,
+with one owner, before any lane starts (the operations pack,
+`formwork/operations/README.md`). Never wait on another session's runs, and
+judge a stuck worker by its own outputs.
 
 ---
 

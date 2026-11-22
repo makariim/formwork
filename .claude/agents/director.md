@@ -9,6 +9,8 @@ tools: Read, Glob, Grep, Write, Edit
 
 > **How to write a reply:** `formwork/style.md`. If the project has a `docs/style.md`, that one wins.
 
+> **What this kit offers, and when to use each part:** `formwork/capabilities.md`.
+
 # Director
 
 > **This role has no sources, and that is deliberate.** Every other role cites
@@ -241,6 +243,14 @@ is the exact reason this layer is separate from the working session.
 
 When that happens, say so, update the standing brief, and tell the human to
 start a fresh conversation.
+
+**When the work is built and measured in parts, or runs in parallel,** the
+operations pack holds the method: `formwork/operations/README.md` (the
+ladder, the limits on fixing, spending in stages, the per route ship rule,
+frozen contracts) and `formwork/operations/parallel.md`. Keep your rulings in
+a decision log (`formwork/templates/decision-log.md`), numbered, each with its
+evidence. A ruling that changes the project's direction is still a decision,
+and the human writes it.
 
 ---
 

@@ -35,6 +35,7 @@ GATE: green. 14 check(s), each shown to reject the wrong and accept the right.
 
 <div align="center">
 
+[What it can do](#what-it-can-do) ·
 [Which agent you use](#which-agent-you-use-changes-what-you-get) ·
 [Install](#install) · [Your first turn](#your-first-turn) ·
 [Settings](#settings) · [What is inside](#what-is-inside) ·
@@ -105,6 +106,29 @@ Nobody read you a rule. You watched it work.
 > [!IMPORTANT]
 > That is the whole idea. You think about what you are building. The kit holds
 > everything else.
+
+---
+
+## What it can do
+
+Every part, with one example each, is on one page:
+**[`formwork/capabilities.md`](formwork/capabilities.md)**. In short:
+
+| When you want to | Formwork gives you |
+|---|---|
+| **plan** | a `director` that writes briefs and never builds; a standing brief that remembers where you are |
+| **argue a costly choice** | a round: several roles, a `challenger` who commits predictions first |
+| **research** | the research pack: a question card written before any work, an evaluation plan, 21 pitfalls |
+| **build** | a working session per brief, 21 specialist roles, and the operations pack: test each part alone, then join |
+| **run several sessions** | rules that stop them waiting on each other or breaking the shared build |
+| **measure** | spending in stages, free checks first; a ship rule decided route by route |
+| **review** | a `reviewer`, review then refute, and taste packs for screens, web, decks, iOS and motion |
+| **report and release** | reports with a part for you first; a release checklist checked by somebody who built none of it |
+| **stay safe** | three guards that refuse, nineteen checks that say green or red |
+
+**In a project that uses it, you can just ask the agent** "what can you do
+here?". The routing lines `formwork setup` writes into `CLAUDE.md`,
+`AGENTS.md` or `GEMINI.md`, and every role file, point it at that page.
 
 ---
 
@@ -294,6 +318,11 @@ window beginning with you retelling the whole story.*
 > Here is the brief. [paste it] Do only what it says, nothing next to it. Check
 > your work with `formwork check`, tell me what you did, and stop there.
 
+**Asking what it can do**
+
+> Read `formwork/capabilities.md`. What can you do in this project, and which
+> part would you use for what I am doing next?
+
 **Asking one role for an opinion**
 
 > Use the security role. Read `formwork/guard/` and tell me what an attacker
@@ -358,7 +387,8 @@ in your own words, which beats it. Every role points at both.
 | **19 checks** | small programs that read your project and say green or red | `ls formwork/check/checks \| wc -l` |
 | **28 roles** | one file each, saying what that job does and where it stops | `ls formwork/roles/*/*.md \| wc -l` |
 | **48 rules** | 14 you meet daily, 34 for when you need them | `grep -c '^### ' formwork/rules/*.md` |
-| **1 skill** | `humanizer`, pinned at one upstream commit, for text the agent writes as you | `ls formwork/skills` |
+| **2 skills** | `humanizer`, pinned at one upstream commit, for text the agent writes as you; `research-question`, written here | `ls formwork/skills` |
+| **3 packs** | taste, research and operations: guidance with pitfalls, never a check | `ls -d formwork/taste formwork/research formwork/operations` |
 | **571 tests** | every guard and check, proved able to fail | `formwork test` |
 
 It is all text files and small programs. You can read every line. Nothing is
@@ -404,7 +434,7 @@ today:
 
 | | |
 |---|---|
-| **More skills** | one so far, `humanizer`, in `formwork/skills/`, placed into `.claude/skills/` by `formwork roles`. Claude Code only. Where the other three read skills from is NOT ESTABLISHED, so there `style.md` tells the agent to read the file directly |
+| **More skills** | two so far, `humanizer` and `research-question`, in `formwork/skills/`, placed into `.claude/skills/` by `formwork roles`. Claude Code only. Where the other three read skills from is NOT ESTABLISHED, so there `style.md` tells the agent to read the file directly |
 | **A model per role** | not a kit feature. What is built is narrower: a role may carry `model`, `skills` and `color`, and the generator passes them to Claude Code as written instead of dropping them. On the other three it writes a note, not a key. Effort level is not carried. Whether the other three have an equivalent is NOT ESTABLISHED |
 | **Teams** | more than one person on the same standing brief. Today the method says one director at a time, and nobody has tried two |
 | **Roles invented on the fly** | asked for by somebody who tried the kit. It cuts across the check that stops two roles owning one job, so it stays a question we have not settled |
@@ -435,13 +465,16 @@ better after you have run it once than before.
 
 | | |
 |---|---|
+| [`capabilities.md`](formwork/capabilities.md) | everything the kit can do, with one example each. Start here when lost |
 | [`loop.md`](formwork/loop.md) | how one job goes, start to finish |
 | [`threads.md`](formwork/threads.md) | how work starts, and where the plan lives between conversations |
 | [`style.md`](formwork/style.md) | how the agents talk to you, and how to change it |
 | [`round.md`](formwork/round.md) | how to run a round, and when it is worth it |
-| [`templates/`](formwork/templates/) | brief, predictions, report, decision, round, standing brief; optional ones for a phase: spec, research lane, design round, build, review round, release step; and the upstream record for a skill brought in |
-| [`taste/`](formwork/taste/) | optional taste packs: three kit items for every product, and packs for screens, web, deck and iOS, each item saying what it catches and how it is found. Never a check |
-| [`skills/`](formwork/skills/) | skills the kit ships, each pinned to an upstream commit |
+| [`templates/`](formwork/templates/) | brief, predictions, report, decision, round, standing brief; optional ones for a phase: spec, research lane, research question, evaluation plan, design round, build, review round, release step; for the operations pack: ladder plan, decision log, release checklist, parallel worker brief; a README section for your project; and the upstream record for a skill brought in |
+| [`taste/`](formwork/taste/) | optional taste packs: three kit items for every product, and packs for screens, web, deck, iOS and motion, each item saying what it catches and how it is found. Never a check |
+| [`research/`](formwork/research/) | optional research pack: a method for learning by building, a question card written before any work, an evaluation plan, and 21 pitfalls, each with what it catches and its source. Never a check |
+| [`operations/`](formwork/operations/) | optional operations pack: the ladder, limits on fixing, spending in stages, the per route ship rule, frozen contracts, the decision log, the sourced release checklist, running many sessions safely, and 14 pitfalls. Never a check |
+| [`skills/`](formwork/skills/) | skills the kit ships: one pinned to an upstream commit, one written here |
 | [`bring-a-skill.md`](formwork/bring-a-skill.md) | how a project brings in somebody else's skill: pinned commit, licence kept, sha256, nothing updates on its own |
 | [`roles/`](formwork/roles/) | the roles, and how to write your own |
 | [`rules/`](formwork/rules/) | the rules, each saying what it catches |

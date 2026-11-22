@@ -284,6 +284,17 @@ check("codex gets AGENTS.md",
       "formwork/route.md" in (read(p, "AGENTS.md") or ""), True, out)
 check("and no CLAUDE.md", read(p, "CLAUDE.md"), None, out)
 
+p = project(config=CONFIG.replace("claude-code", "gemini-cli"))
+code, out = setup(p, "--defaults")
+check("gemini-cli gets GEMINI.md",
+      "formwork/route.md" in (read(p, "GEMINI.md") or ""), True, out)
+check("and no AGENTS.md", read(p, "AGENTS.md"), None, out)
+
+p = project(config=CONFIG)
+code, out = setup(p, "--defaults")
+check("the lines name the capability map",
+      "formwork/capabilities.md" in (read(p, "CLAUDE.md") or ""), True, out)
+
 p = project(config=CONFIG, **{"CLAUDE.md": "my own rules\n"})
 code, out = setup(p, "--defaults")
 check("an existing CLAUDE.md is never written over",

@@ -10,6 +10,8 @@ description = "Whether the thing works, and, the harder half, what would show th
 developer_instructions = """
 How to write a reply: formwork/style.md. If the project has a docs/style.md, that one wins.
 
+What this kit offers, and when to use each part: formwork/capabilities.md.
+
 # Tester
 
 **Owns.** Whether the thing works, and, the harder half, what would show that
@@ -48,6 +50,13 @@ than their names suggest.
 
 **Run the suite before you change anything.** A test that was already failing,
 or already being skipped, is a finding on its own.
+
+**When the thing is built from parts,** test it on the ladder in
+`formwork/operations/README.md`: each part alone first, perfect inputs to
+tell a reading fault from a building fault, then one join at a time. Add the
+checks automatic tests miss: an applied value check (a wrong value reported
+as success) and a scorer self test (gold in gives full marks, planted faults
+are caught). A lost test says this build, never the idea.
 
 ---
 

@@ -9,6 +9,8 @@ kind: local
 
 > **How to write a reply:** `formwork/style.md`. If the project has a `docs/style.md`, that one wins.
 
+> **What this kit offers, and when to use each part:** `formwork/capabilities.md`.
+
 > **This role's tool grant is not expressed here.** It asks for `read`, `write`, and gemini-cli does not have a documented name for `write`. An incomplete allowlist would quietly remove a tool the role needs, so none is written. The grant is advice on this runtime.
 
 # User experience

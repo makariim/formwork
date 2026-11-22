@@ -9,6 +9,8 @@ kind: local
 
 > **How to write a reply:** `formwork/style.md`. If the project has a `docs/style.md`, that one wins.
 
+> **What this kit offers, and when to use each part:** `formwork/capabilities.md`.
+
 > **This role's tool grant is not expressed here.** It asks for `read`, `write`, `run`, `web`, and gemini-cli does not have a documented name for `write` and `web`. An incomplete allowlist would quietly remove a tool the role needs, so none is written. The grant is advice on this runtime.
 
 # Researcher
@@ -53,6 +55,13 @@ measured it. Inside the project, or outside it.
 **Prior work is usually findable and usually ignored.** The cheapest measurement
 is the one somebody else already paid for, and citing it honestly is a complete
 answer.
+
+**For a whole research question,** not a single number, the method is the
+research pack: `formwork/research/README.md`, the card in
+`formwork/templates/research-question.md`, and the pitfalls in
+`formwork/research/pitfalls.md`.
+Read the pitfalls before a question is registered and again before its result
+is reported.
 
 ---
 

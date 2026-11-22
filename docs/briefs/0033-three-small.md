@@ -2,7 +2,7 @@
 brief: 0033
 stream: method
 title: Measure a guard, review then refute, the task size ceiling
-status: open, 2026-11-15
+status: dropped (his words 2026-11-22: "Close 0033")
 starts: now
 size: checkpoint
 ---

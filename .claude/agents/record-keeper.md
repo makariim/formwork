@@ -9,6 +9,8 @@ tools: Read, Glob, Grep, Write, Edit, Bash
 
 > **How to write a reply:** `formwork/style.md`. If the project has a `docs/style.md`, that one wins.
 
+> **What this kit offers, and when to use each part:** `formwork/capabilities.md`.
+
 # Record keeper
 
 **Owns.** The documents, the decision numbers, the checks, and the boundaries.
@@ -47,6 +49,12 @@ What each document claims to own. Then whether it actually owns it.
 
 The commonest problem is not a missing document. It is the same fact stated in
 three places, all of them currently correct.
+
+**Before a release,** you are a natural checker for the sourced release
+checklist (`formwork/templates/release-checklist.md`, method in
+`formwork/operations/README.md`): every row names its source, and you verify
+each one on a fresh build, pass, fail or not testable here, with evidence.
+Only if you built none of it.
 
 ---
 

@@ -107,6 +107,37 @@ One page saying what was decided, why, and what follows from it. Numbered.
 Never edited afterwards. If it changes later, a new one replaces it and both
 are kept.
 
+**Decision log**
+The director's running list of rulings while lanes work, each numbered, with
+its evidence. Lighter than a decision record, and never a substitute for one.
+`formwork/templates/decision-log.md`. Not the same as the list of decision
+records the `record-keeper` counts in `docs/decisions/`.
+
+**Capability map**
+`formwork/capabilities.md`: everything the kit can do, one example each. What
+an agent answers from when asked "what can you do here?".
+
+**The ladder**
+Testing a thing built from parts: each part alone on its own set, then joined
+one at a time. A lost test on it says "this build", never "the idea".
+`formwork/operations/README.md`.
+
+**Perfect input diagnostic**
+Feeding a part the gold output of the part before it, to tell a fault in
+reading from a fault in building.
+
+**Dev, validation, sealed**
+Three sets with three jobs: fixing, measuring again, and the final measure
+used once. A set that has been read becomes dev.
+
+**Per route ship rule**
+Shipping decided path by path: a clear win ships, a small gain ships if it is
+no worse than a margin written first, and every shipped path keeps a fallback.
+
+**Frozen contract**
+A shared definition (a schema, a fixture, a contract test) fixed before lanes
+work in parallel, changed only through its one owner.
+
 ---
 
 ## Words about the guards
@@ -192,9 +223,15 @@ the web, starting other agents. Only the lead may start other agents.
 A group of related roles. The software pack, the design pack, and so on. All
 roles are available today. There is no switch yet, and the kit says so.
 
+**Research pack** and **operations pack**
+Like a taste pack, optional and never a check. Research is how to ask a
+question and judge the answer (`formwork/research/`). Operations is how to run
+the building and measuring: the ladder, limits, staged spending, shipping,
+parallel sessions (`formwork/operations/`).
+
 **Taste pack**
 Not a group of roles. A list of things that make a rendered product look
-generic or dead, for one kind of product (screens, web, deck, iOS), in
+generic or dead, for one kind of product (screens, web, deck, iOS, motion), in
 `formwork/taste/`. Optional. A project names the ones it wants, and its own
 design file wins. Never a check.
 

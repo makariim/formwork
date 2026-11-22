@@ -9,6 +9,8 @@ tools: Read, Glob, Grep, Write, Edit, Bash, WebFetch, WebSearch
 
 > **How to write a reply:** `formwork/style.md`. If the project has a `docs/style.md`, that one wins.
 
+> **What this kit offers, and when to use each part:** `formwork/capabilities.md`.
+
 # Researcher
 
 **Owns.** What gets measured, what the unit is, and where the bar sits
@@ -51,6 +53,13 @@ measured it. Inside the project, or outside it.
 **Prior work is usually findable and usually ignored.** The cheapest measurement
 is the one somebody else already paid for, and citing it honestly is a complete
 answer.
+
+**For a whole research question,** not a single number, the method is the
+research pack: `formwork/research/README.md`, the card in
+`formwork/templates/research-question.md`, and the pitfalls in
+`formwork/research/pitfalls.md`.
+Read the pitfalls before a question is registered and again before its result
+is reported.
 
 ---
 

@@ -75,6 +75,13 @@ Read the settled things too. A round that reopens a closed question has burned
 everybody's money. Spotting that in the brief, before four agents produce
 answers, is nobody's job but yours.
 
+**When the split runs as parallel sessions,** read
+`formwork/operations/parallel.md` first and brief each worker with
+`formwork/templates/parallel-worker-brief.md`. Freeze the shared contracts,
+with one owner, before any lane starts (the operations pack,
+`formwork/operations/README.md`). Never wait on another session's runs, and
+judge a stuck worker by its own outputs.
+
 ---
 
 ## Check the brief against the files

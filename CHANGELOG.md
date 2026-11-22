@@ -8,6 +8,35 @@ version commit's message in git: `git show 02bd5f0` for 0.2.0 and
 
 ## Unreleased
 
+- The operations pack. `formwork/operations/`: the ladder (each part alone,
+  the perfect input diagnostic, then one join at a time; a lost test says
+  this build, never the idea), the iteration loop with limits (3 failed fixes
+  of one defect class, then a design call; 3 revisions for a model part; a
+  used set becomes dev), spending in stages, the per route ship rule with a
+  non inferiority margin and a fallback, frozen contracts with one owner, the
+  director's decision log, the sourced release checklist, the checks
+  automatic tests miss, and `parallel.md` for running many sessions safely.
+  14 pitfalls, `ops-1` to `ops-14`, each with a public source. Four templates:
+  `ladder-plan`, `decision-log`, `release-checklist`,
+  `parallel-worker-brief`. Pointers in `director`, `lead`, `tester` and
+  `record-keeper`. Links to the research pack instead of repeating it.
+- The capability map. `formwork/capabilities.md` lists everything the kit can
+  do with one example each, and tells an agent to answer "what can you do
+  here?" from it. Every generated role now points at it beside the style
+  page; the routing line in `templates/project-instructions.md` names it; a
+  new `templates/readme-section.md` gives a project README a "where to start"
+  section; the README has a "What it can do" section.
+- Fix: `setup` wrote the routing lines to `AGENTS.md` for Gemini CLI, because
+  it looked the runtime up as `gemini` and the runtime is `gemini-cli`. It
+  now writes `GEMINI.md`.
+- **Migration for installed projects.** After `formwork sync`, run
+  `formwork/fw roles` so the role files carry the new pointer (until then
+  `generated-current` is red, as after any kit change to the generator). If
+  your `CLAUDE.md`, `AGENTS.md` or `GEMINI.md` was written by an earlier
+  `setup`, its first line ends at `formwork/route.md`; `sync` now names such a
+  file and never edits it. Replace that line with the first line of
+  `formwork/templates/project-instructions.md`. No file moved, so no link in
+  a project breaks.
 - Measuring a guard. `formwork/measure-a-guard.md` and
   `formwork/evals/guards/run`: the same task with the guard off, on, and a
   placebo that refuses the same calls with one generic line; the runner
