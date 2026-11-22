@@ -6,7 +6,7 @@ version commit's message in git: `git show 02bd5f0` for 0.2.0 and
 
 ---
 
-## Unreleased
+## 1.1.0 (2026-11-22)
 
 - The operations pack. `formwork/operations/`: the ladder (each part alone,
   the perfect input diagnostic, then one join at a time; a lost test says

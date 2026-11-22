@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "formwork-kit"
-version = "1.0.1"
+version = "1.1.0"
 description = "You bring the idea. It brings the whole team. Rules your coding agent cannot ignore."
 readme = "README.md"
 requires-python = ">=3.8"
